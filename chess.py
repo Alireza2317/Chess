@@ -1,23 +1,36 @@
 from typing import TypeAlias
+from enum import Enum
+
+class Player(Enum):
+	WHITE = 'w'
+	BLACK = 'b'
+
 
 
 class King:
-	pass
+	def __init__(self, side: Player, board):
+		self.side = side
+
 
 class Queen:
-	pass
+	def __init__(self, side: Player):
+		self.side = side
 
 class Rook:
-	pass
+	def __init__(self, side: Player):
+		self.side = side
 
 class Bishop:
-	pass
+	def __init__(self, side: Player):
+		self.side = side
 
 class Knight:
-	pass
+	def __init__(self, side: Player):
+		self.side = side
 
 class Pawn:
-	pass
+	def __init__(self, side: Player):
+		self.side = side
 
 
 
@@ -76,8 +89,7 @@ class Board:
 
 
 def main():
-	board = Board()
-	print(board.chess2regular_coordinate('g7'))
+	print(Coordinate('g7').regular)
 
 if __name__ == '__main__':
 	main()
