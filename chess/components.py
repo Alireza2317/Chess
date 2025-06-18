@@ -2,7 +2,7 @@ from __future__ import annotations
 from enum import Enum
 
 
-class Side(Enum):
+class Color(Enum):
 	WHITE = 'w'
 	BLACK = 'b'
 
@@ -41,8 +41,8 @@ class Coordinate:
 
 
 class Piece:
-	def __init__(self, side: Side, board: Board, coordinate: Coordinate):
-		self.side = side
+	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
+		self.color = color
 		self.board = board
 		self.coordinate = coordinate
 		self.has_moved: bool = False

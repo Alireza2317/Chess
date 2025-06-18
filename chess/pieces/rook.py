@@ -1,9 +1,9 @@
-from chess.components import Piece, Coordinate, Side, Board
+from chess.components import Piece, Coordinate, Color, Board
 
 
 class Rook(Piece):
-	def __init__(self, side, board, coordinate):
-		super().__init__(side, board, coordinate)
+	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
+		super().__init__(color, board, coordinate)
 
 	def available_moves(self) -> list[Coordinate]:
 		pass

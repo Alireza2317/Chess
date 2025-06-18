@@ -1,9 +1,9 @@
-from chess.components import Piece, Coordinate, Side, Board
+from chess.components import Piece, Coordinate, Color, Board
 
 
 class King(Piece):
-	def __init__(self, side: Side, board: Board, coordinate: Coordinate):
-		super().__init__(side, board, coordinate)
+	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
+		super().__init__(color, board, coordinate)
 
 	def attacking_squares(self) -> list[Coordinate]:
 		"""
@@ -43,22 +43,22 @@ class King(Piece):
 			piece: Piece | None = self.board.get(square)
 
 			if piece:
-				# check its side
+				# check its color
 				# if its a piece of our own, can't move there
-				if piece.side == self.side: continue
+				if piece.color == self.color: continue
 
 			moves.append(square)
 
 		return moves
 
-	
+
 def main():
 	board = Board()
-	Piece(Side.BLACK, board, Coordinate('h2'))
-	Piece(Side.WHITE, board, Coordinate('g1'))
-	Piece(Side.BLACK, board, Coordinate('g2'))
+	Piece(Color.BLACK, board, Coordinate('h2'))
+	Piece(Color.WHITE, board, Coordinate('g1'))
+	Piece(Color.BLACK, board, Coordinate('g2'))
 
-	king = King(Side.WHITE, board, Coordinate('h1'))
+	king = King(Color.WHITE, board, Coordinate('h1'))
 
 	print(king.available_moves())
 
