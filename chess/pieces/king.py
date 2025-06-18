@@ -51,6 +51,8 @@ class King(Piece):
 
 		return moves
 
+	def __repr__(self):
+		return 'K'
 
 def main():
 	board = Board()

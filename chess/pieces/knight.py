@@ -8,6 +8,9 @@ class Knight(Piece):
 	def available_moves(self) -> list[Coordinate]:
 		pass
 
+	def __repr__(self):
+		return 'N'
+
 
 def main():
 	pass

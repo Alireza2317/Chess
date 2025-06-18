@@ -8,7 +8,9 @@ class Rook(Piece):
 	def available_moves(self) -> list[Coordinate]:
 		pass
 
-
+	def __repr__(self):
+		return 'R'
+	
 def main():
 	pass
 
