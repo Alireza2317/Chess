@@ -52,8 +52,14 @@ class Piece:
 
 
 class Square:
-	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
-		self.coordinate = coordinate
+	def __init__(self, coordinate: Coordinate | str, piece: Piece | None = None):
+		if isinstance(coordinate, Coordinate):
+			self.coordinate = coordinate
+		elif isinstance(coordinate, str):
+			self.coordinate = Coordinate(coordinate)
+		else:
+			raise ValueError('Invalid coordinate!')
+
 		self.piece: Piece | None = piece
 
 		# set the color based on the coordinate
@@ -69,47 +75,51 @@ class Square:
 		else:
 			self.color = Color.WHITE
 
+	def __repr__(self):
+		return str(self.piece)
 
 class Board:
 	def __init__(self):
 		# the arrangement of these lists is such that the first row is
 		# equivalent to the rank 1, from a to h
 		# and the last row is the rank 8
-		self.board: list[list[Piece | None]] = [
-			[None for _ in range(8)]
-			for _ in range(8)
-		]
+		self.board: list[list[Square]] = []
 
-	def put(self, piece: Piece | None, chess_coordinate: Coordinate) -> None:
+		for rank in '12345678':
+			self.board.append(
+				[
+					Square(f'{file}{rank}', piece=None)
+					for file in 'abcdefgh'
+				]
+			)
+
+
+	def put(self, piece: Piece | None, coordinate: Coordinate) -> None:
 		"""
 		takes a chess coordinate and puts the given piece
-		in the appropriate location
+		in the appropriate square
 		"""
 
-		row, col = chess_coordinate.regular
+		row, col = coordinate.regular
 
-		if self.board[row][col] is None:
-			self.board[row][col] = piece
+		if self.board[row][col].piece is None:
+			self.board[row][col].piece = piece
 		else:
-			raise ValueError(f'There is already a piece on {chess_coordinate}')
+			raise ValueError(f'There is already a piece on {coordinate}')
 
-	def remove(self, chess_coordinate: Coordinate) -> None:
+	def remove(self, coordinate: Coordinate) -> None:
 		""" removes the piece(if any) from the given coordinate. """
-		self.put(None, chess_coordinate)
+		self.put(None, coordinate)
 
-	def get(self, chess_coordinate: Coordinate) -> Piece | None:
-		""" returns the piece in the given coordinate. """
-		row, col = chess_coordinate.regular
+	def get(self, coordinate: Coordinate) -> Square:
+		""" returns the square in the given coordinate. """
+		row, col = coordinate.regular
 		return self.board[row][col]
 
 
 def main():
-	for file in 'abcdefg':
-		for rank in '12345678':
-			c = f'{file}{rank}'
-			s = Square(Coordinate(c))
-			print(c, s.color)
-
+	b = Board()
+	print(*b.board, sep='\n')
 
 if __name__ == '__main__':
 	main()
