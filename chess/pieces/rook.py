@@ -9,8 +9,8 @@ class Rook(Piece):
 		pass
 
 	def __repr__(self):
-		return 'R'
-	
+		return 'R' if self.color == Color.WHITE else 'r'
+
 def main():
 	pass
 

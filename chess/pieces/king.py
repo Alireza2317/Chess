@@ -52,7 +52,7 @@ class King(Piece):
 		return moves
 
 	def __repr__(self):
-		return 'K'
+		return 'K' if self.color == Color.WHITE else 'k'
 
 def main():
 	board = Board()

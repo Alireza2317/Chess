@@ -9,7 +9,7 @@ class Bishop(Piece):
 		pass
 
 	def __repr__(self):
-		return 'B'
+		return 'B' if self.color == Color.WHITE else 'b'
 
 def main():
 	pass

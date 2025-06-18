@@ -9,7 +9,7 @@ class Pawn(Piece):
 		pass
 
 	def __repr__(self):
-		return 'P'
+		return 'P' if self.color == Color.WHITE else 'p'
 
 def main():
 	pass

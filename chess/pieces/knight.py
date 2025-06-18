@@ -9,7 +9,7 @@ class Knight(Piece):
 		pass
 
 	def __repr__(self):
-		return 'N'
+		return 'N' if self.color == Color.WHITE else 'n'
 
 
 def main():

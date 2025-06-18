@@ -9,7 +9,7 @@ class Queen(Piece):
 		pass
 
 	def __repr__(self):
-		return 'Q'
+		return 'Q' if self.color == Color.WHITE else 'q'
 
 def main():
 	pass
