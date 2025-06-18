@@ -1,37 +1,47 @@
 from typing import TypeAlias
 from enum import Enum
+from __future__ import annotations
+
 
 class Player(Enum):
 	WHITE = 'w'
 	BLACK = 'b'
 
 
-
 class King:
-	def __init__(self, side: Player, board):
+	def __init__(self, side: Player, board: Board):
 		self.side = side
+		self.board = board
 
 
 class Queen:
-	def __init__(self, side: Player):
+	def __init__(self, side: Player, board: Board):
 		self.side = side
+		self.board = board
+
 
 class Rook:
-	def __init__(self, side: Player):
+	def __init__(self, side: Player, board: Board):
 		self.side = side
+		self.board = board
+
 
 class Bishop:
-	def __init__(self, side: Player):
+	def __init__(self, side: Player, board: Board):
 		self.side = side
+		self.board = board
+
 
 class Knight:
-	def __init__(self, side: Player):
+	def __init__(self, side: Player, board: Board):
 		self.side = side
+		self.board = board
+
 
 class Pawn:
-	def __init__(self, side: Player):
+	def __init__(self, side: Player, board: Board):
 		self.side = side
-
+		self.board = board
 
 
 Piece: TypeAlias = King | Queen | Rook | Bishop | Knight | Pawn
@@ -70,7 +80,6 @@ class Board:
 			for _ in range(8)
 		]
 
-
 	def put(self, piece: Piece | None, chess_coordinate: Coordinate) -> None:
 		"""
 		takes a chess coordinate and puts the given piece
@@ -81,11 +90,9 @@ class Board:
 
 		self.board[row][col] = piece
 
-
 	def remove(self, chess_coordinate: Coordinate) -> None:
 		""" removes the piece(if any) from the given coordinate. """
 		self.put(None, chess_coordinate)
-
 
 
 def main():
