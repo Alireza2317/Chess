@@ -1,6 +1,5 @@
-from typing import TypeAlias
-from enum import Enum
 from __future__ import annotations
+from enum import Enum
 
 
 class Side(Enum):
@@ -8,45 +7,42 @@ class Side(Enum):
 	BLACK = 'b'
 
 
-class King:
-	def __init__(self, side: Side, board: Board):
-		self.side = side
-		self.board = board
-		self.has_moved: bool = False
-
-class Queen:
-	def __init__(self, side: Side, board: Board):
-		self.side = side
-		self.board = board
-
-
-class Rook:
+class Piece:
 	def __init__(self, side: Side, board: Board):
 		self.side = side
 		self.board = board
 		self.has_moved: bool = False
 
 
-class Bishop:
-	def __init__(self, side: Side, board: Board):
-		self.side = side
-		self.board = board
+class King(Piece):
+	def __init__(self, *args):
+		super().__init__(*args)
 
 
-class Knight:
-	def __init__(self, side: Side, board: Board):
-		self.side = side
-		self.board = board
+class Queen(Piece):
+	def __init__(self, *args):
+		super().__init__(*args)
 
 
-class Pawn:
-	def __init__(self, side: Side, board: Board):
-		self.side = side
-		self.board = board
-		self.has_moved: bool = False
+class Rook(Piece):
+	def __init__(self, *args):
+		super().__init__(*args)
 
 
-Piece: TypeAlias = King | Queen | Rook | Bishop | Knight | Pawn
+class Bishop(Piece):
+	def __init__(self, *args):
+		super().__init__(*args)
+
+
+class Knight(Piece):
+	def __init__(self, *args):
+		super().__init__(*args)
+
+
+class Pawn(Piece):
+	def __init__(self, *args):
+		super().__init__(*args)
+
 
 
 class Coordinate:
