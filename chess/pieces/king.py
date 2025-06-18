@@ -5,7 +5,11 @@ class King(Piece):
 	def __init__(self, side: Side, board: Board, coordinate: Coordinate):
 		super().__init__(side, board, coordinate)
 
-	def available_moves(self) -> list[Coordinate]:
+	def attacking_squares(self) -> list[Coordinate]:
+		"""
+		returns the squares that the king can attack
+		regardless of checks
+		"""
 		moves: list[Coordinate] = []
 
 		file_ord: int = ord(self.coordinate.file)
@@ -19,19 +23,35 @@ class King(Piece):
 				if rank not in '12345678': continue
 
 				c = Coordinate(f'{file}{rank}')
-
-				# if there is a piece there
-				piece: Piece | None = self.board.get(c)
-				if piece:
-					# check its side
-					# if its a piece of our own, can't move there
-					if piece.side == self.side: continue
+				# exclude the king's current coordinate
+				if c.cc == self.coordinate.cc: continue
 
 				moves.append(c)
 
 		return moves
 
+	def available_moves(self) -> list[Coordinate]:
+		"""
+		returns the moves that the king can choose
+		regardless of checks
+		is a subset of attacking squares
+		"""
+		moves: list[Coordinate] = []
 
+		for square in self.attacking_squares():
+			# if there is a piece there
+			piece: Piece | None = self.board.get(square)
+
+			if piece:
+				# check its side
+				# if its a piece of our own, can't move there
+				if piece.side == self.side: continue
+
+			moves.append(square)
+
+		return moves
+
+	
 def main():
 	board = Board()
 	Piece(Side.BLACK, board, Coordinate('h2'))
