@@ -3,45 +3,47 @@ from enum import Enum
 from __future__ import annotations
 
 
-class Player(Enum):
+class Side(Enum):
 	WHITE = 'w'
 	BLACK = 'b'
 
 
 class King:
-	def __init__(self, side: Player, board: Board):
+	def __init__(self, side: Side, board: Board):
 		self.side = side
 		self.board = board
-
+		self.has_moved: bool = False
 
 class Queen:
-	def __init__(self, side: Player, board: Board):
+	def __init__(self, side: Side, board: Board):
 		self.side = side
 		self.board = board
 
 
 class Rook:
-	def __init__(self, side: Player, board: Board):
+	def __init__(self, side: Side, board: Board):
 		self.side = side
 		self.board = board
+		self.has_moved: bool = False
 
 
 class Bishop:
-	def __init__(self, side: Player, board: Board):
+	def __init__(self, side: Side, board: Board):
 		self.side = side
 		self.board = board
 
 
 class Knight:
-	def __init__(self, side: Player, board: Board):
+	def __init__(self, side: Side, board: Board):
 		self.side = side
 		self.board = board
 
 
 class Pawn:
-	def __init__(self, side: Player, board: Board):
+	def __init__(self, side: Side, board: Board):
 		self.side = side
 		self.board = board
+		self.has_moved: bool = False
 
 
 Piece: TypeAlias = King | Queen | Rook | Bishop | Knight | Pawn
