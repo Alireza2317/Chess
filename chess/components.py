@@ -117,9 +117,23 @@ class Board:
 		return self.board[row][col]
 
 
+	def __repr__(self):
+		s: str = ''
+		for row in reversed(self.board):
+			for sq in row:
+				if sq.piece:
+					s += f'{sq.piece}'
+				else:
+					if sq.color == Color.WHITE:
+						s += '□'
+					else:
+						s += '■'
+				s += '  '
+			s += '\n'
+		return s
+
 def main():
-	b = Board()
-	print(*b.board, sep='\n')
+	pass
 
 if __name__ == '__main__':
 	main()
