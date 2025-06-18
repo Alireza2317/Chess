@@ -51,6 +51,25 @@ class Piece:
 		self.board.put(self, self.coordinate)
 
 
+class Square:
+	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
+		self.coordinate = coordinate
+		self.piece: Piece | None = piece
+
+		# set the color based on the coordinate
+		self.set_color()
+
+	def set_color(self):
+		if (
+			(self.coordinate.file in 'aceg' and int(self.coordinate.rank)%2 == 1)
+			or
+			self.coordinate.file in 'bdfh' and int(self.coordinate.rank)%2 == 0
+		):
+			self.color = Color.BLACK
+		else:
+			self.color = Color.WHITE
+
+
 class Board:
 	def __init__(self):
 		# the arrangement of these lists is such that the first row is
@@ -84,3 +103,13 @@ class Board:
 		return self.board[row][col]
 
 
+def main():
+	for file in 'abcdefg':
+		for rank in '12345678':
+			c = f'{file}{rank}'
+			s = Square(Coordinate(c))
+			print(c, s.color)
+
+
+if __name__ == '__main__':
+	main()
