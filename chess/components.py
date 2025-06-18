@@ -1,6 +1,6 @@
 from __future__ import annotations
 from enum import Enum
-
+from chess.utils import colored_str
 
 class Color(Enum):
 	WHITE = 'w'
@@ -129,7 +129,10 @@ class Board:
 					else:
 						s += '■'
 				s += '  '
-			s += '\n'
+			s += f'{colored_str(sq.coordinate.rank, color="g")}\n'
+
+		s += colored_str('  '.join('abcdefgh'), 'g')
+
 		return s
 
 def main():
