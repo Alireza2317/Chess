@@ -1,4 +1,4 @@
-from chess.components import Piece, Coordinate, Color, Board
+from chess.components import Piece, Coordinate, Color, Board, Square
 
 
 class King(Piece):
@@ -13,41 +13,42 @@ class King(Piece):
 		moves: list[Coordinate] = []
 
 		file_ord: int = ord(self.coordinate.file)
+		rank_ord: int = ord(self.coordinate.rank)
+
+		possible_moves = []
 		for file_code in range(file_ord-1, file_ord+2):
-			file: str = chr(file_code)
-			if file not in 'abcdefgh': continue
-
-			rank_ord: int = ord(self.coordinate.rank)
 			for rank_s in range(rank_ord-1, rank_ord+2):
+				file: str = chr(file_code)
 				rank: str = chr(rank_s)
-				if rank not in '12345678': continue
-
-				c = Coordinate(f'{file}{rank}')
 				# exclude the king's current coordinate
-				if c.cc == self.coordinate.cc: continue
+				if f'{file}{rank}' == self.coordinate.cc: continue
 
-				moves.append(c)
+				possible_moves.append(f'{file}{rank}')
+
+		for m in possible_moves:
+			if Coordinate.is_valid(m):
+				moves.append(Coordinate(m))
 
 		return moves
 
 	def available_moves(self) -> list[Coordinate]:
 		"""
 		returns the moves that the king can choose
-		regardless of checks
+		regardless of checks.
 		is a subset of attacking squares
 		"""
 		moves: list[Coordinate] = []
 
-		for square in self.attacking_squares():
-			# if there is a piece there
-			piece: Piece | None = self.board.get(square)
+		for coord in self.attacking_squares():
+			square: Square = self.board.get(coord)
 
-			if piece:
+			# if there is a piece there
+			if square.piece:
 				# check its color
 				# if its a piece of our own, can't move there
-				if piece.color == self.color: continue
+				if square.piece.color == self.color: continue
 
-			moves.append(square)
+			moves.append(coord)
 
 		return moves
 
@@ -56,11 +57,16 @@ class King(Piece):
 
 def main():
 	board = Board()
-	Piece(Color.BLACK, board, Coordinate('h2'))
-	Piece(Color.WHITE, board, Coordinate('g1'))
-	Piece(Color.BLACK, board, Coordinate('g2'))
+	Piece(Color.WHITE, board, Coordinate('e3'))
+	Piece(Color.WHITE, board, Coordinate('e5'))
+	Piece(Color.WHITE, board, Coordinate('d3'))
+	Piece(Color.WHITE, board, Coordinate('d4'))
+	Piece(Color.WHITE, board, Coordinate('d5'))
+	Piece(Color.WHITE, board, Coordinate('f3'))
+	Piece(Color.WHITE, board, Coordinate('f4'))
+	Piece(Color.WHITE, board, Coordinate('f5'))
 
-	king = King(Color.WHITE, board, Coordinate('h1'))
+	king = King(Color.BLACK, board, Coordinate('e4'))
 
 	print(king.available_moves())
 

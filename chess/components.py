@@ -35,6 +35,10 @@ class Coordinate:
 
 		return row, col
 
+	@staticmethod
+	def is_valid(coordinate: str) -> bool:
+		return (coordinate[0] in 'abcdefgh') and (coordinate[1] in '12345678')
+
 
 	def __repr__(self):
 		return self.cc
