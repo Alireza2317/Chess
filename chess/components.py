@@ -120,6 +120,38 @@ class Board:
 		row, col = coordinate.regular
 		return self.board[row][col]
 
+	def get_coordinates(
+		self,
+		current_coordinate: Coordinate,
+		direction: tuple[int, int]) -> list[Coordinate]:
+		"""
+		returns all coordinates in the given direction
+		stops when exits board or reaches a piece of any color(inclusive).
+		direction is a tuple of 2 numbers, it contains a direction-like vector
+		that corresponds to (file_direction, rank_direction)
+		like (0, 1), which means going up
+		"""
+
+		file_ord = ord(current_coordinate.file)
+		rank_ord = ord(current_coordinate.rank)
+
+		coords: list[Coordinate] = []
+
+		for i in range(1, 8):
+			new_file = chr(file_ord + i*direction[0])
+			new_rank = chr(rank_ord + i*direction[1])
+
+			m = f'{new_file}{new_rank}'
+
+			if not Coordinate.is_valid(m): return coords
+
+			c = Coordinate(m)
+			coords.append(c)
+
+			# if reached a piece, the range of attack stops
+			if self.get(c).piece: return coords
+
+		return coords
 
 	def __repr__(self):
 		s: str = ''
@@ -140,7 +172,10 @@ class Board:
 		return s
 
 def main():
-	pass
+	b = Board()
+	Piece(Color.WHITE, b, Coordinate('a5'))
+
+	print(b.get_coordinates(Coordinate('a4'), (0, 1)))
 
 if __name__ == '__main__':
 	main()
