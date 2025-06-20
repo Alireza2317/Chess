@@ -46,6 +46,13 @@ class Coordinate:
 
 class Piece:
 	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
+		if not isinstance(color, Color):
+			raise TypeError(f'color should be of type {type(Color)}!')
+		if not isinstance(board, Board):
+			raise TypeError(f'board should be of type {type(Board)}!')
+		if not isinstance(coordinate, Coordinate):
+			raise TypeError(f'coordinate should be of type {type(Coordinate)}!')
+
 		self.color = color
 		self.board = board
 		self.coordinate = coordinate
@@ -56,14 +63,17 @@ class Piece:
 
 
 class Square:
-	def __init__(self, coordinate: Coordinate | str, piece: Piece | None = None):
-		if isinstance(coordinate, Coordinate):
-			self.coordinate = coordinate
-		elif isinstance(coordinate, str):
-			self.coordinate = Coordinate(coordinate)
-		else:
-			raise ValueError('Invalid coordinate!')
+	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
+		if not isinstance(coordinate, Coordinate):
+			raise TypeError(
+				f'Invalid coordinate! should be of type {type(Coordinate)}'
+			)
+		if not isinstance(piece, (Piece, None)):
+			raise TypeError(
+				f'Invalid piece! should be a Piece object, or None.'
+			)
 
+		self.coordinate = coordinate
 		self.piece: Piece | None = piece
 
 		# set the color based on the coordinate
@@ -92,7 +102,7 @@ class Board:
 		for rank in '12345678':
 			self.board.append(
 				[
-					Square(f'{file}{rank}', piece=None)
+					Square(Coordinate(f'{file}{rank}'), piece=None)
 					for file in 'abcdefgh'
 				]
 			)
