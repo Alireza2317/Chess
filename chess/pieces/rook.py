@@ -31,17 +31,8 @@ class Rook(Piece):
 		returns the moves that the rook can choose.
 		regardless of checks.
 		"""
-		moves: list[Coordinate] = []
 
-		for c in self.attacking_coordinates():
-			p: Piece | None = self.board.get(c).piece
-			if p:
-				# if is a piece of our own, cannot move there
-				if p.color == self.color: continue
-
-			moves.append(c)
-
-		return moves
+		return super().available_moves(self.attacking_coordinates())
 
 	def __repr__(self):
 		return 'R' if self.color == Color.WHITE else 'r'
