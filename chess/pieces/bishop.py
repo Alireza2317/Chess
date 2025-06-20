@@ -40,8 +40,8 @@ class Bishop(Piece):
 def main():
 	b = Board()
 
-	bish = Bishop(Color.WHITE, b, Coordinate('a8'))
-	Pawn(Color.WHITE, b, Coordinate('c6'))
+	bish = Bishop(b, Color.WHITE, Coordinate('a8'))
+	Pawn(b, Color.WHITE, Coordinate('c6'))
 
 	print(b)
 	print(bish.attacking_coordinates())

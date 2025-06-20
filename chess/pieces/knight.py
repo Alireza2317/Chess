@@ -45,10 +45,10 @@ class Knight(Piece):
 
 def main():
 	board = Board()
-	Piece(Color.WHITE, board, Coordinate('d2'))
-	Piece(Color.WHITE, board, Coordinate('f2'))
+	Piece(board, Color.WHITE, Coordinate('d2'))
+	Piece(board, Color.WHITE, Coordinate('f2'))
 
-	knight = Knight(Color.WHITE, board, Coordinate('e4'))
+	knight = Knight(board, Color.WHITE, Coordinate('e4'))
 
 	print(knight.available_moves())
 

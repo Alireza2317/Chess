@@ -45,7 +45,7 @@ class Coordinate:
 
 
 class Piece:
-	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
+	def __init__(self, board: Board, color: Color, coordinate: Coordinate):
 		if not isinstance(color, Color):
 			raise TypeError(f'color should be of type {type(Color)}!')
 		if not isinstance(board, Board):
@@ -53,8 +53,8 @@ class Piece:
 		if not isinstance(coordinate, Coordinate):
 			raise TypeError(f'coordinate should be of type {type(Coordinate)}!')
 
-		self.color = color
 		self.board = board
+		self.color = color
 		self.coordinate = coordinate
 		self.has_moved: bool = False
 

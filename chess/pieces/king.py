@@ -45,16 +45,16 @@ class King(Piece):
 
 def main():
 	board = Board()
-	Piece(Color.WHITE, board, Coordinate('e3'))
-	Piece(Color.WHITE, board, Coordinate('e5'))
-	Piece(Color.WHITE, board, Coordinate('d3'))
-	Piece(Color.WHITE, board, Coordinate('d4'))
-	Piece(Color.WHITE, board, Coordinate('d5'))
-	Piece(Color.WHITE, board, Coordinate('f3'))
-	Piece(Color.WHITE, board, Coordinate('f4'))
-	Piece(Color.WHITE, board, Coordinate('f5'))
+	Piece(board, Color.WHITE, Coordinate('e3'))
+	Piece(board, Color.WHITE, Coordinate('e5'))
+	Piece(board, Color.WHITE, Coordinate('d3'))
+	Piece(board, Color.WHITE, Coordinate('d4'))
+	Piece(board, Color.WHITE, Coordinate('d5'))
+	Piece(board, Color.WHITE, Coordinate('f3'))
+	Piece(board, Color.WHITE, Coordinate('f4'))
+	Piece(board, Color.WHITE, Coordinate('f5'))
 
-	king = King(Color.BLACK, board, Coordinate('e4'))
+	king = King(board, Color.BLACK, Coordinate('e4'))
 
 	print(king.available_moves())
 

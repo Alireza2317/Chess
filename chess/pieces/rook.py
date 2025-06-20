@@ -40,11 +40,9 @@ class Rook(Piece):
 def main():
 	b = Board()
 
-	rook = Rook(Color.WHITE, b, Coordinate('e4'))
-	#Pawn(Color.WHITE, b, Coordinate('g3'))
-	Pawn(Color.BLACK, b, Coordinate('e7'))
-	Pawn(Color.WHITE, b, Coordinate('h4'))
-	#Pawn(Color.WHITE, b, Coordinate('h2'))
+	rook = Rook(b, Color.WHITE, Coordinate('e4'))
+	Pawn(b, Color.BLACK, Coordinate('e7'))
+	Pawn(b, Color.WHITE, Coordinate('h4'))
 
 	print(b)
 	print(rook.attacking_coordinates())

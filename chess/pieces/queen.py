@@ -45,8 +45,8 @@ class Queen(Piece):
 def main():
 	b = Board()
 
-	q = Queen(Color.WHITE, b, Coordinate('e4'))
-	Pawn(Color.WHITE, b, Coordinate('f3'))
+	q = Queen(b, Color.WHITE, Coordinate('e4'))
+	Pawn(b, Color.WHITE, Coordinate('f3'))
 
 	print(b)
 	print(q.attacking_coordinates())

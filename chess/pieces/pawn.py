@@ -68,8 +68,8 @@ class Pawn(Piece):
 
 def main():
 	b = Board()
-	p = Pawn(Color.BLACK, b, Coordinate('e7'))
-	Pawn(Color.WHITE, b, Coordinate('d6'))
+	p = Pawn(b, Color.BLACK, Coordinate('e7'))
+	Pawn(b, Color.WHITE, Coordinate('d6'))
 
 	print(b)
 	print(p.attacking_coordinates())
