@@ -11,53 +11,18 @@ class Rook(Piece):
 		"""
 		moves: list[Coordinate] = []
 
-		file_ord = ord(self.coordinate.file)
-		rank_ord = ord(self.coordinate.rank)
+		# directions in comments are from white's perspective
+		attacking_directions: list[tuple[int, int]] = [
+			(0, 1), # up
+			(0, -1), # down
+			(1, 0), # right
+			(-1, 0), # left
+		]
 
-		# directions, from white's perspective
-		# going up
-		for i in range(1, 8):
-			m = f'{chr(file_ord)}{chr(rank_ord+i)}'
-			if not Coordinate.is_valid(m): break
-
-			c = Coordinate(m)
-			moves.append(c)
-
-			# if reached a piece, the range of attack stops
-			if self.board.get(c).piece: break
-
-		# going down
-		for i in range(1, 8):
-			m = f'{chr(file_ord)}{chr(rank_ord-i)}'
-			if not Coordinate.is_valid(m): break
-
-			c = Coordinate(m)
-			moves.append(c)
-
-			# if reached a piece, the range of attack stops
-			if self.board.get(c).piece: break
-
-		# going right
-		for i in range(1, 8):
-			m = f'{chr(file_ord+i)}{chr(rank_ord)}'
-			if not Coordinate.is_valid(m): break
-
-			c = Coordinate(m)
-			moves.append(c)
-
-			# if reached a piece, the range of attack stops
-			if self.board.get(c).piece: break
-
-		# going left
-		for i in range(1, 8):
-			m = f'{chr(file_ord-i)}{chr(rank_ord)}'
-			if not Coordinate.is_valid(m): break
-
-			c = Coordinate(m)
-			moves.append(c)
-
-			# if reached a piece, the range of attack stops
-			if self.board.get(c).piece: break
+		for direction in attacking_directions:
+			moves.extend(
+				self.board.get_coordinates(self.coordinate, direction)
+			)
 
 		return moves
 
