@@ -27,16 +27,15 @@ class Pawn(Piece):
 		return moves
 
 	def available_moves(self) -> list[Coordinate]:
-		""" returns all available moves for the pawn. """
+		"""
+		returns all available moves for the pawn.
+		regardless of checks.
+		"""
 		moves: list[Coordinate] = []
 
-		for coord in self.attacking_coordinates():
-			p: Piece | None = self.board.get(coord).piece
-			if p:
-				# add attack moves, only if the pawn can capture
-				# an enemy piece
-				if p.color != self.color:
-					moves.append(coord)
+		moves.extend(
+			super().available_moves(self.attacking_coordinates())
+		)
 
 		file = self.coordinate.file
 		rank_ord = ord(self.coordinate.rank)
