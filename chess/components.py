@@ -84,7 +84,7 @@ class Square:
 			raise TypeError(
 				f'Invalid coordinate! should be of type {type(Coordinate)}'
 			)
-		if not isinstance(piece, (Piece, None)):
+		if not isinstance(piece, (Piece, type(None))):
 			raise TypeError(
 				f'Invalid piece! should be a Piece object, or None.'
 			)
