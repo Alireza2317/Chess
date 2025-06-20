@@ -35,23 +35,9 @@ class Knight(Piece):
 		"""
 		returns the moves that the knight can choose
 		regardless of checks.
-		is a subset of attacking squares
 		"""
-		moves: list[Coordinate] = []
 
-		for coord in self.attacking_coordinates():
-			square: Square = self.board.get(coord)
-
-			# if there is a piece there
-			if square.piece:
-				# check its color
-				# if its a piece of our own, can't move there
-				if square.piece.color == self.color: continue
-
-			moves.append(coord)
-
-		return moves
-
+		return super().available_moves(self.attacking_coordinates())
 
 	def __repr__(self):
 		return 'N' if self.color == Color.WHITE else 'n'
