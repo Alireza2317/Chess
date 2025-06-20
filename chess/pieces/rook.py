@@ -1,5 +1,5 @@
 from chess.components import Piece, Coordinate, Color, Board
-
+from chess.pieces.pawn import Pawn
 
 class Rook(Piece):
 	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
@@ -11,48 +11,60 @@ class Rook(Piece):
 		"""
 		moves: list[Coordinate] = []
 
-		file_ord = self.coordinate.file
-		rank_ord = self.coordinate.rank
+		file_ord = ord(self.coordinate.file)
+		rank_ord = ord(self.coordinate.rank)
 
 		# going up or down
 		for new_rank_ord in range(rank_ord+1, rank_ord+8):
 			m = f'{chr(file_ord)}{chr(new_rank_ord)}'
-			if not Coordinate.is_valid(m): continue
+			if not Coordinate.is_valid(m): break
 
+			c = Coordinate(m)
 			# if reached a piece, the range of attack stops
-			if self.board.get(Coordinate(m)).piece:
-				moves.append(Coordinate(m))
+			if self.board.get(c).piece:
+				moves.append(c)
 				break
+
+			moves.append(c)
 
 		# going up or down, opposite direction
 		for new_rank_ord in range(rank_ord-1, rank_ord-8, -1):
 			m = f'{chr(file_ord)}{chr(new_rank_ord)}'
-			if not Coordinate.is_valid(m): continue
+			if not Coordinate.is_valid(m): break
 
+			c = Coordinate(m)
 			# if reached a piece, the range of attack stops
-			if self.board.get(Coordinate(m)).piece:
-				moves.append(Coordinate(m))
+			if self.board.get(c).piece:
+				moves.append(c)
 				break
+
+			moves.append(c)
 
 		# going right or left
 		for new_file_ord in range(file_ord+1, file_ord+8):
 			m = f'{chr(new_file_ord)}{chr(rank_ord)}'
-			if not Coordinate.is_valid(m): continue
+			if not Coordinate.is_valid(m): break
 
+			c = Coordinate(m)
 			# if reached a piece, the range of attack stops
-			if self.board.get(Coordinate(m)).piece:
-				moves.append(Coordinate(m))
+			if self.board.get(c).piece:
+				moves.append(c)
 				break
+
+			moves.append(c)
 
 		# going right or left, opposite direction
 		for new_file_ord in range(file_ord-1, file_ord-8, -1):
 			m = f'{chr(new_file_ord)}{chr(rank_ord)}'
-			if not Coordinate.is_valid(m): continue
+			if not Coordinate.is_valid(m): break
 
+			c = Coordinate(m)
 			# if reached a piece, the range of attack stops
-			if self.board.get(Coordinate(m)).piece:
-				moves.append(Coordinate(m))
+			if self.board.get(c).piece:
+				moves.append(c)
 				break
+
+			moves.append(c)
 
 		return moves
 
@@ -61,20 +73,33 @@ class Rook(Piece):
 		returns the moves that the rook can choose.
 		regardless of checks.
 		"""
-		moves: list[Coordinate] = self.attacking_coordinates()
+		moves: list[Coordinate] = []
 
 		for c in self.attacking_coordinates():
 			p: Piece | None = self.board.get(c).piece
 			if p:
 				# if is a piece of our own, cannot move there
-				if p.color == self.color:
-					moves.remove(c)
+				if p.color == self.color: continue
+
+			moves.append(c)
+
+		return moves
 
 	def __repr__(self):
 		return 'R' if self.color == Color.WHITE else 'r'
 
 def main():
-	pass
+	b = Board()
+
+	rook = Rook(Color.WHITE, b, Coordinate('e4'))
+	#Pawn(Color.WHITE, b, Coordinate('g3'))
+	Pawn(Color.BLACK, b, Coordinate('e7'))
+	Pawn(Color.WHITE, b, Coordinate('h4'))
+	#Pawn(Color.WHITE, b, Coordinate('h2'))
+
+	print(b)
+	print(rook.attacking_coordinates())
+	print(rook.available_moves())
 
 if __name__ == '__main__':
 	main()
