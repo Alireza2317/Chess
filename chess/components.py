@@ -61,6 +61,22 @@ class Piece:
 		# put the piece on the board on init
 		self.board.put(self, self.coordinate)
 
+	def available_moves(self, attacking_moves: list[Coordinate]) -> list[Coordinate]:
+		"""
+		returns the moves that the piece can choose.
+		regardless of checks.
+		"""
+		moves: list[Coordinate] = []
+
+		for c in attacking_moves:
+			p: Piece | None = self.board.get(c).piece
+			if p:
+				# if is a piece of our own, cannot move there
+				if p.color == self.color: continue
+
+			moves.append(c)
+
+		return moves
 
 class Square:
 	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
