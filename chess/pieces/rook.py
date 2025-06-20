@@ -20,12 +20,10 @@ class Rook(Piece):
 			if not Coordinate.is_valid(m): break
 
 			c = Coordinate(m)
-			# if reached a piece, the range of attack stops
-			if self.board.get(c).piece:
-				moves.append(c)
-				break
-
 			moves.append(c)
+
+			# if reached a piece, the range of attack stops
+			if self.board.get(c).piece: break
 
 		# going up or down, opposite direction
 		for new_rank_ord in range(rank_ord-1, rank_ord-8, -1):
@@ -33,12 +31,10 @@ class Rook(Piece):
 			if not Coordinate.is_valid(m): break
 
 			c = Coordinate(m)
-			# if reached a piece, the range of attack stops
-			if self.board.get(c).piece:
-				moves.append(c)
-				break
-
 			moves.append(c)
+
+			# if reached a piece, the range of attack stops
+			if self.board.get(c).piece: break
 
 		# going right or left
 		for new_file_ord in range(file_ord+1, file_ord+8):
@@ -46,12 +42,10 @@ class Rook(Piece):
 			if not Coordinate.is_valid(m): break
 
 			c = Coordinate(m)
-			# if reached a piece, the range of attack stops
-			if self.board.get(c).piece:
-				moves.append(c)
-				break
-
 			moves.append(c)
+
+			# if reached a piece, the range of attack stops
+			if self.board.get(c).piece: break
 
 		# going right or left, opposite direction
 		for new_file_ord in range(file_ord-1, file_ord-8, -1):
@@ -59,12 +53,10 @@ class Rook(Piece):
 			if not Coordinate.is_valid(m): break
 
 			c = Coordinate(m)
-			# if reached a piece, the range of attack stops
-			if self.board.get(c).piece:
-				moves.append(c)
-				break
-
 			moves.append(c)
+
+			# if reached a piece, the range of attack stops
+			if self.board.get(c).piece: break
 
 		return moves
 
