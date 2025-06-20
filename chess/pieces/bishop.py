@@ -11,68 +11,20 @@ class Bishop(Piece):
 		"""
 		moves: list[Coordinate] = []
 
-		file_ord = ord(self.coordinate.file)
-		rank_ord = ord(self.coordinate.rank)
+		# directions in comments are from white's perspective
+		attacking_directions: list[tuple[int, int]] = [
+			(1, 1), # up&right
+			(-1, -1), # down&left
+			(1, -1), # up&left
+			(-1, 1), # down&right
+		]
 
-		# directions, from white's perspective
-		# going down and right diagonally
-		for i in range(1, 8):
-			new_file = chr(file_ord+i)
-			new_rank = chr(rank_ord-i)
-			m = f'{new_file}{new_rank}'
-
-			if not Coordinate.is_valid(m): break
-
-			c = Coordinate(m)
-			moves.append(c)
-
-			# range of attack stops if there's a piece in the way
-			if self.board.get(c).piece: break
-
-		# going up and left diagonally
-		for i in range(1, 8):
-			new_file = chr(file_ord-i)
-			new_rank = chr(rank_ord+i)
-			m = f'{new_file}{new_rank}'
-
-			if not Coordinate.is_valid(m): break
-
-			c = Coordinate(m)
-			moves.append(c)
-
-			# range of attack stops if there's a piece in the way
-			if self.board.get(c).piece: break
-
-		# going up and right diagonally
-		for i in range(1, 8):
-			new_file = chr(file_ord+i)
-			new_rank = chr(rank_ord+i)
-			m = f'{new_file}{new_rank}'
-
-			if not Coordinate.is_valid(m): break
-
-			c = Coordinate(m)
-			moves.append(c)
-
-			# range of attack stops if there's a piece in the way
-			if self.board.get(c).piece: break
-
-		# going down and left diagonally
-		for i in range(1, 8):
-			new_file = chr(file_ord-i)
-			new_rank = chr(rank_ord-i)
-			m = f'{new_file}{new_rank}'
-
-			if not Coordinate.is_valid(m): break
-
-			c = Coordinate(m)
-			moves.append(c)
-
-			# range of attack stops if there's a piece in the way
-			if self.board.get(c).piece: break
+		for direction in attacking_directions:
+			moves.extend(
+				self.board.get_coordinates(self.coordinate, direction)
+			)
 
 		return moves
-
 
 	def available_moves(self) -> list[Coordinate]:
 		"""
