@@ -5,7 +5,7 @@ class Pawn(Piece):
 	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
 		super().__init__(color, board, coordinate)
 
-	def attacking_squares(self) -> list[Coordinate]:
+	def attacking_coordinates(self) -> list[Coordinate]:
 		""" returns the one/two attacking coordinates of the pawn. """
 		moves: list[Coordinate] = []
 
@@ -30,7 +30,7 @@ class Pawn(Piece):
 		""" returns all available moves for the pawn. """
 		moves: list[Coordinate] = []
 
-		for coord in self.attacking_squares():
+		for coord in self.attacking_coordinates():
 			p: Piece | None = self.board.get(coord).piece
 			if p:
 				# add attack moves, only if the pawn can capture
@@ -73,7 +73,7 @@ def main():
 	Pawn(Color.WHITE, b, Coordinate('d6'))
 
 	print(b)
-	print(p.attacking_squares())
+	print(p.attacking_coordinates())
 	print(p.available_moves())
 
 if __name__ == '__main__':

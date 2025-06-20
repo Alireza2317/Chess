@@ -5,9 +5,9 @@ class Knight(Piece):
 	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
 		super().__init__(color, board, coordinate)
 
-	def attacking_squares(self) -> list[Coordinate]:
+	def attacking_coordinates(self) -> list[Coordinate]:
 		"""
-		returns the squares that the knight can attack
+		returns the coordinates that the knight can attack
 		regardless of checks
 		"""
 		moves: list[Coordinate] = []
@@ -39,7 +39,7 @@ class Knight(Piece):
 		"""
 		moves: list[Coordinate] = []
 
-		for coord in self.attacking_squares():
+		for coord in self.attacking_coordinates():
 			square: Square = self.board.get(coord)
 
 			# if there is a piece there

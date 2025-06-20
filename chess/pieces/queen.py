@@ -5,6 +5,9 @@ class Queen(Piece):
 	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
 		super().__init__(color, board, coordinate)
 
+	def attacking_coordinates(self) -> list[Coordinate]:
+		pass
+
 	def available_moves(self) -> list[Coordinate]:
 		pass
 
