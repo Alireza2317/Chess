@@ -14,9 +14,10 @@ class Rook(Piece):
 		file_ord = ord(self.coordinate.file)
 		rank_ord = ord(self.coordinate.rank)
 
-		# going up or down
-		for new_rank_ord in range(rank_ord+1, rank_ord+8):
-			m = f'{chr(file_ord)}{chr(new_rank_ord)}'
+		# directions, from white's perspective
+		# going up
+		for i in range(1, 8):
+			m = f'{chr(file_ord)}{chr(rank_ord+i)}'
 			if not Coordinate.is_valid(m): break
 
 			c = Coordinate(m)
@@ -25,9 +26,9 @@ class Rook(Piece):
 			# if reached a piece, the range of attack stops
 			if self.board.get(c).piece: break
 
-		# going up or down, opposite direction
-		for new_rank_ord in range(rank_ord-1, rank_ord-8, -1):
-			m = f'{chr(file_ord)}{chr(new_rank_ord)}'
+		# going down
+		for i in range(1, 8):
+			m = f'{chr(file_ord)}{chr(rank_ord-i)}'
 			if not Coordinate.is_valid(m): break
 
 			c = Coordinate(m)
@@ -36,9 +37,9 @@ class Rook(Piece):
 			# if reached a piece, the range of attack stops
 			if self.board.get(c).piece: break
 
-		# going right or left
-		for new_file_ord in range(file_ord+1, file_ord+8):
-			m = f'{chr(new_file_ord)}{chr(rank_ord)}'
+		# going right
+		for i in range(1, 8):
+			m = f'{chr(file_ord+i)}{chr(rank_ord)}'
 			if not Coordinate.is_valid(m): break
 
 			c = Coordinate(m)
@@ -47,9 +48,9 @@ class Rook(Piece):
 			# if reached a piece, the range of attack stops
 			if self.board.get(c).piece: break
 
-		# going right or left, opposite direction
-		for new_file_ord in range(file_ord-1, file_ord-8, -1):
-			m = f'{chr(new_file_ord)}{chr(rank_ord)}'
+		# going left
+		for i in range(1, 8):
+			m = f'{chr(file_ord-i)}{chr(rank_ord)}'
 			if not Coordinate.is_valid(m): break
 
 			c = Coordinate(m)
