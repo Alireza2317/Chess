@@ -36,18 +36,8 @@ class Queen(Piece):
 		returns the moves that the queen can choose.
 		regardless of checks.
 		"""
-		moves: list[Coordinate] = []
 
-		for c in self.attacking_coordinates():
-			p: Piece | None = self.board.get(c).piece
-			if p:
-				# if is a piece of our own, cannot move there
-				if p.color == self.color: continue
-
-			moves.append(c)
-
-		return moves
-
+		return super().available_moves(self.attacking_coordinates())
 
 	def __repr__(self):
 		return 'Q' if self.color == Color.WHITE else 'q'
