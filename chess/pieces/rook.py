@@ -1,9 +1,10 @@
 from chess.components import Piece, Coordinate, Color, Board
+from chess.game.player import Player
 from chess.pieces.pawn import Pawn
 
 class Rook(Piece):
-	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
-		super().__init__(color, board, coordinate)
+	def __init__(self, player: Player, coordinate: Coordinate):
+		super().__init__(player, coordinate)
 
 	def attacking_coordinates(self) -> list[Coordinate]:
 		"""
