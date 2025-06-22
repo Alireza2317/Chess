@@ -37,7 +37,7 @@ class Queen(Piece):
 		regardless of checks.
 		"""
 
-		return super().available_moves(self.attacking_coordinates())
+		return super().available_moves()
 
 	def __repr__(self):
 		return 'Q' if self.color == Color.WHITE else 'q'

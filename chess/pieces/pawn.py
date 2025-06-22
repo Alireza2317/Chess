@@ -34,7 +34,7 @@ class Pawn(Piece):
 		moves: list[Coordinate] = []
 
 		moves.extend(
-			super().available_moves(self.attacking_coordinates())
+			super().available_moves()
 		)
 
 		file = self.coordinate.file

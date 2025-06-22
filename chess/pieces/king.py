@@ -39,7 +39,7 @@ class King(Piece):
 		is a subset of attacking squares
 		"""
 
-		return super().available_moves(self.attacking_coordinates())
+		return super().available_moves()
 
 	def __repr__(self):
 		return 'K' if self.color == Color.WHITE else 'k'

@@ -32,7 +32,7 @@ class Bishop(Piece):
 		regardless of checks.
 		"""
 
-		return super().available_moves(self.attacking_coordinates())
+		return super().available_moves()
 
 	def __repr__(self):
 		return 'B' if self.color == Color.WHITE else 'b'
