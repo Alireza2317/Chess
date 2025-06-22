@@ -1,9 +1,14 @@
-from chess.components import Piece, Coordinate, Color, Board
+from chess.components import Coordinate, Color, Board
 from chess.game.player import Player
+from chess.pieces.piece_abc import PieceType, Piece
 
 class Pawn(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate):
 		super().__init__(player, coordinate)
+
+	@property
+	def piece_type(self) -> PieceType:
+		return PieceType.PAWN
 
 	def attacking_coordinates(self) -> list[Coordinate]:
 		""" returns the one/two attacking coordinates of the pawn. """
