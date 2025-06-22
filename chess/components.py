@@ -1,4 +1,5 @@
 from __future__ import annotations
+from abc import ABCMeta, abstractmethod, ABC
 from enum import Enum
 from chess.utils import colored_str
 
@@ -44,7 +45,7 @@ class Coordinate:
 		return self.cc
 
 
-class Piece:
+class Piece(ABC):
 	def __init__(self, board: Board, color: Color, coordinate: Coordinate):
 		if not isinstance(color, Color):
 			raise TypeError(f'color should be of type {type(Color)}!')
@@ -77,6 +78,10 @@ class Piece:
 			moves.append(c)
 
 		return moves
+
+	@abstractmethod
+	def attacking_coordinates(self) -> list[Coordinate]:
+		pass
 
 class Square:
 	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
