@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from enum import Enum
 from chess.utils import colored_str
+from chess.game.player import Player
 
 class Color(Enum):
 	WHITE = 'w'
@@ -63,16 +64,12 @@ class Coordinate:
 
 
 class Piece(ABC):
-	def __init__(self, board: Board, color: Color, coordinate: Coordinate):
-		if not isinstance(color, Color):
-			raise TypeError(f'color should be of type {type(Color)}!')
-		if not isinstance(board, Board):
-			raise TypeError(f'board should be of type {type(Board)}!')
+	def __init__(self, player: Player, coordinate: Coordinate):
 		if not isinstance(coordinate, Coordinate):
 			raise TypeError(f'coordinate should be of type {type(Coordinate)}!')
 
-		self.board = board
-		self.color = color
+		self.board = player.board
+		self.color = player.color
 		self.coordinate = coordinate
 		self.has_moved: bool = False
 
