@@ -75,6 +75,8 @@ class Piece(ABC):
 
 		# put the piece on the board on init
 		self.board.put(self, self.coordinate)
+		# add the piece to player's pieces
+		player.add_piece(self)
 
 	@abstractmethod
 	def attacking_coordinates(self) -> list[Coordinate]:
