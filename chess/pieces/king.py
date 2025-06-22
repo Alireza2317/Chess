@@ -20,8 +20,9 @@ class King(Piece):
 			for rank_s in range(rank_ord-1, rank_ord+2):
 				file: str = chr(file_code)
 				rank: str = chr(rank_s)
+				c = Coordinate(f'{file}{rank}')
 				# exclude the king's current coordinate
-				if f'{file}{rank}' == self.coordinate.cc: continue
+				if c == self.coordinate: continue
 
 				possible_moves.append(f'{file}{rank}')
 
