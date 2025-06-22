@@ -79,14 +79,18 @@ class Piece(ABC):
 		# put the piece on the board on init
 		self.board.put(self, self.coordinate)
 
-	def available_moves(self, attacking_moves: list[Coordinate]) -> list[Coordinate]:
+	@abstractmethod
+	def attacking_coordinates(self) -> list[Coordinate]:
+		pass
+
+	def available_moves(self) -> list[Coordinate]:
 		"""
 		returns the moves that the piece can choose.
 		regardless of checks.
 		"""
 		moves: list[Coordinate] = []
 
-		for c in attacking_moves:
+		for c in self.attacking_coordinates():
 			p: Piece | None = self.board.get(c).piece
 			if p:
 				# if is a piece of our own, cannot move there
@@ -96,9 +100,6 @@ class Piece(ABC):
 
 		return moves
 
-	@abstractmethod
-	def attacking_coordinates(self) -> list[Coordinate]:
-		pass
 
 class Square:
 	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
