@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import ABCMeta, abstractmethod, ABC
+from abc import ABC, abstractmethod
 from enum import Enum
 from chess.utils import colored_str
 
@@ -40,6 +40,23 @@ class Coordinate:
 	def is_valid(coordinate: str) -> bool:
 		return (coordinate[0] in 'abcdefgh') and (coordinate[1] in '12345678')
 
+	def __eq__(self, other: Coordinate):
+		if not isinstance(other, Coordinate):
+			raise TypeError(
+				f'Cannot check equality between ' +
+				f'{type(Coordinate)} and {type(other)}!'
+			)
+
+		return (self.file == other.file) and (self.rank == other.rank)
+
+	def __ne__(self, other: Coordinate):
+		if not isinstance(other, Coordinate):
+			raise TypeError(
+				f'Cannot check equality between ' +
+				f'{type(Coordinate)} and {type(other)}!'
+			)
+
+		return (self.file != other.file) or (self.rank != other.rank)
 
 	def __repr__(self):
 		return self.cc
