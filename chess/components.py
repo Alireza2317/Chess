@@ -1,8 +1,7 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
 from enum import Enum
 from chess.utils import colored_str
-from chess.game.player import Player
+from chess.pieces.piece_abc import Piece
 
 class Color(Enum):
 	WHITE = 'w'
@@ -63,43 +62,6 @@ class Coordinate:
 		return self.cc
 
 
-class Piece(ABC):
-	def __init__(self, player: Player, coordinate: Coordinate):
-		if not isinstance(coordinate, Coordinate):
-			raise TypeError(f'coordinate should be of type {type(Coordinate)}!')
-
-		self.board = player.board
-		self.color = player.color
-		self.coordinate = coordinate
-		self.has_moved: bool = False
-
-		# put the piece on the board on init
-		self.board.put(self, self.coordinate)
-		# add the piece to player's pieces
-		player.add_piece(self)
-
-	@abstractmethod
-	def attacking_coordinates(self) -> list[Coordinate]:
-		pass
-
-	def available_moves(self) -> list[Coordinate]:
-		"""
-		returns the moves that the piece can choose.
-		regardless of checks.
-		"""
-		moves: list[Coordinate] = []
-
-		for c in self.attacking_coordinates():
-			p: Piece | None = self.board.get(c).piece
-			if p:
-				# if is a piece of our own, cannot move there
-				if p.color == self.color: continue
-
-			moves.append(c)
-
-		return moves
-
-
 class Square:
 	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
 		if not isinstance(coordinate, Coordinate):
@@ -129,6 +91,7 @@ class Square:
 
 	def __repr__(self):
 		return str(self.piece)
+
 
 class Board:
 	def __init__(self):
@@ -220,10 +183,7 @@ class Board:
 		return s
 
 def main():
-	b = Board()
-	Piece(Color.WHITE, b, Coordinate('a5'))
-
-	print(b.get_coordinates(Coordinate('a4'), (0, 1)))
+	pass
 
 if __name__ == '__main__':
 	main()
