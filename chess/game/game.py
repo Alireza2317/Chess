@@ -10,8 +10,8 @@ from chess.pieces.pawn import Pawn
 class ChessGame:
 	def __init__(self):
 		self.board = Board()
-		self.white_p: Player = Player(self.board, Color.WHITE)
-		self.black_p: Player = Player(self.board, Color.BLACK)
+		self.white_p: Player = Player(Color.WHITE)
+		self.black_p: Player = Player(Color.BLACK)
 
 	def classic_setup(self) -> None:
 		for color in [Color.WHITE, Color.BLACK]:
