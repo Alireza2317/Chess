@@ -1,8 +1,7 @@
-from chess.components import Coordinate, Color, Board, Piece, PieceType
-from chess.game.player import Player
-from chess.pieces.pawn import Pawn
+from chess.components import Coordinate, Color, Piece, PieceType
 
 class Bishop(Piece):
+	from chess.game.player import Player
 	def __init__(self, player: Player, coordinate: Coordinate):
 		super().__init__(player, coordinate)
 
@@ -43,10 +42,16 @@ class Bishop(Piece):
 		return 'B' if self.color == Color.WHITE else 'b'
 
 def main():
-	b = Board()
+	from chess.components import Board
+	from chess.pieces.pawn import Pawn
+	from chess.pieces.king import King
+	from chess.game.player import Player
 
-	bish = Bishop(b, Color.WHITE, Coordinate('a8'))
-	Pawn(b, Color.WHITE, Coordinate('c6'))
+	b = Board()
+	p = Player(b, Color.WHITE)
+	king = King(p, Coordinate('e1'))
+	bish = Bishop(p, Coordinate('a8'))
+	Pawn(p, Coordinate('c6'))
 
 	print(b)
 	print(bish.attacking_coordinates())

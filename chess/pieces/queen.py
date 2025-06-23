@@ -1,8 +1,7 @@
-from chess.components import Coordinate, Color, Board, PieceType, Piece
-from chess.game.player import Player
-from chess.pieces.pawn import Pawn
+from chess.components import Coordinate, Color, PieceType, Piece
 
 class Queen(Piece):
+	from chess.game.player import Player
 	def __init__(self, player: Player, coordinate: Coordinate):
 		super().__init__(player, coordinate)
 
@@ -35,7 +34,6 @@ class Queen(Piece):
 
 		return moves
 
-
 	def available_moves(self) -> list[Coordinate]:
 		"""
 		returns the moves that the queen can choose.
@@ -47,15 +45,9 @@ class Queen(Piece):
 	def __repr__(self):
 		return 'Q' if self.color == Color.WHITE else 'q'
 
+
 def main():
-	b = Board()
-
-	q = Queen(b, Color.WHITE, Coordinate('e4'))
-	Pawn(b, Color.WHITE, Coordinate('f3'))
-
-	print(b)
-	print(q.attacking_coordinates())
-	print(q.available_moves())
+	pass
 
 if __name__ == '__main__':
 	main()

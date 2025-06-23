@@ -1,5 +1,4 @@
-from chess.components import Coordinate, Color, Board, PieceType, Piece
-
+from chess.components import Coordinate, Color, PieceType, Piece
 
 class King(Piece):
 	from chess.game.player import Player
@@ -50,19 +49,7 @@ class King(Piece):
 		return 'K' if self.color == Color.WHITE else 'k'
 
 def main():
-	board = Board()
-	Piece(board, Color.WHITE, Coordinate('e3'))
-	Piece(board, Color.WHITE, Coordinate('e5'))
-	Piece(board, Color.WHITE, Coordinate('d3'))
-	Piece(board, Color.WHITE, Coordinate('d4'))
-	Piece(board, Color.WHITE, Coordinate('d5'))
-	Piece(board, Color.WHITE, Coordinate('f3'))
-	Piece(board, Color.WHITE, Coordinate('f4'))
-	Piece(board, Color.WHITE, Coordinate('f5'))
-
-	king = King(board, Color.BLACK, Coordinate('e4'))
-
-	print(king.available_moves())
+	pass
 
 if __name__ == '__main__':
 	main()

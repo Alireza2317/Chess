@@ -1,8 +1,8 @@
-from chess.components import Coordinate, Color, Board, PieceType, Piece
-from chess.game.player import Player
-from chess.pieces.pawn import Pawn
+from chess.components import Coordinate, Color, PieceType, Piece
 
 class Rook(Piece):
+	from chess.game.player import Player
+
 	def __init__(self, player: Player, coordinate: Coordinate):
 		super().__init__(player, coordinate)
 
@@ -42,16 +42,9 @@ class Rook(Piece):
 	def __repr__(self):
 		return 'R' if self.color == Color.WHITE else 'r'
 
+
 def main():
-	b = Board()
-
-	rook = Rook(b, Color.WHITE, Coordinate('e4'))
-	Pawn(b, Color.BLACK, Coordinate('e7'))
-	Pawn(b, Color.WHITE, Coordinate('h4'))
-
-	print(b)
-	print(rook.attacking_coordinates())
-	print(rook.available_moves())
+	pass
 
 if __name__ == '__main__':
 	main()

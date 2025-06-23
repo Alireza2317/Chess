@@ -1,17 +1,17 @@
 from chess.components import Board, Color, Coordinate
 from chess.game.player import Player
 from chess.pieces.king import King
-#from chess.pieces.queen import Queen
-#from chess.pieces.rook import Rook
-#from chess.pieces.bishop import Bishop
-#from chess.pieces.knight import Knight
-#from chess.pieces.pawn import Pawn
+from chess.pieces.queen import Queen
+from chess.pieces.rook import Rook
+from chess.pieces.bishop import Bishop
+from chess.pieces.knight import Knight
+from chess.pieces.pawn import Pawn
 
 class ChessGame:
 	def __init__(self):
 		self.board = Board()
-		self.white_p: Player = Player(Color.WHITE)
-		self.black_p: Player = Player(Color.BLACK)
+		self.white_p: Player = Player(self.board, Color.WHITE)
+		self.black_p: Player = Player(self.board, Color.BLACK)
 
 	def classic_setup(self) -> None:
 		for color in [Color.WHITE, Color.BLACK]:
@@ -41,6 +41,7 @@ class ChessGame:
 def main():
 	game = ChessGame()
 	game.classic_setup()
+	print(game.board)
 
 if __name__ == '__main__':
 	main()

@@ -1,11 +1,14 @@
 from __future__ import annotations
-from chess.components import Color, Coordinate, Piece, PieceType
+from chess.components import Color, Board, Coordinate, Piece, PieceType
 
 class Player:
-	def __init__(self, color: 'Color'):
+	def __init__(self, board: Board, color: 'Color'):
 		if not isinstance(color, Color):
 			raise TypeError(f'color should be of type {type(Color)}!')
+		if not isinstance(board, Board):
+			raise TypeError(f'board should be of type {type(Board)}!')
 
+		self.board = board
 		self.color = color
 		self.pieces: list[Piece] = []
 		self.move: bool = True

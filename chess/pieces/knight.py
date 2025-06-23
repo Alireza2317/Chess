@@ -1,7 +1,7 @@
-from chess.components import Coordinate, Color, Board, Piece, PieceType
-from chess.game.player import Player
+from chess.components import Coordinate, Color, Piece, PieceType
 
 class Knight(Piece):
+	from chess.game.player import Player
 	def __init__(self, player: Player, coordinate: Coordinate):
 		super().__init__(player, coordinate)
 
@@ -48,15 +48,7 @@ class Knight(Piece):
 
 
 def main():
-	board = Board()
-	Piece(board, Color.WHITE, Coordinate('d2'))
-	Piece(board, Color.WHITE, Coordinate('f2'))
-
-	knight = Knight(board, Color.WHITE, Coordinate('e4'))
-
-	print(knight.available_moves())
-
-
+	pass
 
 if __name__ == '__main__':
 	main()

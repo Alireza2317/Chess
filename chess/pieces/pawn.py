@@ -1,7 +1,7 @@
-from chess.components import Coordinate, Color, Board,  PieceType, Piece
-from chess.game.player import Player
+from chess.components import Coordinate, Color, PieceType, Piece
 
 class Pawn(Piece):
+	from chess.game.player import Player
 	def __init__(self, player: Player, coordinate: Coordinate):
 		super().__init__(player, coordinate)
 
@@ -71,13 +71,7 @@ class Pawn(Piece):
 
 
 def main():
-	b = Board()
-	p = Pawn(b, Color.BLACK, Coordinate('e7'))
-	Pawn(b, Color.WHITE, Coordinate('d6'))
-
-	print(b)
-	print(p.attacking_coordinates())
-	print(p.available_moves())
+	pass
 
 if __name__ == '__main__':
 	main()
