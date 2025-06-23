@@ -37,3 +37,11 @@ class ChessGame:
 				file = chr(file_ord)
 				Pawn(player, Coordinate(f'{file}{pawn_rank}'))
 
+
+def main():
+	game = ChessGame()
+	game.classic_setup()
+
+if __name__ == '__main__':
+	main()
+

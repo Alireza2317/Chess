@@ -1,6 +1,5 @@
-from chess.components import Coordinate, Color, Board
+from chess.components import Coordinate, Color, Board, Piece, PieceType
 from chess.game.player import Player
-from chess.pieces.piece_abc import Piece, PieceType
 
 class Knight(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate):

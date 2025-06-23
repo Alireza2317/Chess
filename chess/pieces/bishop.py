@@ -1,6 +1,5 @@
-from chess.components import Coordinate, Color, Board
+from chess.components import Coordinate, Color, Board, Piece, PieceType
 from chess.game.player import Player
-from chess.pieces.piece_abc import Piece, PieceType
 from chess.pieces.pawn import Pawn
 
 class Bishop(Piece):

@@ -1,16 +1,11 @@
 from __future__ import annotations
-from chess.components import Color, Board, Piece, Coordinate
-from chess.pieces.king import King
-from chess.pieces.rook import Rook
+from chess.components import Color, Coordinate, Piece, PieceType
 
 class Player:
-	def __init__(self, board: Board, color: Color):
+	def __init__(self, color: 'Color'):
 		if not isinstance(color, Color):
 			raise TypeError(f'color should be of type {type(Color)}!')
-		if not isinstance(board, Board):
-			raise TypeError(f'board should be of type {type(Board)}!')
-		
-		self.board = board
+
 		self.color = color
 		self.pieces: list[Piece] = []
 		self.move: bool = True
@@ -19,7 +14,7 @@ class Player:
 		""" sets up self.king based on self.pieces. """
 		k_count = 0
 		for piece in self.pieces:
-			if isinstance(piece, King):
+			if piece.piece_type == PieceType.KING:
 				self.king = piece
 				k_count += 1
 
@@ -44,9 +39,9 @@ class Player:
 		if self.king.has_moved: return False
 		if self.is_in_check(): return False
 
-		for p in self.pieces:
-			if isinstance(p, Rook):
-				if not p.has_moved:
+		for piece in self.pieces:
+			if piece.piece_type == PieceType.ROOK:
+				if not piece.has_moved:
 					return True
 
 		# no rooks, or rooks have moved
@@ -63,12 +58,12 @@ class Player:
 
 		king_rook_moves_pair: list[tuple[Coordinate, Coordinate]] = []
 
-		for p in self.pieces:
-			if isinstance(p, Rook):
-				if p.has_moved: continue
+		for piece in self.pieces:
+			if piece.piece_type == PieceType.ROOK:
+				if piece.has_moved: continue
 
 				# short castle
-				if p.coordinate.file == 'h':
+				if piece.coordinate.file == 'h':
 					if self.color == Color.WHITE:
 						king_c = Coordinate('g1')
 						rook_c = Coordinate('f1')
@@ -77,7 +72,7 @@ class Player:
 						rook_c = Coordinate('f8')
 
 				# long castle
-				elif p.coordinate.file == 'a':
+				elif piece.coordinate.file == 'a':
 					if self.color == Color.WHITE:
 						king_c = Coordinate('c1')
 						rook_c = Coordinate('d1')
