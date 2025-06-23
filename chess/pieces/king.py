@@ -1,7 +1,8 @@
 from chess.components import Coordinate, Color, Board, PieceType, Piece
-from chess.game.player import Player
+
 
 class King(Piece):
+	from chess.game.player import Player
 	def __init__(self, player: Player, coordinate: Coordinate):
 		super().__init__(player, coordinate)
 

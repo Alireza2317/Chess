@@ -1,11 +1,11 @@
 from chess.components import Board, Color, Coordinate
 from chess.game.player import Player
 from chess.pieces.king import King
-from chess.pieces.queen import Queen
-from chess.pieces.rook import Rook
-from chess.pieces.bishop import Bishop
-from chess.pieces.knight import Knight
-from chess.pieces.pawn import Pawn
+#from chess.pieces.queen import Queen
+#from chess.pieces.rook import Rook
+#from chess.pieces.bishop import Bishop
+#from chess.pieces.knight import Knight
+#from chess.pieces.pawn import Pawn
 
 class ChessGame:
 	def __init__(self):

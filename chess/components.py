@@ -1,8 +1,12 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 from enum import Enum
 from chess.utils import colored_str
-from chess.game.player import Player
+
+if TYPE_CHECKING:
+	from chess.game.player import Player
+
 
 class PieceType(Enum):
 	KING = 'k'
@@ -73,7 +77,7 @@ class Coordinate:
 
 
 class Piece(ABC):
-	def __init__(self, player: 'Player', coordinate: Coordinate):
+	def __init__(self, player: Player, coordinate: Coordinate):
 		if not isinstance(coordinate, Coordinate):
 			raise TypeError(f'coordinate should be of type {type(Coordinate)}!')
 
