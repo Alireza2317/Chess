@@ -13,6 +13,9 @@ class ChessGame:
 		self.white_p: Player = Player(self.board, Color.WHITE)
 		self.black_p: Player = Player(self.board, Color.BLACK)
 
+		self.white_p.set_opponent(self.black_p)
+		self.black_p.set_opponent(self.white_p)
+
 	def classic_setup(self) -> None:
 		for color in [Color.WHITE, Color.BLACK]:
 			if color == Color.WHITE:
