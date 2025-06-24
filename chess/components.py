@@ -84,6 +84,7 @@ class Piece(ABC):
 		self.board = player.board
 		self.color = player.color
 		self.coordinate = coordinate
+		self.valid_moves: list[Coordinate]
 		self.has_moved: bool = False
 
 		# put the piece on the board on init

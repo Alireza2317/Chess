@@ -120,7 +120,7 @@ class Player:
 		return (
 			self.move and
 			self.is_in_check() and
-			not self.king.available_moves()
+			not self.king.valid_moves
 		)
 
 	def is_stalemate(self) -> bool:
@@ -128,5 +128,5 @@ class Player:
 		return (
 			self.move and
 			not self.is_in_check() and
-			not self.king.available_moves()
+			not self.king.valid_moves
 		)

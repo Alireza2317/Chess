@@ -43,8 +43,13 @@ class ChessGame:
 
 def main():
 	game = ChessGame()
-	game.classic_setup()
-	print(game.board)
+	#game.classic_setup()
+	King(game.white_p, Coordinate('e1'))
+	King(game.black_p, Coordinate('e8'))
+
+	q=Queen(game.white_p, Coordinate('b4'))
+	print(q.valid_moves)
+
 
 if __name__ == '__main__':
 	main()
