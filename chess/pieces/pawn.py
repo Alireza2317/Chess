@@ -46,19 +46,31 @@ class Pawn(Piece):
 			sign: int = -1
 
 		new_rank = chr(rank_ord + sign*1)
-		c: Coordinate = Coordinate(f'{file}{new_rank}')
+		m = f'{file}{new_rank}'
+		if Coordinate.is_valid(m):
+			c: Coordinate = Coordinate(m)
 
-		# if there isn't a piece ahead(any color) -> can move forward
-		if not self.board.get(c).piece:
-			moves.append(c)
+			# if there isn't a piece ahead(any color) -> can move forward
+			if not self.board.get(c).piece:
+				moves.append(c)
 
 			# only if it's the first move, allow double forward move
 			if not self.has_moved:
 				new_rank = chr(rank_ord + sign*2)
-				c = Coordinate(f'{file}{new_rank}')
-				# if there isn't a piece ahead
-				if not self.board.get(c).piece:
-					moves.append(c)
+				m = f'{file}{new_rank}'
+				if Coordinate.is_valid(m):
+					c: Coordinate = Coordinate(m)
+
+					# if there isn't a piece ahead
+					if not self.board.get(c).piece:
+						moves.append(c)
+
+		# capturing moves
+		for move in self.attacking_coordinates():
+			p = self.board.get(move).piece
+			if p:
+				if p.color != self.color:
+					moves.append(move)
 
 		return moves
 
