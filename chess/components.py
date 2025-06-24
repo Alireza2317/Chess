@@ -175,6 +175,7 @@ class Board:
 
 		if self.board[row][col].piece is None:
 			self.board[row][col].piece = piece
+			piece.coordinate = coordinate
 		else:
 			raise ValueError(f'There is already a piece on {coordinate}')
 
