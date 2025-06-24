@@ -40,11 +40,15 @@ class ChessGame:
 				file = chr(file_ord)
 				Pawn(player, Coordinate(f'{file}{pawn_rank}'))
 
+	def two_kings_setup(self) -> None:
+		King(self.white_p, Coordinate('e1'))
+		King(self.black_p, Coordinate('e8'))
+
 	def step(self) -> bool:
 		print(self.board)
 
 		self.white_p.update_valid_moves()
-		
+
 		if self.white_p.is_checkmated() or self.white_p.is_stalemate():
 			print('Game over!')
 			return True
@@ -57,12 +61,12 @@ class ChessGame:
 				)
 
 		for i, (p, wm) in enumerate(white_moves):
-			print(f'{i}: {p.piece_type} {wm}')
+			print(f'{i:02}: {p.piece_type.name.title(): >6} {wm}')
 
 		move_idx = int(input("White's move: "))
 		p = white_moves[move_idx][0]
 		wm = white_moves[move_idx][1]
-		self.white_p.move_piece(p, wm)
+		self.board.move(p, wm)
 
 		print(self.board)
 
@@ -80,22 +84,20 @@ class ChessGame:
 				)
 
 		for i, (p, bm) in enumerate(black_moves):
-			print(f'{i}: {p.piece_type} {bm}')
+			print(f'{i:02}: {p.piece_type.name.title(): >6} {bm}')
 
 		move_idx = int(input("Black's move: "))
 		p = black_moves[move_idx][0]
 		bm = black_moves[move_idx][1]
-		self.black_p.move_piece(p, bm)
-
+		self.board.move(p, bm)
 
 		return False
 
+
 def main():
 	game = ChessGame()
-	game.classic_setup()
-	game.white_p.update_valid_moves()
-	game.white_p.update_valid_moves()
 
+	game.classic_setup()
 	while True:
 		game_over = game.step()
 		if game_over: break
