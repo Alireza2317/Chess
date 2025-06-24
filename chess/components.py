@@ -174,12 +174,8 @@ class Board:
 		"""
 
 		row, col = coordinate.regular
-
-		if self.board[row][col].piece is None:
-			self.board[row][col].piece = piece
-			piece.coordinate = coordinate
-		else:
-			raise ValueError(f'There is already a piece on {coordinate}')
+		self.board[row][col].piece = piece
+		piece.coordinate = coordinate
 
 	def remove(self, coordinate: Coordinate) -> None:
 		""" removes the piece(if any) from the given coordinate. """
