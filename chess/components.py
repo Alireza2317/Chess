@@ -55,10 +55,11 @@ class Coordinate:
 		return (coordinate[0] in 'abcdefgh') and (coordinate[1] in '12345678')
 
 	def __eq__(self, other: Coordinate):
+		print(other, type(other))
 		if not isinstance(other, Coordinate):
 			raise TypeError(
 				f'Cannot check equality between ' +
-				f'{type(Coordinate)} and {type(other)}!'
+				f'{Coordinate.__name__} and {type(other)}!'
 			)
 
 		return (self.file == other.file) and (self.rank == other.rank)
@@ -67,7 +68,7 @@ class Coordinate:
 		if not isinstance(other, Coordinate):
 			raise TypeError(
 				f'Cannot check equality between ' +
-				f'{type(Coordinate)} and {type(other)}!'
+				f'{Coordinate.__name__} and {type(other)}!'
 			)
 
 		return (self.file != other.file) or (self.rank != other.rank)
@@ -79,7 +80,9 @@ class Coordinate:
 class Piece(ABC):
 	def __init__(self, player: Player, coordinate: Coordinate):
 		if not isinstance(coordinate, Coordinate):
-			raise TypeError(f'coordinate should be of type {type(Coordinate)}!')
+			raise TypeError(
+				f'coordinate should be of type {Coordinate.__name__}!'
+			)
 
 		self.board = player.board
 		self.color = player.color
@@ -123,7 +126,7 @@ class Square:
 	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
 		if not isinstance(coordinate, Coordinate):
 			raise TypeError(
-				f'Invalid coordinate! should be of type {type(Coordinate)}'
+				f'Invalid coordinate! should be of type {Coordinate.__name__}'
 			)
 		if not isinstance(piece, (Piece, type(None))):
 			raise TypeError(
@@ -165,8 +168,7 @@ class Board:
 				]
 			)
 
-
-	def put(self, piece: Piece | None, coordinate: Coordinate) -> None:
+	def put(self, piece: Piece, coordinate: Coordinate) -> None:
 		"""
 		takes a chess coordinate and puts the given piece
 		in the appropriate square
@@ -184,6 +186,14 @@ class Board:
 		""" removes the piece(if any) from the given coordinate. """
 		row, col = coordinate.regular
 		self.board[row][col].piece = None
+
+	def move(self, piece: Piece, coordinate: Coordinate) -> None:
+		"""
+		puts the piece in given coordinate and
+		removes it from its original coordinate
+		"""
+		self.board.remove(piece.coordinate)
+		self.board.put(piece, coordinate)
 
 	def get(self, coordinate: Coordinate) -> Square:
 		""" returns the square in the given coordinate. """
