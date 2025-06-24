@@ -30,17 +30,26 @@ class Player:
 	def set_opponent(self, opponent: Player) -> None:
 		self.opponent = opponent
 
+	def move_piece(self, piece: Piece, coordinate: Coordinate) -> None:
+		"""
+		puts the piece in given coordinate and
+		removes it from its original coordinate
+		"""
+		self.board.remove(piece.coordinate)
+		self.board.put(piece, coordinate)
+
 	def update_valid_moves(self):
 		for piece in self.pieces:
 			valid_moves: list[Coordinate] = []
 			original_coordinate = piece.coordinate
 
 			for move in piece.available_moves():
-				self.board.put(piece, move)
+				self.move_piece(piece, move)
+
 				if not self.is_in_check():
 					valid_moves.append(move)
 
-			self.board.put(piece, original_coordinate)
+				self.move_piece(piece, original_coordinate)
 			piece.valid_moves = valid_moves
 
 	def add_piece(self, piece: Piece) -> None:
@@ -125,8 +134,12 @@ class Player:
 
 	def is_stalemate(self) -> bool:
 		""" returns wether the game is a stalemate(draw) or not. """
+		all_valid_moves = []
+		for p in self.pieces:
+			all_valid_moves.extend(p.valid_moves)
+
 		return (
 			self.move and
 			not self.is_in_check() and
-			not self.king.valid_moves
+			not all_valid_moves
 		)
