@@ -1,12 +1,21 @@
 from __future__ import annotations
 from chess.components import Color, Board, Coordinate, Piece, PieceType
 
+class valid_moves_checking_mode:
+	def __init__(self, piece: Piece):
+		self.piece = piece
+	def __enter__(self):
+		self.original_coordinate = self.piece.coordinate
+	def __exit__(self, *args) -> bool:
+		self.piece.board.move(self.piece, self.original_coordinate)
+		return False
+
 class Player:
-	def __init__(self, board: Board, color: 'Color'):
+	def __init__(self, board: Board, color: Color):
 		if not isinstance(color, Color):
-			raise TypeError(f'color should be of type {type(Color)}!')
+			raise TypeError(f'color should be of type {Color.__name__}!')
 		if not isinstance(board, Board):
-			raise TypeError(f'board should be of type {type(Board)}!')
+			raise TypeError(f'board should be of type {Board.__name__}!')
 
 		self.board = board
 		self.color = color
@@ -30,33 +39,23 @@ class Player:
 	def set_opponent(self, opponent: Player) -> None:
 		self.opponent = opponent
 
-	def move_piece(self, piece: Piece, coordinate: Coordinate) -> None:
-		"""
-		puts the piece in given coordinate and
-		removes it from its original coordinate
-		"""
-		self.board.remove(piece.coordinate)
-		self.board.put(piece, coordinate)
-
 	def update_valid_moves(self):
 		for piece in self.pieces:
 			valid_moves: list[Coordinate] = []
-			original_coordinate = piece.coordinate
+			with valid_moves_checking_mode(piece):
+				for c in piece.available_moves():
+					self.board.move(piece, c)
 
-			for move in piece.available_moves():
-				self.move_piece(piece, move)
+					if not self.is_in_check():
+						valid_moves.append(c)
 
-				if not self.is_in_check():
-					valid_moves.append(move)
-
-				self.move_piece(piece, original_coordinate)
 			piece.valid_moves = valid_moves
 
 	def add_piece(self, piece: Piece) -> None:
 		"""	adds the given piece to self.pieces & updates self.king. """
 		if not isinstance(piece, Piece):
 			raise TypeError(
-				f'piece should be of type {type(Piece)}'
+				f'piece should be of type {Piece.__name__}'
 			)
 
 		self.pieces.append(piece)
