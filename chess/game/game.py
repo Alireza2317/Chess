@@ -40,15 +40,65 @@ class ChessGame:
 				file = chr(file_ord)
 				Pawn(player, Coordinate(f'{file}{pawn_rank}'))
 
+	def step(self) -> bool:
+		print(self.board)
+
+		self.white_p.update_valid_moves()
+		
+		if self.white_p.is_checkmated() or self.white_p.is_stalemate():
+			print('Game over!')
+			return True
+
+		white_moves = []
+		for piece in self.white_p.pieces:
+			for move in piece.valid_moves:
+				white_moves.append(
+					(piece, move)
+				)
+
+		for i, (p, wm) in enumerate(white_moves):
+			print(f'{i}: {p.piece_type} {wm}')
+
+		move_idx = int(input("White's move: "))
+		p = white_moves[move_idx][0]
+		wm = white_moves[move_idx][1]
+		self.white_p.move_piece(p, wm)
+
+		print(self.board)
+
+		self.black_p.update_valid_moves()
+
+		if self.black_p.is_checkmated() or self.black_p.is_stalemate():
+			print('Game over!')
+			return True
+
+		black_moves = []
+		for piece in self.black_p.pieces:
+			for move in piece.valid_moves:
+				black_moves.append(
+					(piece, move)
+				)
+
+		for i, (p, bm) in enumerate(black_moves):
+			print(f'{i}: {p.piece_type} {bm}')
+
+		move_idx = int(input("Black's move: "))
+		p = black_moves[move_idx][0]
+		bm = black_moves[move_idx][1]
+		self.black_p.move_piece(p, bm)
+
+
+		return False
 
 def main():
 	game = ChessGame()
-	#game.classic_setup()
-	King(game.white_p, Coordinate('e1'))
-	King(game.black_p, Coordinate('e8'))
+	game.classic_setup()
+	game.white_p.update_valid_moves()
+	game.white_p.update_valid_moves()
 
-	q=Queen(game.white_p, Coordinate('b4'))
-	print(q.valid_moves)
+	while True:
+		game_over = game.step()
+		if game_over: break
 
 
 if __name__ == '__main__':
