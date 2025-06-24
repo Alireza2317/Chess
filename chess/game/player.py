@@ -1,15 +1,6 @@
 from __future__ import annotations
 from chess.components import Color, Board, Coordinate, Piece, PieceType
 
-class valid_moves_checking_mode:
-	def __init__(self, piece: Piece):
-		self.piece = piece
-	def __enter__(self):
-		self.original_coordinate = self.piece.coordinate
-	def __exit__(self, *args) -> bool:
-		self.piece.board.move(self.piece, self.original_coordinate)
-		return False
-
 class Player:
 	def __init__(self, board: Board, color: Color):
 		if not isinstance(color, Color):
@@ -39,16 +30,47 @@ class Player:
 	def set_opponent(self, opponent: Player) -> None:
 		self.opponent = opponent
 
-	def update_valid_moves(self):
+	def update_valid_moves(self) -> None:
+		"""
+		updates valid_moves property for each piece of the player
+		this is a subset of each piece's available_moves()
+		but considers potential checks and illegal moves in chess
+		and sets up only the legal and valid moves
+		"""
 		for piece in self.pieces:
+			original_coord = piece.coordinate
+			has_moved = piece.has_moved
 			valid_moves: list[Coordinate] = []
-			with valid_moves_checking_mode(piece):
-				for c in piece.available_moves():
-					self.board.move(piece, c)
 
-					if not self.is_in_check():
-						valid_moves.append(c)
+			for coord in piece.available_moves():
+				enemy_piece: Piece | None = self.board.get(coord).piece
 
+				self.board.remove(coord)
+				if enemy_piece:
+					# remove from opponent's pieces
+					for op_piece in self.opponent.pieces:
+						if op_piece.coordinate == coord:
+							self.opponent.pieces.remove(op_piece)
+							break
+
+				self.board.move(piece, coord)
+
+				if not self.is_in_check():
+					valid_moves.append(coord)
+
+				# reset
+				self.board.move(piece, original_coord)
+
+				# reset
+				if enemy_piece:
+					self.board.put(enemy_piece, enemy_piece.coordinate)
+					#enemy_piece.board.put(enemy_piece, enemy_piece.coordinate)
+					self.opponent.add_piece(enemy_piece)
+
+			# reset
+			piece.has_moved = has_moved
+
+			# update valid moves for each piece
 			piece.valid_moves = valid_moves
 
 	def add_piece(self, piece: Piece) -> None:
