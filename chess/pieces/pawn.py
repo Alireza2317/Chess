@@ -37,10 +37,6 @@ class Pawn(Piece):
 		"""
 		moves: list[Coordinate] = []
 
-		moves.extend(
-			super().available_moves()
-		)
-
 		file = self.coordinate.file
 		rank_ord = ord(self.coordinate.rank)
 
