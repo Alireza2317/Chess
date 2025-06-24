@@ -23,9 +23,25 @@ class Player:
 
 		if k_count != 1:
 			raise TypeError(
-				f'pieces parameter should be a list of Piece objects!'+
+				f'pieces parameter should be a list of Piece objects!\n'+
 				f'and it should have one and only one King object inside.'
 			)
+
+	def set_opponent(self, opponent: Player) -> None:
+		self.opponent = opponent
+
+	def update_valid_moves(self):
+		for piece in self.pieces:
+			valid_moves: list[Coordinate] = []
+			original_coordinate = piece.coordinate
+
+			for move in piece.available_moves():
+				self.board.put(piece, move)
+				if not self.is_in_check():
+					valid_moves.append(move)
+
+			self.board.put(piece, original_coordinate)
+			piece.valid_moves = valid_moves
 
 	def add_piece(self, piece: Piece) -> None:
 		"""	adds the given piece to self.pieces & updates self.king. """
@@ -89,11 +105,11 @@ class Player:
 
 		return king_rook_moves_pair
 
-	def is_in_check(self, enemy: Player) -> bool:
+	def is_in_check(self) -> bool:
 		""" returns wether the player is in check or not. """
 		if not self.move: return False
 
-		for piece in enemy.pieces:
+		for piece in self.opponent.pieces:
 			if self.king.coordinate in piece.attacking_coordinates():
 				return True
 
