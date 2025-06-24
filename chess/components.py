@@ -189,6 +189,7 @@ class Board:
 		"""
 		self.remove(piece.coordinate)
 		self.put(piece, coordinate)
+		piece.has_moved = True
 
 	def get(self, coordinate: Coordinate) -> Square:
 		""" returns the square in the given coordinate. """
