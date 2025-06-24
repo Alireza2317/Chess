@@ -149,7 +149,7 @@ class Square:
 			self.color = Color.WHITE
 
 	def __repr__(self):
-		return str(self.piece)
+		return f'{Square.__name__}({self.coordinate}, {self.piece})'
 
 
 class Board:
