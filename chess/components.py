@@ -157,10 +157,10 @@ class Board:
 		# the arrangement of these lists is such that the first row is
 		# equivalent to the rank 1, from a to h
 		# and the last row is the rank 8
-		self.board: list[list[Square]] = []
+		self.board_matrix: list[list[Square]] = []
 
 		for rank in '12345678':
-			self.board.append(
+			self.board_matrix.append(
 				[
 					Square(Coordinate(f'{file}{rank}'), piece=None)
 					for file in 'abcdefgh'
@@ -174,13 +174,13 @@ class Board:
 		"""
 
 		row, col = coordinate.regular
-		self.board[row][col].piece = piece
+		self.board_matrix[row][col].piece = piece
 		piece.coordinate = coordinate
 
 	def remove(self, coordinate: Coordinate) -> None:
 		""" removes the piece(if any) from the given coordinate. """
 		row, col = coordinate.regular
-		self.board[row][col].piece = None
+		self.board_matrix[row][col].piece = None
 
 	def move(self, piece: Piece, coordinate: Coordinate) -> None:
 		"""
@@ -194,7 +194,7 @@ class Board:
 	def get(self, coordinate: Coordinate) -> Square:
 		""" returns the square in the given coordinate. """
 		row, col = coordinate.regular
-		return self.board[row][col]
+		return self.board_matrix[row][col]
 
 	def get_coordinates(
 		self,
@@ -231,7 +231,7 @@ class Board:
 
 	def __repr__(self):
 		s: str = ''
-		for row in reversed(self.board):
+		for row in reversed(self.board_matrix):
 			for sq in row:
 				if sq.piece:
 					s += f'{sq.piece}'
