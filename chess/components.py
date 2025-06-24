@@ -55,7 +55,6 @@ class Coordinate:
 		return (coordinate[0] in 'abcdefgh') and (coordinate[1] in '12345678')
 
 	def __eq__(self, other: Coordinate):
-		print(other, type(other))
 		if not isinstance(other, Coordinate):
 			raise TypeError(
 				f'Cannot check equality between ' +
@@ -192,8 +191,8 @@ class Board:
 		puts the piece in given coordinate and
 		removes it from its original coordinate
 		"""
-		self.board.remove(piece.coordinate)
-		self.board.put(piece, coordinate)
+		self.remove(piece.coordinate)
+		self.put(piece, coordinate)
 
 	def get(self, coordinate: Coordinate) -> Square:
 		""" returns the square in the given coordinate. """
