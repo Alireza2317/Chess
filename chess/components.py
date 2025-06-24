@@ -182,7 +182,8 @@ class Board:
 
 	def remove(self, coordinate: Coordinate) -> None:
 		""" removes the piece(if any) from the given coordinate. """
-		self.put(None, coordinate)
+		row, col = coordinate.regular
+		self.board[row][col].piece = None
 
 	def get(self, coordinate: Coordinate) -> Square:
 		""" returns the square in the given coordinate. """
