@@ -1,4 +1,5 @@
-from chess.components import Board, Color, Coordinate
+from enum import Enum
+from chess.components import Board, Color, Coordinate, Piece
 from chess.game.player import Player
 from chess.pieces.king import King
 from chess.pieces.queen import Queen
@@ -6,6 +7,13 @@ from chess.pieces.rook import Rook
 from chess.pieces.bishop import Bishop
 from chess.pieces.knight import Knight
 from chess.pieces.pawn import Pawn
+
+class GameEndState(Enum):
+	BLACK_WON = 'b'
+	WHITE_WON = 'w'
+	DRAW = 'd'
+	ONGOING = 'o'
+
 
 class ChessGame:
 	def __init__(self):
@@ -40,56 +48,69 @@ class ChessGame:
 				file = chr(file_ord)
 				Pawn(player, Coordinate(f'{file}{pawn_rank}'))
 
+		self.white_p.update_valid_moves()
+		self.black_p.update_valid_moves()
+
 	def two_kings_setup(self) -> None:
 		King(self.white_p, Coordinate('e1'))
 		King(self.black_p, Coordinate('e8'))
 
-	def step(self) -> bool:
-		print(self.board)
+	def check_state(self) -> GameEndState:
+		if self.white_p.is_checkmated():
+			print('Black won!')
+			return GameEndState.BLACK_WON
+		if self.black_p.is_checkmated():
+			print('White won!')
+			return GameEndState.WHITE_WON
 
-		self.white_p.update_valid_moves()
+		if self.white_p.is_stalemate() or self.black_p.is_stalemate():
+			print('Stalemate(Draw)')
+			return GameEndState.DRAW
 
-		if self.white_p.is_checkmated() or self.white_p.is_stalemate():
-			print('Game over!')
-			return True
+		return GameEndState.ONGOING
 
-		white_moves = []
-		for piece in self.white_p.pieces:
+	def get_player_valid_moves(self, player: Player) -> list[Coordinate]:
+		player_moves = []
+		for piece in player.pieces:
 			for move in piece.valid_moves:
-				white_moves.append(
+				player_moves.append(
 					(piece, move)
 				)
 
-		for i, (p, wm) in enumerate(white_moves):
+		for i, (p, wm) in enumerate(player_moves):
 			print(f'{i:02}: {p.piece_type.name.title(): >6} {wm}')
 
-		move_idx = int(input("White's move: "))
-		p = white_moves[move_idx][0]
-		wm = white_moves[move_idx][1]
+		return player_moves
+
+	def apply_input_to_game(
+			self,
+			player: Player,
+			valid_moves: list[Coordinate]
+	):
+		move_idx = int(input(f"{player.color.name.title()}'s move: "))
+		p = valid_moves[move_idx][0]
+		wm = valid_moves[move_idx][1]
 		self.board.move(p, wm)
 
-		print(self.board)
+	def step(self) -> bool:
+		"""
+		one step in the game which contains one move from white and
+		one move from black
+		returns the game_over state(bool)
+		"""
+		for player in (self.white_p, self.black_p):
+			print(self.board)
 
-		self.black_p.update_valid_moves()
+			player.update_valid_moves()
 
-		if self.black_p.is_checkmated() or self.black_p.is_stalemate():
-			print('Game over!')
-			return True
+			state = self.check_state()
+			if state != GameEndState.ONGOING: return True
 
-		black_moves = []
-		for piece in self.black_p.pieces:
-			for move in piece.valid_moves:
-				black_moves.append(
-					(piece, move)
-				)
-
-		for i, (p, bm) in enumerate(black_moves):
-			print(f'{i:02}: {p.piece_type.name.title(): >6} {bm}')
-
-		move_idx = int(input("Black's move: "))
-		p = black_moves[move_idx][0]
-		bm = black_moves[move_idx][1]
-		self.board.move(p, bm)
+			valid_moves = self.get_player_valid_moves(player)
+			self.apply_input_to_game(
+				player,
+				valid_moves
+			)
 
 		return False
 
