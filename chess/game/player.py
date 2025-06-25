@@ -83,6 +83,11 @@ class Player:
 		self.pieces.append(piece)
 		self.set_king()
 
+	def remove_piece(self, piece: Piece) -> None:
+		for i, p in enumerate(self.pieces):
+			if p.coordinate == piece.coordinate:
+				self.pieces.pop(i)
+
 	def can_castle(self) -> bool:
 		""" Checks wether the player can castle or not. """
 		if self.king.has_moved: return False
