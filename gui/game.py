@@ -1,17 +1,24 @@
 import sys
 import pygame as pg
 from gui.config import gui_cfg
-from chess.components import Board, Coordinate, Color, Piece
-from chess.pieces.king import King
-from chess.pieces.queen import Queen
-from chess.pieces.rook import Rook
-from chess.pieces.bishop import Bishop
-from chess.pieces.knight import Knight
-from chess.pieces.pawn import Pawn
+from chess.components import Board, Coordinate, Color, Piece, PieceType
+#from chess.pieces.king import King
+#from chess.pieces.queen import Queen
+#from chess.pieces.rook import Rook
+#from chess.pieces.bishop import Bishop
+#from chess.pieces.knight import Knight
+#from chess.pieces.pawn import Pawn
+from chess.game.game import ChessGame
 
-
-class ChessGUI:
+class ChessGUI(ChessGame):
 	def __init__(self):
+		super().__init__()
+
+		self.init_gui_elements()
+
+		self.classic_setup()
+
+	def init_gui_elements(self):
 		pg.init()
 		pg.display.set_caption('Chess')
 
@@ -34,7 +41,12 @@ class ChessGUI:
 					pg.quit()
 					sys.exit()
 
-	def draw_image_at(self, surface: pg.Surface, filepath: str, rect: tuple[int, int]):
+	def _draw_image_at(
+		self,
+		surface: pg.Surface,
+		filepath: str,
+		xy: tuple[int, int]
+	):
 		"""
 		puts the given image on the given surface and position.
 		"""
@@ -45,8 +57,8 @@ class ChessGUI:
 			(gui_cfg.square_size, gui_cfg.square_size)
 		)
 		scaled_image_rect = scaled_image.get_rect()
-		scaled_image_rect.x = rect[0]
-		scaled_image_rect.y = rect[1]
+		scaled_image_rect.x = xy[0]
+		scaled_image_rect.y = xy[1]
 
 		surface.blit(scaled_image, scaled_image_rect)
 
@@ -64,17 +76,17 @@ class ChessGUI:
 			filepath += Color.BLACK.value
 
 		# add piece type letter
-		if isinstance(piece, King):
+		if piece.piece_type == PieceType.KING:
 			filepath += 'k'
-		elif isinstance(piece, Queen):
+		if piece.piece_type == PieceType.QUEEN:
 			filepath += 'q'
-		elif isinstance(piece, Rook):
+		if piece.piece_type == PieceType.ROOK:
 			filepath += 'r'
-		elif isinstance(piece, Bishop):
+		if piece.piece_type == PieceType.BISHOP:
 			filepath += 'b'
-		elif isinstance(piece, Knight):
+		if piece.piece_type == PieceType.KNIGHT:
 			filepath += 'n'
-		elif isinstance(piece, Pawn):
+		if piece.piece_type == PieceType.PAWN:
 			filepath += 'p'
 
 		# add file extension
@@ -85,51 +97,20 @@ class ChessGUI:
 		# if row==1 -> rank 2 -> y = (7-row)*square_size = 6*square_size
 		# if col==0 -> file a -> x = col*square_size = 0
 		# if col==1 -> file b -> x = col*square_size = square_size
-		rect: tuple[int, int] = (
+		xy: tuple[int, int] = (
 			col * gui_cfg.square_size, (7-row) * gui_cfg.square_size
 		)
 
-		self.draw_image_at(self.board_screen, filepath, rect)
+		self._draw_image_at(self.board_screen, filepath, xy)
 
 	def draw_coordinates(self):
 		pass
 
-	def create_dummy_board(self):
-		# dummy board
-		self.board = Board()
-		for file in 'abcdefgh':
-			Pawn(Color.WHITE, self.board, Coordinate(f'{file}2'))
-			Pawn(Color.BLACK, self.board, Coordinate(f'{file}7'))
-
-		King(Color.WHITE, self.board, Coordinate('e1'))
-		King(Color.BLACK, self.board, Coordinate('e8'))
-
-		Queen(Color.WHITE, self.board, Coordinate('d1'))
-		Queen(Color.BLACK, self.board, Coordinate('d8'))
-
-		Rook(Color.WHITE, self.board, Coordinate('a1'))
-		Rook(Color.WHITE, self.board, Coordinate('h1'))
-		Rook(Color.BLACK, self.board, Coordinate('a8'))
-		Rook(Color.BLACK, self.board, Coordinate('h8'))
-
-		Bishop(Color.WHITE, self.board, Coordinate('c1'))
-		Bishop(Color.WHITE, self.board, Coordinate('f1'))
-		Bishop(Color.BLACK, self.board, Coordinate('c8'))
-		Bishop(Color.BLACK, self.board, Coordinate('f8'))
-
-		Knight(Color.WHITE, self.board, Coordinate('b1'))
-		Knight(Color.WHITE, self.board, Coordinate('g1'))
-		Knight(Color.BLACK, self.board, Coordinate('b8'))
-		Knight(Color.BLACK, self.board, Coordinate('g8'))
-
-
 	def draw_board(self):
 		self.board_screen = pg.surface.Surface(gui_cfg.dimensions)
 
-		self.create_dummy_board()
-		
 		first = True
-		for r, row in enumerate(reversed(self.board.board)):
+		for r, row in enumerate(reversed(self.board.board_matrix)):
 			for f, sq in enumerate(row):
 				if sq.color == Color.BLACK:
 					color = gui_cfg.black_color
@@ -165,20 +146,23 @@ class ChessGUI:
 			)
 			self.board_screen.blit(c, (805, r*100 + 50))
 
-		for row in self.board.board:
+		for row in self.board.board_matrix:
 			for sq in row:
 				if sq.piece:
 					self.draw_piece(sq.piece)
 
 		self.screen.blit(self.board_screen, (0, 0))
 
-	def step(self):
-		self.handle_events()
-
+	def update_screen(self):
 		self.draw_board()
 
 		pg.display.update()
 		self.clock.tick(gui_cfg.fps)
+
+	def step(self):
+		self.handle_events()
+
+		self.update_screen()
 
 
 def main():
