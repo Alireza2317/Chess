@@ -148,6 +148,12 @@ class Square:
 		else:
 			self.color = Color.WHITE
 
+	def __eq__(self, other: Square):
+		return self.piece is other.piece
+
+	def __ne__(self, other: Square):
+		return self.piece is not other.piece
+	
 	def __repr__(self):
 		return f'{Square.__name__}({self.coordinate}, {self.piece})'
 
