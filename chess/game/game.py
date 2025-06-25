@@ -88,9 +88,17 @@ class ChessGame:
 			valid_moves: list[Coordinate]
 	):
 		move_idx = int(input(f"{player.color.name.title()}'s move: "))
-		p = valid_moves[move_idx][0]
-		wm = valid_moves[move_idx][1]
-		self.board.move(p, wm)
+		piece = valid_moves[move_idx][0]
+		move = valid_moves[move_idx][1]
+
+		## if there is an enemy piece on the desired coordinate: capture
+		#if self.board.get(move).piece:
+		#	# remove from board
+		#	self.board.remove(move)
+		#	# remove from player's pieces
+		#	player.remove_piece(piece)
+
+		self.board.move(piece, move)
 
 	def step(self) -> bool:
 		"""

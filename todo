@@ -1,5 +1,5 @@
 1. piece capture effect:
-	del from boar
+	del from board
 	del from player pieces
 
 2. stop check via removing the threat
