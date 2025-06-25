@@ -1,34 +1,50 @@
 import sys
 import pygame as pg
+from copy import deepcopy
 from gui.config import gui_cfg
-from chess.components import Board, Coordinate, Color, Piece, PieceType
-#from chess.pieces.king import King
-#from chess.pieces.queen import Queen
-#from chess.pieces.rook import Rook
-#from chess.pieces.bishop import Bishop
-#from chess.pieces.knight import Knight
-#from chess.pieces.pawn import Pawn
+from chess.components import Board, Coordinate, Color, Piece, PieceType, Square
 from chess.game.game import ChessGame
 
 class ChessGUI(ChessGame):
 	def __init__(self):
 		super().__init__()
+		self.old_board = deepcopy(self.board)
+		self.classic_setup()
 
 		self.init_gui_elements()
 
-		self.classic_setup()
-
 	def init_gui_elements(self):
+		"""
+		initialize important gui properties and functionalities.
+		"""
 		pg.init()
 		pg.display.set_caption('Chess')
 
-		self.screen = pg.display.set_mode(gui_cfg.dimensions)
+		self.screen = pg.display.set_mode(
+			(
+				gui_cfg.dimensions[0]+gui_cfg.coordinates_width,
+				gui_cfg.dimensions[1]+gui_cfg.square_size//2
+			)
+		)
+		self.screen.fill(gui_cfg.bg_color)
+
+		board_size = (
+			gui_cfg.dimensions[0]+gui_cfg.coordinates_width,
+			gui_cfg.dimensions[1]+gui_cfg.coordinates_width
+		)
+		self.board_screen = pg.surface.Surface(board_size)
+		self.board_screen.fill((0, 0, 0))
+
 		self.clock = pg.time.Clock()
 		self.font = pg.font.Font(
 			pg.font.get_default_font(), gui_cfg.font_size
 		)
 
+		self.draw_coordinates()
+		self.update_board(first_time=True)
+
 	def handle_events(self):
+		""" handle user events. """
 		# get user input in event loop
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
@@ -48,7 +64,7 @@ class ChessGUI(ChessGame):
 		xy: tuple[int, int]
 	):
 		"""
-		puts the given image on the given surface and position.
+		puts the given image in `filepath` on the given surface and position.
 		"""
 		image = pg.image.load(filepath)
 
@@ -63,9 +79,7 @@ class ChessGUI(ChessGame):
 		surface.blit(scaled_image, scaled_image_rect)
 
 	def draw_piece(self, piece: Piece):
-		"""
-		draw the given piece on its coordinate.
-		"""
+		"""	draw the given piece on its coordinate. """
 		filepath = f'assets/pieces/{gui_cfg.pieces_theme}/'
 
 		# add color letter
@@ -104,71 +118,133 @@ class ChessGUI(ChessGame):
 		self._draw_image_at(self.board_screen, filepath, xy)
 
 	def draw_coordinates(self):
-		pass
+		""" draw the chess coordinates beside the board. """
+		for rank, row in enumerate(reversed(self.board.board_matrix)):
+			for file, square in enumerate(row):
+				c = self.font.render(
+					square.coordinate.file, True, gui_cfg.coordinates_text_color
+				)
 
-	def draw_board(self):
-		self.board_screen = pg.surface.Surface(gui_cfg.dimensions)
+				pg.draw.rect(
+					self.board_screen,
+					gui_cfg.coordinates_bg_color,
+					(
+						(file*gui_cfg.square_size + 1, gui_cfg.dimensions[1]),
+						(gui_cfg.square_size-2, gui_cfg.coordinates_width)
+					)
+				)
+				self.board_screen.blit(
+					c,
+					(
+						file*gui_cfg.square_size + 2*gui_cfg.coordinates_width,
+						gui_cfg.dimensions[1]+5
+					)
+				)
 
-		first = True
-		for r, row in enumerate(reversed(self.board.board_matrix)):
-			for f, sq in enumerate(row):
+			c = self.font.render(
+				square.coordinate.rank, True, gui_cfg.coordinates_text_color
+			)
+
+			pg.draw.rect(
+				self.board_screen,
+				gui_cfg.coordinates_bg_color,
+				(
+					(gui_cfg.dimensions[0], rank*gui_cfg.square_size + 1),
+					(gui_cfg.coordinates_width, gui_cfg.square_size-2)
+	 			)
+			)
+			self.board_screen.blit(
+				c,
+				(
+					gui_cfg.dimensions[0]+6,
+					rank*gui_cfg.square_size + gui_cfg.square_size/2
+				)
+			)
+		pg.draw.rect(
+			self.board_screen,
+			gui_cfg.coordinates_bg_color,
+			(
+				gui_cfg.dimensions[0]-1,
+				gui_cfg.dimensions[1]-1,
+				gui_cfg.coordinates_width+1,
+				gui_cfg.coordinates_width+1
+			)
+		)
+
+		pg.draw.line(
+			self.board_screen,
+			(0, 0, 0),
+			start_pos=gui_cfg.dimensions,
+			end_pos=(
+				gui_cfg.dimensions[0]+gui_cfg.coordinates_width,
+				gui_cfg.dimensions[1]+gui_cfg.coordinates_width,
+			),
+			width=2
+		)
+
+	def draw_board(self, first_time: bool = False):
+		""" draw the game board(without pieces). """
+		for i, row in enumerate(reversed(self.board.board_matrix)):
+			for j, sq in enumerate(row):
 				if sq.color == Color.BLACK:
 					color = gui_cfg.black_color
 				else:
 					color = gui_cfg.white_color
 
-				l = gui_cfg.square_size * 'abcdefgh'.index(sq.coordinate.file)
-				t = gui_cfg.square_size * '12345678'.index(sq.coordinate.rank)
+				l = gui_cfg.square_size * sq.coordinate.regular[0]
+				t = gui_cfg.square_size * sq.coordinate.regular[1]
 
-
-				pg.draw.rect(
-					self.board_screen,
-					color,
-					((l, t), (gui_cfg.square_size, gui_cfg.square_size))
-				)
-
-				if first:
-					c = self.font.render(sq.coordinate.file, True, (0, 0, 0))
+				# draw only if changed
+				if (self.old_board.board_matrix[i][j] != sq) or first_time:
 					pg.draw.rect(
 						self.board_screen,
-						(150, 150, 150),
-						((f*100 + 1, 800), (98, 24))
+						color,
+						((l, t), (gui_cfg.square_size, gui_cfg.square_size))
 					)
-					self.board_screen.blit(c, (f*100 + 48, 805))
 
-			first = False
-
-			c = self.font.render(sq.coordinate.rank, True, (0, 0, 0))
-			pg.draw.rect(
-				self.board_screen,
-				(150, 150, 150),
-				((800, r*100 + 1), (24, 98))
-			)
-			self.board_screen.blit(c, (805, r*100 + 50))
-
-		for row in self.board.board_matrix:
-			for sq in row:
-				if sq.piece:
-					self.draw_piece(sq.piece)
 
 		self.screen.blit(self.board_screen, (0, 0))
 
+	def update_board(self, first_time: bool = False):
+		"""
+		draw all the pieces of the game on the appropriate coordinate
+		and draw empty squares if a piece moved from it.
+		"""
+		self.draw_board(first_time)
+
+		for i, row in enumerate(self.board.board_matrix):
+			for j, square in enumerate(row):
+				if square.piece:
+					if (self.old_board.board_matrix[i][j] != square) or first_time:
+						self.draw_piece(square.piece)
+						print('changed')
+
+
 	def update_screen(self):
-		self.draw_board()
+		""" update all the dynamic gui elements. """
+		self.update_board()
 
 		pg.display.update()
 		self.clock.tick(gui_cfg.fps)
 
 	def step(self):
+		""" one step in the chess game + gui updates."""
 		self.handle_events()
+
+		# change board
+		# self.board  is the new board
+		p = self.white_p.king
+		self.board.move(p, Coordinate('e4'))
 
 		self.update_screen()
 
+		# set self.oldboard
+		self.old_board = deepcopy(self.board)
 
 def main():
 	game = ChessGUI()
 	while True:
-		game.step()
+		if game.step(): break
 
 if __name__ == '__main__':
 	main()
