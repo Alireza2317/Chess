@@ -1,0 +1,13 @@
+1. piece capture effect:
+	del from board
+	del from player pieces
+
+2. stop check via removing the threat
+
+3. castling
+
+4. en passant
+
+5. other draw situations
+	threefold repetition
+	insufficient material

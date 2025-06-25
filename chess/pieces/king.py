@@ -1,30 +1,34 @@
-from chess.components import Piece, Coordinate, Color, Board
-
+from chess.components import Coordinate, Color, PieceType, Piece
 
 class King(Piece):
-	def __init__(self, color: Color, board: Board, coordinate: Coordinate):
-		super().__init__(color, board, coordinate)
+	from chess.game.player import Player
+	def __init__(self, player: Player, coordinate: Coordinate):
+		super().__init__(player, coordinate)
 
-	def attacking_squares(self) -> list[Coordinate]:
+	@property
+	def piece_type(self) -> PieceType:
+		return PieceType.KING
+
+	def attacking_coordinates(self) -> list[Coordinate]:
 		"""
-		returns the squares that the king can attack
+		returns the coordinates that the king can attack
 		regardless of checks
 		"""
 		moves: list[Coordinate] = []
 
 		file_ord: int = ord(self.coordinate.file)
+		rank_ord: int = ord(self.coordinate.rank)
+
 		for file_code in range(file_ord-1, file_ord+2):
-			file: str = chr(file_code)
-			if file not in 'abcdefgh': continue
-
-			rank_ord: int = ord(self.coordinate.rank)
 			for rank_s in range(rank_ord-1, rank_ord+2):
+				file: str = chr(file_code)
 				rank: str = chr(rank_s)
-				if rank not in '12345678': continue
+				m = f'{file}{rank}'
+				if not Coordinate.is_valid(m): continue
 
-				c = Coordinate(f'{file}{rank}')
+				c = Coordinate(m)
 				# exclude the king's current coordinate
-				if c.cc == self.coordinate.cc: continue
+				if c == self.coordinate: continue
 
 				moves.append(c)
 
@@ -33,36 +37,17 @@ class King(Piece):
 	def available_moves(self) -> list[Coordinate]:
 		"""
 		returns the moves that the king can choose
-		regardless of checks
+		regardless of checks.
 		is a subset of attacking squares
 		"""
-		moves: list[Coordinate] = []
 
-		for square in self.attacking_squares():
-			# if there is a piece there
-			piece: Piece | None = self.board.get(square)
-
-			if piece:
-				# check its color
-				# if its a piece of our own, can't move there
-				if piece.color == self.color: continue
-
-			moves.append(square)
-
-		return moves
+		return super().available_moves()
 
 	def __repr__(self):
 		return 'K' if self.color == Color.WHITE else 'k'
 
 def main():
-	board = Board()
-	Piece(Color.BLACK, board, Coordinate('h2'))
-	Piece(Color.WHITE, board, Coordinate('g1'))
-	Piece(Color.BLACK, board, Coordinate('g2'))
-
-	king = King(Color.WHITE, board, Coordinate('h1'))
-
-	print(king.available_moves())
+	pass
 
 if __name__ == '__main__':
 	main()
