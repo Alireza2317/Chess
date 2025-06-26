@@ -120,6 +120,15 @@ class Piece(ABC):
 	def piece_type(self) -> PieceType:
 		pass
 
+	def __eq__(self, other: Piece):
+		if other is None: return False
+
+		same_color: bool = (self.color == other.color)
+		same_type: bool = (self.piece_type == other.piece_type)
+		return same_color and same_type
+
+	def __ne__(self, other: Piece):
+		return not self.__eq__(other)
 
 class Square:
 	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
@@ -149,11 +158,13 @@ class Square:
 			self.color = Color.WHITE
 
 	def __eq__(self, other: Square):
-		return self.piece is other.piece
+		same_coordinate: bool = (self.coordinate == other.coordinate)
+		same_piece: bool = (self.piece == other.piece)
+		return same_coordinate and same_piece
 
 	def __ne__(self, other: Square):
-		return self.piece is not other.piece
-	
+		return not self.__eq__(other)
+
 	def __repr__(self):
 		return f'{Square.__name__}({self.coordinate}, {self.piece})'
 
