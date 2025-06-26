@@ -8,8 +8,9 @@ from chess.game.game import ChessGame
 class ChessGUI(ChessGame):
 	def __init__(self):
 		super().__init__()
-		self.old_board = deepcopy(self.board)
 		self.classic_setup()
+
+		self.old_board = deepcopy(self.board)
 
 		self.init_gui_elements()
 
@@ -79,7 +80,7 @@ class ChessGUI(ChessGame):
 		surface.blit(scaled_image, scaled_image_rect)
 
 	def draw_piece(self, piece: Piece):
-		"""	draw the given piece on its coordinate. """
+		"""	draws the given piece on its coordinate. """
 		filepath = f'assets/pieces/{gui_cfg.pieces_theme}/'
 
 		# add color letter
@@ -118,7 +119,7 @@ class ChessGUI(ChessGame):
 		self._draw_image_at(self.board_screen, filepath, xy)
 
 	def draw_coordinates(self):
-		""" draw the chess coordinates beside the board. """
+		""" draws the chess coordinates on the side of the board. """
 		for rank, row in enumerate(reversed(self.board.board_matrix)):
 			for file, square in enumerate(row):
 				c = self.font.render(
@@ -182,43 +183,47 @@ class ChessGUI(ChessGame):
 			width=2
 		)
 
-	def draw_board(self, first_time: bool = False):
-		""" draw the game board(without pieces). """
-		for i, row in enumerate(reversed(self.board.board_matrix)):
-			for j, sq in enumerate(row):
-				if sq.color == Color.BLACK:
+	def update_board(self, first_time: bool = False):
+		"""
+		draws the whole game board.
+		draws all the pieces of the game on appropriate coordinates
+		and draws empty squares if a piece moved from it.
+		"""
+		c=0
+		for i, row in enumerate(self.board.board_matrix):
+			for j, square in enumerate(row):
+				if square.color == Color.BLACK:
 					color = gui_cfg.black_color
 				else:
 					color = gui_cfg.white_color
 
-				l = gui_cfg.square_size * sq.coordinate.regular[0]
-				t = gui_cfg.square_size * sq.coordinate.regular[1]
+				l = gui_cfg.square_size * square.coordinate.regular[0]
+				t = gui_cfg.square_size * square.coordinate.regular[1]
 
-				# draw only if changed
-				if (self.old_board.board_matrix[i][j] != sq) or first_time:
+				# draw only if changed or first time
+				if (self.old_board.board_matrix[i][j] != square) or first_time:
+					if not first_time:
+						print('-----')
+						print(self.old_board.board_matrix[i][j])
+						print(square)
+						print(id(self.old_board.board_matrix[i][j].piece))
+						print(id(square.piece))
+						print('-----')
+					# draw board squares
 					pg.draw.rect(
 						self.board_screen,
 						color,
 						((l, t), (gui_cfg.square_size, gui_cfg.square_size))
 					)
 
+					# draw pieces
+					if square.piece:
+						# draw only if changed or first time
+						self.draw_piece(square.piece)
+						print(f'{c}:changed')
+						c+=1
 
 		self.screen.blit(self.board_screen, (0, 0))
-
-	def update_board(self, first_time: bool = False):
-		"""
-		draw all the pieces of the game on the appropriate coordinate
-		and draw empty squares if a piece moved from it.
-		"""
-		self.draw_board(first_time)
-
-		for i, row in enumerate(self.board.board_matrix):
-			for j, square in enumerate(row):
-				if square.piece:
-					if (self.old_board.board_matrix[i][j] != square) or first_time:
-						self.draw_piece(square.piece)
-						print('changed')
-
 
 	def update_screen(self):
 		""" update all the dynamic gui elements. """
