@@ -44,6 +44,18 @@ class ChessGUI(ChessGame):
 			pg.font.get_default_font(), gui_cfg.font_size
 		)
 
+	def highlight_valid_moves(self, piece: Piece):
+		"""	highlights the valid moves of the given piece on the board. """
+
+		for move in piece.valid_moves:
+			square = self.board.get(move)
+			#color = square.color
+
+			self.draw_square(square, gui_cfg.valid_color)
+
+			if square.piece:
+				self.draw_piece(square.piece)
+
 	def handle_events(self):
 		""" handle user events. """
 		# get user input in event loop
