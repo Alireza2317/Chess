@@ -84,6 +84,8 @@ class Player:
 		self.set_king()
 
 	def remove_piece(self, piece: Piece) -> None:
+		if piece is None: return
+		
 		for i, p in enumerate(self.pieces):
 			if p.coordinate == piece.coordinate:
 				self.pieces.pop(i)
