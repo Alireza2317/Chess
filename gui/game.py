@@ -2,7 +2,7 @@ import sys
 import pygame as pg
 from copy import deepcopy
 from gui.config import gui_cfg
-from chess.components import Board, Coordinate, Color, Piece, PieceType, Square
+from chess.components import Color, Piece, PieceType
 from chess.game.game import ChessGame
 
 class ChessGUI(ChessGame):
@@ -13,6 +13,9 @@ class ChessGUI(ChessGame):
 		self.old_board = deepcopy(self.board)
 
 		self.init_gui_elements()
+
+		self.draw_coordinates()
+		self.update_board(first_time=True)
 
 	def init_gui_elements(self):
 		"""
@@ -41,9 +44,6 @@ class ChessGUI(ChessGame):
 			pg.font.get_default_font(), gui_cfg.font_size
 		)
 
-		self.draw_coordinates()
-		self.update_board(first_time=True)
-
 	def handle_events(self):
 		""" handle user events. """
 		# get user input in event loop
@@ -67,7 +67,11 @@ class ChessGUI(ChessGame):
 		"""
 		puts the given image in `filepath` on the given surface and position.
 		"""
-		image = pg.image.load(filepath)
+		try:
+			image = pg.image.load(filepath)
+		except Exception as e:
+			print(f'error loading the piece image in {filepath}: {e}')
+			return
 
 		scaled_image = pg.transform.scale(
 			image,
@@ -189,7 +193,7 @@ class ChessGUI(ChessGame):
 		draws all the pieces of the game on appropriate coordinates
 		and draws empty squares if a piece moved from it.
 		"""
-		c=0
+		self.draw_coordinates()
 		for i, row in enumerate(self.board.board_matrix):
 			for j, square in enumerate(row):
 				if square.color == Color.BLACK:
@@ -197,31 +201,24 @@ class ChessGUI(ChessGame):
 				else:
 					color = gui_cfg.white_color
 
-				l = gui_cfg.square_size * square.coordinate.regular[0]
-				t = gui_cfg.square_size * square.coordinate.regular[1]
+				row, col = square.coordinate.regular
+				l = gui_cfg.square_size * col
+				t = gui_cfg.square_size * (7-row)
 
-				# draw only if changed or first time
-				if (self.old_board.board_matrix[i][j] != square) or first_time:
-					if not first_time:
-						print('-----')
-						print(self.old_board.board_matrix[i][j])
-						print(square)
-						print(id(self.old_board.board_matrix[i][j].piece))
-						print(id(square.piece))
-						print('-----')
-					# draw board squares
-					pg.draw.rect(
-						self.board_screen,
-						color,
-						((l, t), (gui_cfg.square_size, gui_cfg.square_size))
-					)
+				# skip if not changed or not first time
+				if (self.old_board.board_matrix[i][j] == square) and not(first_time):
+					continue
 
-					# draw pieces
-					if square.piece:
-						# draw only if changed or first time
-						self.draw_piece(square.piece)
-						print(f'{c}:changed')
-						c+=1
+				# draw board squares
+				pg.draw.rect(
+					self.board_screen,
+					color,
+					((l, t), (gui_cfg.square_size, gui_cfg.square_size))
+				)
+
+				# draw pieces
+				if square.piece:
+					self.draw_piece(square.piece)
 
 		self.screen.blit(self.board_screen, (0, 0))
 
@@ -236,14 +233,9 @@ class ChessGUI(ChessGame):
 		""" one step in the chess game + gui updates."""
 		self.handle_events()
 
-		# change board
-		# self.board  is the new board
-		p = self.white_p.king
-		self.board.move(p, Coordinate('e4'))
-
 		self.update_screen()
 
-		# set self.oldboard
+		# set self.old_board
 		self.old_board = deepcopy(self.board)
 
 def main():
