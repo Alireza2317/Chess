@@ -14,6 +14,7 @@ class ChessGUIConfig:
 	bg_color: Color = (20, 20, 20)
 	black_color: Color = (200, 100, 100)
 	white_color: Color = (80, 50, 50)
+	valid_color: Color = (75, 212, 84)
 	coordinates_text_color: Color = (0, 0, 0)
 	coordinates_bg_color: Color = (150, 150, 150)
 	pieces_theme: str = 'neo_wood'

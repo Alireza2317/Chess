@@ -187,15 +187,9 @@ class ChessGUI(ChessGame):
 			width=2
 		)
 
-	def update_board(self, first_time: bool = False):
-		"""
-		draws the whole game board.
-		draws all the pieces of the game on appropriate coordinates
-		and draws empty squares if a piece moved from it.
-		"""
-		self.draw_coordinates()
-		for i, row in enumerate(self.board.board_matrix):
-			for j, square in enumerate(row):
+	def draw_square(self, square: Square, color: tuple[int, int, int] | None = None):
+		""" draws the given square object. """
+		if color is None:
 				if square.color == Color.BLACK:
 					color = gui_cfg.black_color
 				else:
@@ -205,16 +199,33 @@ class ChessGUI(ChessGame):
 				l = gui_cfg.square_size * col
 				t = gui_cfg.square_size * (7-row)
 
-				# skip if not changed or not first time
-				if (self.old_board.board_matrix[i][j] == square) and not(first_time):
-					continue
-
 				# draw board squares
 				pg.draw.rect(
 					self.board_screen,
 					color,
 					((l, t), (gui_cfg.square_size, gui_cfg.square_size))
 				)
+		pg.draw.rect(
+			self.board_screen,
+			gui_cfg.bg_color,
+			((l, t), (gui_cfg.square_size, gui_cfg.square_size)), width=1
+		)
+
+	def update_board(self, first_time: bool = False):
+		"""
+		draws the whole game board.
+		draws all the pieces of the game on appropriate coordinates
+		and draws empty squares if a piece moved from it.
+		"""
+		self.draw_coordinates()
+		for i, row in enumerate(self.board.board_matrix):
+			for j, square in enumerate(row):
+				# skip if not changed or not first time
+				if (self.old_board.board_matrix[i][j] == square) and not(first_time):
+					continue
+
+				# draw board squares
+				self.draw_square(square)
 
 				# draw pieces
 				if square.piece:
