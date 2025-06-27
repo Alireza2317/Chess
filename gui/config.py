@@ -9,7 +9,7 @@ class ChessGUIConfig:
 	dimensions: tuple[int, int] = (800, 800)
 	square_size: int = 100
 	padding: int = 20
-	fps: int = 1
+	fps: int = 10
 
 	bg_color: Color = (20, 20, 20)
 	black_color: Color = (200, 100, 100)

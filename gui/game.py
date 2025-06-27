@@ -1,8 +1,9 @@
 import sys
 import pygame as pg
 from copy import deepcopy
+from chess.pieces.pawn import Pawn
 from gui.config import gui_cfg
-from chess.components import Color, Piece, PieceType
+from chess.components import Color, Coordinate, Piece, PieceType, Square
 from chess.game.game import ChessGame
 
 class ChessGUI(ChessGame):
@@ -15,7 +16,7 @@ class ChessGUI(ChessGame):
 		self.init_gui_elements()
 
 		self.draw_coordinates()
-		self.update_board(first_time=True)
+		self.update_board(all_board=True)
 
 	def init_gui_elements(self):
 		"""
@@ -46,15 +47,32 @@ class ChessGUI(ChessGame):
 
 	def highlight_valid_moves(self, piece: Piece):
 		"""	highlights the valid moves of the given piece on the board. """
-
 		for move in piece.valid_moves:
 			square = self.board.get(move)
-			#color = square.color
 
 			self.draw_square(square, gui_cfg.valid_color)
 
 			if square.piece:
 				self.draw_piece(square.piece)
+
+	def get_coordinate_on_click(self, pos: tuple[int, int]) -> Coordinate:
+		x = pos[0]
+		y = pos[1]
+
+		row = 7
+		col = 0
+		for i in range(1, 8+1):
+			if x < i*gui_cfg.square_size: break
+			col += 1
+
+		for i in range(1, 8+1):
+			if y < i*gui_cfg.square_size: break
+			row -= 1
+
+		file = chr(ord('a')+col)
+		rank = chr(ord('1')+row)
+
+		return Coordinate(f'{file}{rank}')
 
 	def handle_events(self):
 		""" handle user events. """
@@ -64,11 +82,18 @@ class ChessGUI(ChessGame):
 				pg.quit()
 				sys.exit()
 
-			if event.type == pg.KEYDOWN:
+			elif event.type == pg.KEYDOWN:
 				print('keydown')
 				if event.key == pg.K_q:
 					pg.quit()
 					sys.exit()
+
+			elif event.type == pg.MOUSEBUTTONUP:
+				self.update_board(all_board=True)
+				c = self.get_coordinate_on_click(event.pos)
+				p = self.board.get(c).piece
+				self.highlight_valid_moves(p)
+
 
 	def _draw_image_at(
 		self,
@@ -202,28 +227,29 @@ class ChessGUI(ChessGame):
 	def draw_square(self, square: Square, color: tuple[int, int, int] | None = None):
 		""" draws the given square object. """
 		if color is None:
-				if square.color == Color.BLACK:
-					color = gui_cfg.black_color
-				else:
-					color = gui_cfg.white_color
+			if square.color == Color.BLACK:
+				color = gui_cfg.black_color
+			else:
+				color = gui_cfg.white_color
 
-				row, col = square.coordinate.regular
-				l = gui_cfg.square_size * col
-				t = gui_cfg.square_size * (7-row)
+		row, col = square.coordinate.regular
+		l = gui_cfg.square_size * col
+		t = gui_cfg.square_size * (7-row)
 
-				# draw board squares
-				pg.draw.rect(
-					self.board_screen,
-					color,
-					((l, t), (gui_cfg.square_size, gui_cfg.square_size))
-				)
+		# draw board squares
+		pg.draw.rect(
+			self.board_screen,
+			color,
+			((l, t), (gui_cfg.square_size, gui_cfg.square_size))
+		)
+		# border
 		pg.draw.rect(
 			self.board_screen,
 			gui_cfg.bg_color,
 			((l, t), (gui_cfg.square_size, gui_cfg.square_size)), width=1
 		)
 
-	def update_board(self, first_time: bool = False):
+	def update_board(self, all_board: bool = False):
 		"""
 		draws the whole game board.
 		draws all the pieces of the game on appropriate coordinates
@@ -232,8 +258,8 @@ class ChessGUI(ChessGame):
 		self.draw_coordinates()
 		for i, row in enumerate(self.board.board_matrix):
 			for j, square in enumerate(row):
-				# skip if not changed or not first time
-				if (self.old_board.board_matrix[i][j] == square) and not(first_time):
+				# skip if not changed OR not asked to draw all board
+				if (self.old_board.board_matrix[i][j] == square) and not(all_board):
 					continue
 
 				# draw board squares
