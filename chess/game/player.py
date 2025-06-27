@@ -11,7 +11,8 @@ class Player:
 		self.board = board
 		self.color = color
 		self.pieces: list[Piece] = []
-		self.move: bool = True
+		# it's white's turn at first
+		self.is_turn: bool = (color == Color.WHITE)
 
 	def set_king(self) -> None:
 		""" sets up self.king based on self.pieces. """
@@ -85,7 +86,7 @@ class Player:
 
 	def remove_piece(self, piece: Piece) -> None:
 		if piece is None: return
-		
+
 		for i, p in enumerate(self.pieces):
 			if p.coordinate == piece.coordinate:
 				self.pieces.pop(i)
@@ -144,7 +145,7 @@ class Player:
 
 	def is_in_check(self) -> bool:
 		""" returns wether the player is in check or not. """
-		if not self.move: return False
+		if not self.is_turn: return False
 
 		for piece in self.opponent.pieces:
 			if self.king.coordinate in piece.attacking_coordinates():
@@ -155,7 +156,7 @@ class Player:
 	def is_checkmated(self) -> bool:
 		""" returns wether the player is lost or not. """
 		return (
-			self.move and
+			self.is_turn and
 			self.is_in_check() and
 			not self.king.valid_moves
 		)
@@ -167,7 +168,7 @@ class Player:
 			all_valid_moves.extend(p.valid_moves)
 
 		return (
-			self.move and
+			self.is_turn and
 			not self.is_in_check() and
 			not all_valid_moves
 		)
