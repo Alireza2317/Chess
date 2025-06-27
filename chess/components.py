@@ -82,7 +82,7 @@ class Piece(ABC):
 			raise TypeError(
 				f'coordinate should be of type {Coordinate.__name__}!'
 			)
-
+		self.player = player
 		self.board = player.board
 		self.color = player.color
 		self.coordinate = coordinate
