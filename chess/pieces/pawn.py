@@ -54,16 +54,16 @@ class Pawn(Piece):
 			if not self.board.get(c).piece:
 				moves.append(c)
 
-			# only if it's the first move, allow double forward move
-			if not self.has_moved:
-				new_rank = chr(rank_ord + sign*2)
-				m = f'{file}{new_rank}'
-				if Coordinate.is_valid(m):
-					c: Coordinate = Coordinate(m)
+				# only if it's the first move, allow double forward move
+				if not self.has_moved:
+					new_rank = chr(rank_ord + sign*2)
+					m = f'{file}{new_rank}'
+					if Coordinate.is_valid(m):
+						c: Coordinate = Coordinate(m)
 
-					# if there isn't a piece ahead
-					if not self.board.get(c).piece:
-						moves.append(c)
+						# if there isn't a piece ahead
+						if not self.board.get(c).piece:
+							moves.append(c)
 
 		# capturing moves
 		for move in self.attacking_coordinates():
@@ -79,7 +79,28 @@ class Pawn(Piece):
 
 
 def main():
-	pass
+	from chess.game.player import Player
+	from chess.components import Board
+	from chess.pieces.king import King
+
+	board = Board()
+	white = Player(board, Color.WHITE)
+	black = Player(board, Color.BLACK)
+
+	King(white, Coordinate('e1'))
+	King(black, Coordinate('e8'))
+
+	P = Pawn(white, Coordinate('e2'))
+	P2 = Pawn(white, Coordinate('h2'))
+	p = Pawn(black, Coordinate('e3'))
+	Pawn(black, Coordinate('h4'))
+
+	print(P.available_moves())
+	print(P2.available_moves())
+	board.move(P2, Coordinate('h3'))
+	print(P2.available_moves())
+
+	print(board)
 
 if __name__ == '__main__':
 	main()
