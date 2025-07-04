@@ -83,6 +83,33 @@ class ChessGame:
 
 		return GameEndState.ONGOING
 
+	def move(self, piece: Piece, coordinate: Coordinate):
+		"""
+		moves the given piece to the given coordinate.
+		handles captures of opponent pieces.
+		"""
+		if not (piece and coordinate):
+			print('cannot move the given piece ')
+			return
+
+		opponent_piece: Piece | None = self.board.get(coordinate).piece
+
+		if opponent_piece:
+			opponent: Player = opponent_piece.player
+
+		# removes opponent's piece from board, if any
+		# or just moves the piece
+		self.board.move(piece, coordinate)
+
+		# capturing
+		if opponent_piece:
+			# remove piece from opponent's(player) pieces
+
+			opponent.remove_piece(opponent_piece)
+
+		# switch turns
+		self.change_turns()
+
 	def get_player_valid_moves(self, player: Player) -> list[Coordinate]:
 		player_moves = []
 		for piece in player.pieces:
@@ -102,17 +129,9 @@ class ChessGame:
 			valid_moves: list[Coordinate]
 	):
 		move_idx = int(input(f"{player.color.name.title()}'s move: "))
-		piece = valid_moves[move_idx][0]
-		move = valid_moves[move_idx][1]
+		piece, move = valid_moves[move_idx]
 
-		## if there is an enemy piece on the desired coordinate: capture
-		#if self.board.get(move).piece:
-		#	# remove from board
-		#	self.board.remove(move)
-		#	# remove from player's pieces
-		#	player.remove_piece(piece)
-
-		self.board.move(piece, move)
+		self.move(piece, move)
 
 	def step(self) -> bool:
 		"""
