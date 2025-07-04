@@ -88,7 +88,7 @@ class Player:
 		if piece is None: return
 
 		for i, p in enumerate(self.pieces):
-			if p.coordinate == piece.coordinate:
+			if p == piece:
 				self.pieces.pop(i)
 
 	def can_castle(self) -> bool:
