@@ -125,10 +125,12 @@ class Piece(ABC):
 
 		same_color: bool = (self.color == other.color)
 		same_type: bool = (self.piece_type == other.piece_type)
-		return same_color and same_type
+		same_coordinate: bool = (self.coordinate == other.coordinate)
+		return same_color and same_type and same_coordinate
 
 	def __ne__(self, other: Piece):
 		return not self.__eq__(other)
+
 
 class Square:
 	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
