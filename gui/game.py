@@ -1,10 +1,15 @@
 import sys
 import pygame as pg
 from copy import deepcopy
+from enum import Enum
 from chess.pieces.pawn import Pawn
 from gui.config import gui_cfg, RGBColor
 from chess.components import Color, Coordinate, Piece, PieceType, Square
 from chess.game.game import ChessGame
+
+class Mode(Enum):
+	PIECE_SELECT = 'p'
+	MOVE_SELECT = 'm'
 
 class ChessGUI(ChessGame):
 	def __init__(self):
@@ -17,6 +22,8 @@ class ChessGUI(ChessGame):
 
 		self.draw_coordinates()
 		self.update_board(all_board=True)
+
+		self.mode: Mode = Mode.PIECE_SELECT
 
 	def init_gui_elements(self):
 		"""
@@ -58,6 +65,10 @@ class ChessGUI(ChessGame):
 				self.draw_piece(square.piece)
 
 	def get_coordinate_on_click(self, pos: tuple[int, int]) -> Coordinate | None:
+		"""
+		returns a chess coordinate based on the user's click.
+		returns None if the click is outside the board. 
+		"""
 		x, y = pos
 
 		row = 7
@@ -80,6 +91,59 @@ class ChessGUI(ChessGame):
 
 		return Coordinate(c_s)
 
+	def select_piece(self, coordinate: Coordinate) -> Piece | None:
+		"""
+		selects the piece that was clicked, highlights its valid moves
+		on the board
+		switches modes
+		and returns the piece 
+		"""
+		self.update_board(all_board=True)
+		p: Piece | None = self.board.get(coordinate).piece
+
+		if self.mode != Mode.PIECE_SELECT: return
+
+		if p and self.turn == p.color:
+			# then we are trying to check the valid moves
+			# of our own piece
+			self.highlight_valid_moves(p)
+			print(f'highlighting {p.color} moves')
+
+		# switch modes
+		self.mode = Mode.MOVE_SELECT
+
+		return p
+
+	def select_move(self, piece: Piece, coordinate: Coordinate):
+		"""
+		selects the move that was clicked
+		switches modes
+		returns the piece and the coordinate
+		"""
+		if self.mode != Mode.MOVE_SELECT: return
+
+		if coordinate not in piece.valid_moves: return
+
+		# trying to move our piece to one of the valid moves
+		# self.move(piece, coordinate) and handling moves and captures
+		print(f'moving {piece} to {coordinate}')
+
+		# switch modes
+		self.mode = Mode.PIECE_SELECT
+
+		return piece, coordinate
+
+	def handle_click(self, pos: tuple[int, int]):
+		#self.update_board(all_board=True)
+
+		c: Coordinate | None = self.get_coordinate_on_click(pos)
+		if not c: return
+
+		piece: Piece | None = self.select_piece(coordinate=c)
+		if not piece: return
+
+		self.select_move(piece, coordinate=c)
+
 	def handle_events(self):
 		""" handle user events. """
 		# get user input in event loop
@@ -95,19 +159,15 @@ class ChessGUI(ChessGame):
 					sys.exit()
 
 			elif event.type == pg.MOUSEBUTTONUP:
-				self.update_board(all_board=True)
-				c: Coordinate | None = self.get_coordinate_on_click(event.pos)
+				#self.handle_click(event.pos)
+				c = self.get_coordinate_on_click(event.pos)
 				if not c: continue
-
-				p: Piece | None = self.board.get(c).piece
-				if p and self.turn == p.color:
-					# then we are trying to check the valid moves
-					# of our own piece
+				p = self.board.get(c).piece
+				if not p: continue
+				if p.color != self.turn: continue
+				if p.valid_moves:
+					self.update_board(all_board=True)
 					self.highlight_valid_moves(p)
-				else:
-					# trying to move our piece to one of the valid moves
-					pass
-
 
 	def _draw_image_at(
 		self,
