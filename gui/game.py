@@ -57,9 +57,8 @@ class ChessGUI(ChessGame):
 			if square.piece:
 				self.draw_piece(square.piece)
 
-	def get_coordinate_on_click(self, pos: tuple[int, int]) -> Coordinate:
-		x = pos[0]
-		y = pos[1]
+	def get_coordinate_on_click(self, pos: tuple[int, int]) -> Coordinate | None:
+		x, y = pos
 
 		row = 7
 		col = 0
@@ -74,7 +73,12 @@ class ChessGUI(ChessGame):
 		file = chr(ord('a')+col)
 		rank = chr(ord('1')+row)
 
-		return Coordinate(f'{file}{rank}')
+		c_s: str = f'{file}{rank}'
+		if not Coordinate.is_valid(c_s):
+			print('clicked outside the chess board.')
+			return None
+
+		return Coordinate(c_s)
 
 	def handle_events(self):
 		""" handle user events. """
@@ -92,9 +96,17 @@ class ChessGUI(ChessGame):
 
 			elif event.type == pg.MOUSEBUTTONUP:
 				self.update_board(all_board=True)
-				c = self.get_coordinate_on_click(event.pos)
-				p = self.board.get(c).piece
-				self.highlight_valid_moves(p)
+				c: Coordinate | None = self.get_coordinate_on_click(event.pos)
+				if not c: continue
+
+				p: Piece | None = self.board.get(c).piece
+				if p and self.turn == p.color:
+					# then we are trying to check the valid moves
+					# of our own piece
+					self.highlight_valid_moves(p)
+				else:
+					# trying to move our piece to one of the valid moves
+					pass
 
 
 	def _draw_image_at(
