@@ -88,7 +88,7 @@ class Player:
 		if piece is None: return
 
 		for i, p in enumerate(self.pieces):
-			if p.coordinate == piece.coordinate:
+			if p == piece:
 				self.pieces.pop(i)
 
 	def can_castle(self) -> bool:
@@ -172,3 +172,6 @@ class Player:
 			not self.is_in_check() and
 			not all_valid_moves
 		)
+
+	def __repr__(self):
+		return f'<{self.color.name.title()} {Player.__name__}>'
