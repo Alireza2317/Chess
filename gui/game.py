@@ -2,7 +2,7 @@ import sys
 import pygame as pg
 from copy import deepcopy
 from chess.pieces.pawn import Pawn
-from gui.config import gui_cfg
+from gui.config import gui_cfg, RGBColor
 from chess.components import Color, Coordinate, Piece, PieceType, Square
 from chess.game.game import ChessGame
 
@@ -52,6 +52,8 @@ class ChessGUI(ChessGame):
 
 			self.draw_square(square, gui_cfg.valid_color)
 
+			# redraw the opponent pieces, since the line above will
+			# kind of remove them from the board
 			if square.piece:
 				self.draw_piece(square.piece)
 
@@ -224,7 +226,7 @@ class ChessGUI(ChessGame):
 			width=2
 		)
 
-	def draw_square(self, square: Square, color: tuple[int, int, int] | None = None):
+	def draw_square(self, square: Square, color: RGBColor | None = None):
 		""" draws the given square object. """
 		if color is None:
 			if square.color == Color.BLACK:
