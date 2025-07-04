@@ -83,14 +83,36 @@ class ChessGame:
 
 		return GameEndState.ONGOING
 
+	def castle(self, piece: Piece, king_new_coordinate: Coordinate):
+		if self.turn == Color.WHITE:
+			player = self.white_p
+		else:
+			player = self.black_p
+
+		all_castle_moves = player.castle_moves()
+
+		if not all_castle_moves: return
+
+		for moves_pair in all_castle_moves:
+			king, king_new_c, rook, rook_new_c = moves_pair
+
+			# if the selected move is available, do it
+			if king_new_coordinate == king_new_c and king == piece:
+				self.move(king, king_new_c)
+				self.move(rook, rook_new_c)
+
 	def move(self, piece: Piece, coordinate: Coordinate):
 		"""
 		moves the given piece to the given coordinate.
+		handles castling moves.
 		handles captures of opponent pieces.
 		"""
 		if not (piece and coordinate):
 			print('cannot move the given piece ')
 			return
+
+		# castle
+		self.castle(coordinate)
 
 		opponent_piece: Piece | None = self.board.get(coordinate).piece
 

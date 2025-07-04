@@ -65,7 +65,6 @@ class Player:
 				# reset
 				if enemy_piece:
 					self.board.put(enemy_piece, enemy_piece.coordinate)
-					#enemy_piece.board.put(enemy_piece, enemy_piece.coordinate)
 					self.opponent.add_piece(enemy_piece)
 
 			# reset
@@ -73,6 +72,8 @@ class Player:
 
 			# update valid moves for each piece
 			piece.valid_moves = valid_moves
+
+		self.add_castle_moves_to_king()
 
 	def add_piece(self, piece: Piece) -> None:
 		"""	adds the given piece to self.pieces & updates self.king. """
@@ -99,21 +100,28 @@ class Player:
 		for piece in self.pieces:
 			if piece.piece_type == PieceType.ROOK:
 				if not piece.has_moved:
-					return True
+					# if there are no pieces in the middle
+					if self.king.coordinate in piece.attacking_coordinates():
+						return True
 
-		# no rooks, or rooks have moved
+		# no rooks, or rooks have moved, or some pieces are in the middle
 		return False
 
-	def castle_moves(self) -> list[tuple[Coordinate, Coordinate]] | None:
+	def castle_moves(
+		self
+	) -> list[tuple[Piece, Coordinate, Piece, Coordinate]] | None:
 		"""
 		returns a list of one or two available castling moves in the format of:
-			a tuple that holds two Coordinate objects,
-			first one is the king's new coordinate
-			second one is the respective rook's new coordinate
+			a tuple that holds 4 items,
+			first one is the king
+			second one is the king's new coordinate
+			third one is the respective rook
+			fourth one is the respective rook's new coordinate
 		"""
 		if not self.can_castle(): return None
 
-		king_rook_moves_pair: list[tuple[Coordinate, Coordinate]] = []
+		# the result
+		king_rook_moves_pair: list[tuple[Piece, Coordinate, Piece, Coordinate]] = []
 
 		for piece in self.pieces:
 			if piece.piece_type == PieceType.ROOK:
@@ -138,10 +146,22 @@ class Player:
 						rook_c = Coordinate('d8')
 
 				king_rook_moves_pair.append(
-						(king_c, rook_c)
+						(self.king, king_c, piece, rook_c)
 					)
 
 		return king_rook_moves_pair
+
+	def add_castle_moves_to_king(self):
+		""" add the available castling moves to self.king. """
+		king_moves: list[Coordinate] = []
+		castling_moves = self.castle_moves()
+		if castling_moves:
+			for moves_pair in castling_moves:
+				_, king_new_coord, *_ = moves_pair
+				king_moves.append(king_new_coord)
+
+		for move in king_moves:
+			self.king.valid_moves.append(move)
 
 	def is_in_check(self) -> bool:
 		""" returns wether the player is in check or not. """
