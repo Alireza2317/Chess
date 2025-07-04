@@ -172,3 +172,6 @@ class Player:
 			not self.is_in_check() and
 			not all_valid_moves
 		)
+
+	def __repr__(self):
+		return f'<{self.color.name.title()} {Player.__name__}>'
