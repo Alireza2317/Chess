@@ -112,7 +112,7 @@ class ChessGame:
 			return
 
 		# castle
-		self.castle(coordinate)
+		self.castle(piece, coordinate)
 
 		opponent_piece: Piece | None = self.board.get(coordinate).piece
 
