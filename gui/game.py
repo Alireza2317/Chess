@@ -4,7 +4,7 @@ from copy import deepcopy
 from enum import Enum
 from gui.config import gui_cfg, RGBColor
 from chess.components import Color, Coordinate, Piece, PieceType, Square
-from chess.game.game import ChessGame
+from chess.game.game import ChessGame, GameEndState
 
 class Mode(Enum):
 	PIECE_SELECT = 'p'
@@ -34,7 +34,7 @@ class ChessGUI(ChessGame):
 		self.screen = pg.display.set_mode(
 			(
 				gui_cfg.dimensions[0]+gui_cfg.coordinates_width,
-				gui_cfg.dimensions[1]+gui_cfg.square_size//2
+				gui_cfg.dimensions[1]+gui_cfg.square_size//1.5
 			)
 		)
 		self.screen.fill(gui_cfg.bg_color)
@@ -47,8 +47,11 @@ class ChessGUI(ChessGame):
 		self.board_screen.fill((0, 0, 0))
 
 		self.clock = pg.time.Clock()
-		self.font = pg.font.Font(
+		self.main_font = pg.font.Font(
 			pg.font.get_default_font(), gui_cfg.font_size
+		)
+		self.coordinates_font = pg.font.Font(
+			pg.font.get_default_font(), gui_cfg.coordinates_font_size
 		)
 
 	def highlight_valid_moves(self, piece: Piece):
@@ -226,7 +229,7 @@ class ChessGUI(ChessGame):
 		""" draws the chess coordinates on the side of the board. """
 		for rank, row in enumerate(reversed(self.board.board_matrix)):
 			for file, square in enumerate(row):
-				c = self.font.render(
+				c = self.coordinates_font.render(
 					square.coordinate.file, True, gui_cfg.coordinates_text_color
 				)
 
@@ -246,7 +249,7 @@ class ChessGUI(ChessGame):
 					)
 				)
 
-			c = self.font.render(
+			c = self.coordinates_font.render(
 				square.coordinate.rank, True, gui_cfg.coordinates_text_color
 			)
 
@@ -341,6 +344,31 @@ class ChessGUI(ChessGame):
 		pg.display.update()
 		self.clock.tick(gui_cfg.fps)
 
+	def on_game_over(self, state: GameEndState):
+		color: RGBColor = '#ffffff'
+
+		if state == GameEndState.WHITE_WON:
+			text = 'White Won!'
+		elif state == GameEndState.BLACK_WON:
+			text = 'Black Won!'
+		elif state == GameEndState.DRAW:
+			text = 'Draw!'
+
+		text_renderd = self.main_font.render(
+			text, True, color
+		)
+
+		self.screen.blit(
+			text_renderd,
+			(
+				gui_cfg.dimensions[0]//2 - 4*len(text),
+				gui_cfg.dimensions[1]+ gui_cfg.coordinates_width + 15
+			)
+		)
+		self.update_screen()
+		while True:
+			self.handle_events()
+
 	def step(self):
 		""" one step in the chess game + gui updates."""
 		self.handle_events()
@@ -349,6 +377,10 @@ class ChessGUI(ChessGame):
 
 		self.white_p.update_valid_moves()
 		self.black_p.update_valid_moves()
+
+		state: GameEndState = self.check_state()
+		if state != GameEndState.ONGOING:
+			self.on_game_over(state)
 
 		# set self.old_board
 		self.old_board = deepcopy(self.board)

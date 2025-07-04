@@ -22,6 +22,7 @@ class ChessGUIConfig:
 	coordinates_bg_color: RGBColor = (150, 150, 150)
 	pieces_theme: str = 'neo_wood'
 
-	font_size: int = 14
+	font_size: int = 20
+	coordinates_font_size: int = 14
 
 gui_cfg = ChessGUIConfig()
