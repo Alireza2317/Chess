@@ -24,6 +24,20 @@ class ChessGame:
 		self.white_p.set_opponent(self.black_p)
 		self.black_p.set_opponent(self.white_p)
 
+		# it's white's turn at first
+		self.turn: Color = Color.WHITE
+
+	def change_turns(self):
+		""" changes the player's turns, from white to black or vice versa. """
+		if self.white_p.is_turn:
+			self.white_p.is_turn = False
+			self.black_p.is_turn = True
+			self.turn = Color.BLACK
+		else:
+			self.black_p.is_turn = False
+			self.white_p.is_turn = True
+			self.turn = Color.WHITE
+
 	def classic_setup(self) -> None:
 		for color in [Color.WHITE, Color.BLACK]:
 			if color == Color.WHITE:
