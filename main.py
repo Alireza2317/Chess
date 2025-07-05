@@ -1,14 +1,9 @@
-from chess.pieces.pawn import Pawn
-from chess.pieces.king import King
-from chess.pieces.knight import Knight
-from chess.components import Board, Color, Coordinate
+from gui.game import ChessGUI
 
+def main():
+	game = ChessGUI()
+	while True:
+		game.step()
 
-b = Board()
-
-for file in 'abcdefgh':
-	Pawn(Color.WHITE, b, Coordinate(f'{file}2'))
-	Pawn(Color.BLACK, b, Coordinate(f'{file}7'))
-
-
-print(b)
+if __name__ == '__main__':
+	main()
