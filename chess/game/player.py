@@ -153,15 +153,19 @@ class Player:
 			_, king_new_coord, *_ = moves_pair
 			self.king.valid_moves.append(king_new_coord)
 
+	def is_under_attack(self, coordinate: Coordinate) -> bool:
+		""" returns wether the given square is under opponent's attack."""
+		for op_piece in self.opponent.pieces:
+			if coordinate in op_piece.attacking_coordinates():
+				return True
+
+		return False
+
 	def is_in_check(self) -> bool:
 		""" returns wether the player is in check or not. """
 		if not self.is_turn: return False
 
-		for piece in self.opponent.pieces:
-			if self.king.coordinate in piece.attacking_coordinates():
-				return True
-
-		return False
+		return self.is_under_attack(self.king.coordinate)
 
 	def is_checkmated(self) -> bool:
 		""" returns wether the player is lost or not. """
