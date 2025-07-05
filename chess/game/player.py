@@ -92,24 +92,6 @@ class Player:
 			if p == piece:
 				self.pieces.pop(i)
 
-	def can_castle(self) -> bool:
-		""" Checks wether the player can castle or not. """
-		if self.king.has_moved: return False
-		if self.is_in_check(): return False
-
-		for piece in self.pieces:
-			if piece.piece_type != PieceType.ROOK: continue
-			if piece.has_moved: continue
-
-			# if there are no pieces in the middle
-			rook: Piece = piece
-			if self.king.coordinate in rook.attacking_coordinates():
-				# the rook can see the king
-				return True
-
-		# no rooks, or rooks have moved, or some pieces are in the middle
-		return False
-
 	def castle_moves(
 		self
 	) -> list[tuple[Piece, Coordinate, Piece, Coordinate]] | None:
@@ -120,61 +102,75 @@ class Player:
 			second one is the king's new coordinate
 			third one is the respective rook
 			fourth one is the respective rook's new coordinate
+		returns None or [] if player has no legal castle moves
 		"""
-		if not self.can_castle(): return None
+		if self.king.has_moved: return None
+		if self.is_in_check(): return None
 
 		# the result
-		king_rook_moves_pair: list[tuple[Piece, Coordinate, Piece, Coordinate]] = []
+		king_rook_moves_pair: list[
+			tuple[Piece, Coordinate, Piece, Coordinate]
+		] = []
 
+		valid_rooks: list[Piece] = []
 		for piece in self.pieces:
-			if piece.piece_type == PieceType.ROOK:
-				if piece.has_moved: continue
+			if piece.piece_type != PieceType.ROOK: continue
 
-				# short castle
-				if piece.coordinate.file == 'h':
-					if self.color == Color.WHITE:
-						king_c = Coordinate('g1')
-						rook_c = Coordinate('f1')
-					else:
-						king_c = Coordinate('g8')
-						rook_c = Coordinate('f8')
+			# rook has moved
+			if piece.has_moved: continue
 
-				# long castle
-				elif piece.coordinate.file == 'a':
-					if self.color == Color.WHITE:
-						king_c = Coordinate('c1')
-						rook_c = Coordinate('d1')
-					else:
-						king_c = Coordinate('c8')
-						rook_c = Coordinate('d8')
+			rook_attacks: list[Coordinate] = piece.attacking_coordinates()
+			# there are pieces in the middle
+			if self.king.coordinate not in rook_attacks: continue
+
+			valid_rooks.append(piece)
+
+		for rook in valid_rooks:
+			rank: str = rook.coordinate.rank
+
+			files: list[str]
+			if rook.coordinate.file == 'h':
+				files = ['g', 'f']
+			elif rook.coordinate.file == 'a':
+				files = ['c', 'd']
+
+			for file in files:
+				# check squares in the middle for enemy attacks
+				c = Coordinate(f'{file}{rank}')
+				if self.is_under_attack(c): break
+			else: # if successful and no break = no enemy attacks
+				king_file, rook_file = files
+				king_c = Coordinate(f'{king_file}{rank}')
+				rook_c = Coordinate(f'{rook_file}{rank}')
 
 				king_rook_moves_pair.append(
-						(self.king, king_c, piece, rook_c)
-					)
+						(self.king, king_c, rook, rook_c)
+				)
 
 		return king_rook_moves_pair
 
-	def add_castle_moves_to_king(self):
-		""" add the available castling moves to self.king. """
-		king_moves: list[Coordinate] = []
+	def add_castle_moves_to_king(self) -> None:
+		""" add the valid castling moves to self.king. """
 		castling_moves = self.castle_moves()
-		if castling_moves:
-			for moves_pair in castling_moves:
-				_, king_new_coord, *_ = moves_pair
-				king_moves.append(king_new_coord)
+		if not castling_moves: return
 
-		for move in king_moves:
-			self.king.valid_moves.append(move)
+		for moves_pair in castling_moves:
+			_, king_new_coord, *_ = moves_pair
+			self.king.valid_moves.append(king_new_coord)
+
+	def is_under_attack(self, coordinate: Coordinate) -> bool:
+		""" returns wether the given square is under opponent's attack."""
+		for op_piece in self.opponent.pieces:
+			if coordinate in op_piece.attacking_coordinates():
+				return True
+
+		return False
 
 	def is_in_check(self) -> bool:
 		""" returns wether the player is in check or not. """
 		if not self.is_turn: return False
 
-		for piece in self.opponent.pieces:
-			if self.king.coordinate in piece.attacking_coordinates():
-				return True
-
-		return False
+		return self.is_under_attack(self.king.coordinate)
 
 	def is_checkmated(self) -> bool:
 		""" returns wether the player is lost or not. """
@@ -198,3 +194,34 @@ class Player:
 
 	def __repr__(self):
 		return f'<{self.color.name.title()} {Player.__name__}>'
+
+
+def main():
+	from chess.pieces.king import King
+	from chess.pieces.rook import Rook
+	from chess.pieces.queen import Queen
+
+	b = Board()
+	white = Player(b, Color.WHITE)
+	black = Player(b, Color.BLACK)
+
+	white.set_opponent(black)
+	black.set_opponent(white)
+
+	wk = King(white, Coordinate('e1'))
+	bk = King(black, Coordinate('e8'))
+	#Queen(black, Coordinate('h2'))
+
+	short_rook = Rook(white, Coordinate('h1'))
+	long_rook = Rook(white, Coordinate('a1'))
+
+	#Knight(white, Coordinate('g1'))
+	#Knight(white, Coordinate('b1'))
+
+	white.update_valid_moves()
+
+	print(b)
+	print(wk.valid_moves)
+
+if __name__ == '__main__':
+	main()
