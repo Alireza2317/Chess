@@ -174,11 +174,14 @@ class Player:
 
 	def is_checkmated(self) -> bool:
 		""" returns wether the player is lost or not. """
-		return (
-			self.is_turn and
-			self.is_in_check() and
-			not self.king.valid_moves
-		)
+		if not self.is_turn: return False
+		if not self.is_in_check(): return False
+
+		for piece in self.pieces:
+			if piece.valid_moves:
+				return False
+
+		return True
 
 	def is_stalemate(self) -> bool:
 		""" returns wether the game is a stalemate(draw) or not. """
