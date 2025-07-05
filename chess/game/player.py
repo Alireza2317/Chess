@@ -124,33 +124,35 @@ class Player:
 		if not self.can_castle(): return None
 
 		# the result
-		king_rook_moves_pair: list[tuple[Piece, Coordinate, Piece, Coordinate]] = []
+		king_rook_moves_pair: list[
+			tuple[Piece, Coordinate, Piece, Coordinate]
+		] = []
 
+
+		valid_rooks: list[Piece] = []
 		for piece in self.pieces:
-			if piece.piece_type == PieceType.ROOK:
-				if piece.has_moved: continue
+			if piece.piece_type != PieceType.ROOK: continue
+			if piece.has_moved: continue
 
+			valid_rooks.append(piece)
+
+		for rook in valid_rooks:
+			rank: str = rook.coordinate.rank
+
+			match rook.coordinate.file:
 				# short castle
-				if piece.coordinate.file == 'h':
-					if self.color == Color.WHITE:
-						king_c = Coordinate('g1')
-						rook_c = Coordinate('f1')
-					else:
-						king_c = Coordinate('g8')
-						rook_c = Coordinate('f8')
+				case 'h':
+					king_c = Coordinate(f'g{rank}')
+					rook_c = Coordinate(f'f{rank}')
 
 				# long castle
-				elif piece.coordinate.file == 'a':
-					if self.color == Color.WHITE:
-						king_c = Coordinate('c1')
-						rook_c = Coordinate('d1')
-					else:
-						king_c = Coordinate('c8')
-						rook_c = Coordinate('d8')
+				case 'a':
+					king_c = Coordinate(f'c{rank}')
+					rook_c = Coordinate(f'd{rank}')
 
-				king_rook_moves_pair.append(
-						(self.king, king_c, piece, rook_c)
-					)
+			king_rook_moves_pair.append(
+					(self.king, king_c, rook, rook_c)
+			)
 
 		return king_rook_moves_pair
 
