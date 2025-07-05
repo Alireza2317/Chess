@@ -11,7 +11,7 @@ class Mode(Enum):
 	MOVE_SELECT = 'm'
 
 class ChessGUI(ChessGame):
-	def __init__(self):
+	def __init__(self) -> None:
 		super().__init__()
 		self.classic_setup()
 
@@ -87,8 +87,7 @@ class ChessGUI(ChessGame):
 		rank = chr(ord('1')+row)
 
 		c_s: str = f'{file}{rank}'
-		if not Coordinate.is_valid(c_s):
-			return None
+		if not Coordinate.is_valid(c_s): return None
 
 		return Coordinate(c_s)
 
@@ -98,7 +97,6 @@ class ChessGUI(ChessGame):
 		on the board
 		and returns the piece 
 		"""
-
 		p: Piece | None = self.board.get(coordinate).piece
 
 		if p and self.turn == p.color:
@@ -109,23 +107,23 @@ class ChessGUI(ChessGame):
 			if p.valid_moves:
 				self.highlight_valid_moves(p)
 			# no valid moves
-			else: return
+			else: return None
 
 		# it was a misclick
-		else: return
+		else: return None
 
 		return p
 
-	def select_move(self, piece: Piece | None, coordinate: Coordinate):
+	def select_move(self, coordinate: Coordinate):
 		"""
-		selects the move that was clicked
+		selects the move that was clicked.
 		"""
-		if coordinate not in piece.valid_moves:
+		if coordinate not in self.selected_piece.valid_moves:
 			self.update_board(all_board=True)
 			return
 
 		# trying to move our piece to one of the valid moves
-		self.move(piece, coordinate)
+		self.move(self.selected_piece, coordinate)
 
 		self.update_board(all_board=True)
 
@@ -141,7 +139,7 @@ class ChessGUI(ChessGame):
 			return
 
 		if self.mode == Mode.MOVE_SELECT:
-			self.select_move(self.selected_piece, c)
+			self.select_move(coordinate=c)
 			self.mode = Mode.PIECE_SELECT
 
 	def handle_events(self):
@@ -345,7 +343,7 @@ class ChessGUI(ChessGame):
 		self.clock.tick(gui_cfg.fps)
 
 	def on_game_over(self, state: GameEndState):
-		color: RGBColor = '#ffffff'
+		color: RGBColor = (255, 255, 255)
 
 		if state == GameEndState.WHITE_WON:
 			text = 'White Won!'
@@ -369,7 +367,7 @@ class ChessGUI(ChessGame):
 		while True:
 			self.handle_events()
 
-	def step(self):
+	def step(self) -> bool:
 		""" one step in the chess game + gui updates."""
 		self.handle_events()
 
@@ -381,9 +379,12 @@ class ChessGUI(ChessGame):
 		state: GameEndState = self.check_state()
 		if state != GameEndState.ONGOING:
 			self.on_game_over(state)
+			return True
 
 		# set self.old_board
 		self.old_board = deepcopy(self.board)
+
+		return False
 
 def main():
 	game = ChessGUI()
