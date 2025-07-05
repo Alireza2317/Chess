@@ -122,6 +122,12 @@ class ChessGame:
 			print('cannot move the given piece ')
 			return
 
+		# castling
+		rook_castle_move = self.get_rook_castle_move(piece, coordinate)
+		if rook_castle_move:
+			rook, rook_move = rook_castle_move
+			self.board.move(rook, rook_move)
+
 		opponent_piece: Piece | None = self.board.get(coordinate).piece
 
 		if opponent_piece:
@@ -138,13 +144,6 @@ class ChessGame:
 
 		# switch turns
 		self.change_turns()
-
-		# castling
-		rook_castle_move = self.get_rook_castle_move(piece, coordinate)
-		if rook_castle_move:
-			rook, rook_move = rook_castle_move
-			self.board.move(rook, rook_move)
-
 
 	def get_player_valid_moves(self, player: Player) -> list[Coordinate]:
 		player_moves = []
