@@ -16,7 +16,7 @@ class GameEndState(Enum):
 
 
 class ChessGame:
-	def __init__(self):
+	def __init__(self) -> None:
 		self.board = Board()
 		self.white_p: Player = Player(self.board, Color.WHITE)
 		self.black_p: Player = Player(self.board, Color.BLACK)
@@ -145,7 +145,9 @@ class ChessGame:
 		# switch turns
 		self.change_turns()
 
-	def get_player_valid_moves(self, player: Player) -> list[Coordinate]:
+	def get_player_valid_moves(
+		self, player: Player
+	) -> list[tuple[Piece, Coordinate]]:
 		player_moves = []
 		for piece in player.pieces:
 			for move in piece.valid_moves:
@@ -161,7 +163,7 @@ class ChessGame:
 	def apply_input_to_game(
 			self,
 			player: Player,
-			valid_moves: list[Coordinate]
+			valid_moves: list[tuple[Piece, Coordinate]]
 	):
 		move_idx = int(input(f"{player.color.name.title()}'s move: "))
 		piece, move = valid_moves[move_idx]
