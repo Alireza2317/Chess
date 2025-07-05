@@ -83,23 +83,34 @@ class ChessGame:
 
 		return GameEndState.ONGOING
 
-	def castle(self, piece: Piece, king_new_coordinate: Coordinate):
+	def get_rook_castle_move(
+		self, piece: Piece, coordinate: Coordinate
+	) -> tuple[Piece, Coordinate] | None:
+		"""
+		returns rook's castle move if the move is a castle move.
+		based on the given piece(king) and its new coordinate.
+		else returns None.
+		"""
+
+		player: Player
 		if self.turn == Color.WHITE:
 			player = self.white_p
 		else:
 			player = self.black_p
 
-		all_castle_moves = player.castle_moves()
+		king = player.king
+		if piece != king: return None
 
-		if not all_castle_moves: return
+		castle_moves = player.castle_moves()
+		if not castle_moves: return None
 
-		for moves_pair in all_castle_moves:
-			king, king_new_c, rook, rook_new_c = moves_pair
+		for moves_pair in castle_moves:
+			_, king_move, rook, rook_move = moves_pair
 
-			# if the selected move is available, do it
-			if king_new_coordinate == king_new_c and king == piece:
-				self.move(king, king_new_c)
-				self.move(rook, rook_new_c)
+			if coordinate == king_move:
+				return (rook, rook_move)
+
+		return None
 
 	def move(self, piece: Piece, coordinate: Coordinate):
 		"""
@@ -110,9 +121,6 @@ class ChessGame:
 		if not (piece and coordinate):
 			print('cannot move the given piece ')
 			return
-
-		# castle
-		#self.castle(piece, coordinate)
 
 		opponent_piece: Piece | None = self.board.get(coordinate).piece
 
@@ -126,11 +134,17 @@ class ChessGame:
 		# capturing
 		if opponent_piece:
 			# remove piece from opponent's(player) pieces
-
 			opponent.remove_piece(opponent_piece)
 
 		# switch turns
 		self.change_turns()
+
+		# castling
+		rook_castle_move = self.get_rook_castle_move(piece, coordinate)
+		if rook_castle_move:
+			rook, rook_move = rook_castle_move
+			self.board.move(rook, rook_move)
+
 
 	def get_player_valid_moves(self, player: Player) -> list[Coordinate]:
 		player_moves = []
