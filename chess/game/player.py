@@ -98,11 +98,14 @@ class Player:
 		if self.is_in_check(): return False
 
 		for piece in self.pieces:
-			if piece.piece_type == PieceType.ROOK:
-				if not piece.has_moved:
-					# if there are no pieces in the middle
-					if self.king.coordinate in piece.attacking_coordinates():
-						return True
+			if piece.piece_type != PieceType.ROOK: continue
+			if piece.has_moved: continue
+
+			# if there are no pieces in the middle
+			rook: Piece = piece
+			if self.king.coordinate in rook.attacking_coordinates():
+				# the rook can see the king
+				return True
 
 		# no rooks, or rooks have moved, or some pieces are in the middle
 		return False
