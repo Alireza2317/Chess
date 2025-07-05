@@ -1,4 +1,4 @@
-from chess.components import Coordinate, Color, PieceType, Piece
+from chess.components import Coordinate, Color, Piece, PieceType
 
 class Pawn(Piece):
 	from chess.game.player import Player
@@ -40,10 +40,11 @@ class Pawn(Piece):
 		file = self.coordinate.file
 		rank_ord = ord(self.coordinate.rank)
 
+		sign: int
 		if self.color == Color.WHITE:
-			sign: int = +1
+			sign = +1
 		elif self.color == Color.BLACK:
-			sign: int = -1
+			sign = -1
 
 		new_rank = chr(rank_ord + sign*1)
 		m = f'{file}{new_rank}'
@@ -59,7 +60,7 @@ class Pawn(Piece):
 					new_rank = chr(rank_ord + sign*2)
 					m = f'{file}{new_rank}'
 					if Coordinate.is_valid(m):
-						c: Coordinate = Coordinate(m)
+						c = Coordinate(m)
 
 						# if there isn't a piece ahead
 						if not self.board.get(c).piece:
@@ -76,31 +77,3 @@ class Pawn(Piece):
 
 	def __repr__(self):
 		return 'P' if self.color == Color.WHITE else 'p'
-
-
-def main():
-	from chess.game.player import Player
-	from chess.components import Board
-	from chess.pieces.king import King
-
-	board = Board()
-	white = Player(board, Color.WHITE)
-	black = Player(board, Color.BLACK)
-
-	King(white, Coordinate('e1'))
-	King(black, Coordinate('e8'))
-
-	P = Pawn(white, Coordinate('e2'))
-	P2 = Pawn(white, Coordinate('h2'))
-	p = Pawn(black, Coordinate('e3'))
-	Pawn(black, Coordinate('h4'))
-
-	print(P.available_moves())
-	print(P2.available_moves())
-	board.move(P2, Coordinate('h3'))
-	print(P2.available_moves())
-
-	print(board)
-
-if __name__ == '__main__':
-	main()

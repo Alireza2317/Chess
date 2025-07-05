@@ -19,19 +19,14 @@ class Knight(Piece):
 		file_ord: int = ord(self.coordinate.file)
 		rank_ord: int = ord(self.coordinate.rank)
 
-		possible_moves = [
-			chr(file_ord-2) + chr(rank_ord-1),
-			chr(file_ord-1) + chr(rank_ord-2),
-			chr(file_ord-2) + chr(rank_ord+1),
-			chr(file_ord-1) + chr(rank_ord+2),
-			chr(file_ord+2) + chr(rank_ord-1),
-			chr(file_ord+1) + chr(rank_ord-2),
-			chr(file_ord+2) + chr(rank_ord+1),
-			chr(file_ord+1) + chr(rank_ord+2)
-		]
-		for m in possible_moves:
-			if Coordinate.is_valid(m):
+		for f_dir, r_dir in [(2, 1), (1, 2)]:
+			for f_s, r_s in [(-1, 1), (1, -1), (1, 1), (-1, -1)]:
+				file = chr(file_ord + f_dir*f_s)
+				rank = chr(rank_ord + r_dir*r_s)
+				m = f'{file}{rank}'
+				if not Coordinate.is_valid(m): continue
 				moves.append(Coordinate(m))
+
 
 		return moves
 
@@ -45,10 +40,3 @@ class Knight(Piece):
 
 	def __repr__(self):
 		return 'N' if self.color == Color.WHITE else 'n'
-
-
-def main():
-	pass
-
-if __name__ == '__main__':
-	main()

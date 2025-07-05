@@ -1,4 +1,4 @@
-from chess.components import Coordinate, Color, PieceType, Piece
+from chess.components import Coordinate, Color, Piece, PieceType
 
 class Queen(Piece):
 	from chess.game.player import Player
@@ -44,10 +44,3 @@ class Queen(Piece):
 
 	def __repr__(self):
 		return 'Q' if self.color == Color.WHITE else 'q'
-
-
-def main():
-	pass
-
-if __name__ == '__main__':
-	main()

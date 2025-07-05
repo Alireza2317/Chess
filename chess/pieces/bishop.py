@@ -40,22 +40,3 @@ class Bishop(Piece):
 
 	def __repr__(self):
 		return 'B' if self.color == Color.WHITE else 'b'
-
-def main():
-	from chess.components import Board
-	from chess.pieces.pawn import Pawn
-	from chess.pieces.king import King
-	from chess.game.player import Player
-
-	b = Board()
-	p = Player(b, Color.WHITE)
-	king = King(p, Coordinate('e1'))
-	bish = Bishop(p, Coordinate('a8'))
-	Pawn(p, Coordinate('c6'))
-
-	print(b)
-	print(bish.attacking_coordinates())
-	print(bish.available_moves())
-
-if __name__ == '__main__':
-	main()

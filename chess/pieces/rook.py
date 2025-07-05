@@ -1,4 +1,4 @@
-from chess.components import Coordinate, Color, PieceType, Piece
+from chess.components import Coordinate, Color, Piece, PieceType
 
 class Rook(Piece):
 	from chess.game.player import Player
@@ -41,10 +41,3 @@ class Rook(Piece):
 
 	def __repr__(self):
 		return 'R' if self.color == Color.WHITE else 'r'
-
-
-def main():
-	pass
-
-if __name__ == '__main__':
-	main()
