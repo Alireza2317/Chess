@@ -102,6 +102,7 @@ class Player:
 			second one is the king's new coordinate
 			third one is the respective rook
 			fourth one is the respective rook's new coordinate
+		returns None or [] if player has no legal castle moves
 		"""
 		if self.king.has_moved: return None
 		if self.is_in_check(): return None
@@ -127,20 +128,24 @@ class Player:
 		for rook in valid_rooks:
 			rank: str = rook.coordinate.rank
 
-			match rook.coordinate.file:
-				# short castle
-				case 'h':
-					king_c = Coordinate(f'g{rank}')
-					rook_c = Coordinate(f'f{rank}')
+			files: list[str]
+			if rook.coordinate.file == 'h':
+				files = ['g', 'f']
+			elif rook.coordinate.file == 'a':
+				files = ['c', 'd']
 
-				# long castle
-				case 'a':
-					king_c = Coordinate(f'c{rank}')
-					rook_c = Coordinate(f'd{rank}')
+			for file in files:
+				# check squares in the middle for enemy attacks
+				c = Coordinate(f'{file}{rank}')
+				if self.is_under_attack(c): break
+			else: # if successful and no break = no enemy attacks
+				king_file, rook_file = files
+				king_c = Coordinate(f'{king_file}{rank}')
+				rook_c = Coordinate(f'{rook_file}{rank}')
 
-			king_rook_moves_pair.append(
-					(self.king, king_c, rook, rook_c)
-			)
+				king_rook_moves_pair.append(
+						(self.king, king_c, rook, rook_c)
+				)
 
 		return king_rook_moves_pair
 
@@ -194,7 +199,7 @@ class Player:
 def main():
 	from chess.pieces.king import King
 	from chess.pieces.rook import Rook
-	from chess.pieces.knight import Knight
+	from chess.pieces.queen import Queen
 
 	b = Board()
 	white = Player(b, Color.WHITE)
@@ -205,6 +210,7 @@ def main():
 
 	wk = King(white, Coordinate('e1'))
 	bk = King(black, Coordinate('e8'))
+	#Queen(black, Coordinate('h2'))
 
 	short_rook = Rook(white, Coordinate('h1'))
 	long_rook = Rook(white, Coordinate('a1'))
