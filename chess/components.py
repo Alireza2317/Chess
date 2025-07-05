@@ -54,23 +54,17 @@ class Coordinate:
 	def is_valid(coordinate: str) -> bool:
 		return (coordinate[0] in 'abcdefgh') and (coordinate[1] in '12345678')
 
-	def __eq__(self, other: Coordinate):
+	def __eq__(self, other: object):
 		if not isinstance(other, Coordinate):
-			raise TypeError(
+			raise NotImplementedError(
 				f'Cannot check equality between ' +
-				f'{Coordinate.__name__} and {type(other)}!'
+				f'{self.__class__.__name__} and {type(other)}!'
 			)
 
 		return (self.file == other.file) and (self.rank == other.rank)
 
-	def __ne__(self, other: Coordinate):
-		if not isinstance(other, Coordinate):
-			raise TypeError(
-				f'Cannot check equality between ' +
-				f'{Coordinate.__name__} and {type(other)}!'
-			)
-
-		return (self.file != other.file) or (self.rank != other.rank)
+	def __ne__(self, other: object):
+		return not self.__eq__(other)
 
 	def __repr__(self):
 		return self.cc
@@ -120,15 +114,19 @@ class Piece(ABC):
 	def piece_type(self) -> PieceType:
 		pass
 
-	def __eq__(self, other: Piece):
+	def __eq__(self, other: object):
 		if other is None: return False
+		if not isinstance(other, Piece):
+			raise NotImplementedError(
+				f'cannot compare {self.__class__.__name__} with {type(other)}!'
+			)
 
 		same_color: bool = (self.color == other.color)
 		same_type: bool = (self.piece_type == other.piece_type)
 		same_coordinate: bool = (self.coordinate == other.coordinate)
 		return same_color and same_type and same_coordinate
 
-	def __ne__(self, other: Piece):
+	def __ne__(self, other: object):
 		return not self.__eq__(other)
 
 
@@ -159,20 +157,25 @@ class Square:
 		else:
 			self.color = Color.WHITE
 
-	def __eq__(self, other: Square):
+	def __eq__(self, other: object):
+		if not isinstance(other, Square):
+			raise NotImplementedError(
+				f'cannot compare {self.__class__.__name__} with {type(other)}!'
+			)
+
 		same_coordinate: bool = (self.coordinate == other.coordinate)
 		same_piece: bool = (self.piece == other.piece)
 		return same_coordinate and same_piece
 
-	def __ne__(self, other: Square):
+	def __ne__(self, other: object):
 		return not self.__eq__(other)
 
 	def __repr__(self):
-		return f'{Square.__name__}({self.coordinate}, {self.piece})'
+		return f'{self.__class__.__name__}({self.coordinate}, {self.piece})'
 
 
 class Board:
-	def __init__(self):
+	def __init__(self) -> None:
 		# the arrangement of these lists is such that the first row is
 		# equivalent to the rank 1, from a to h
 		# and the last row is the rank 8
@@ -191,7 +194,6 @@ class Board:
 		takes a chess coordinate and puts the given piece
 		in the appropriate square
 		"""
-
 		row, col = coordinate.regular
 		self.board_matrix[row][col].piece = piece
 		piece.coordinate = coordinate
@@ -233,8 +235,9 @@ class Board:
 		coords: list[Coordinate] = []
 
 		for i in range(1, 8):
-			new_file = chr(file_ord + i*direction[0])
-			new_rank = chr(rank_ord + i*direction[1])
+			f_dir, r_dir = direction
+			new_file = chr(file_ord + i*f_dir)
+			new_rank = chr(rank_ord + i*r_dir)
 
 			m = f'{new_file}{new_rank}'
 
@@ -248,12 +251,15 @@ class Board:
 
 		return coords
 
-	def __repr__(self):
+	def __repr__(self) -> str:
 		s: str = ''
 		for row in reversed(self.board_matrix):
 			for sq in row:
 				if sq.piece:
-					s += f'{sq.piece}'
+					if sq.piece.color == Color.WHITE:
+						s += colored_str(f'{sq.piece}', 'b')
+					elif sq.piece.color == Color.BLACK:
+						s += colored_str(f'{sq.piece}', 'y')
 				else:
 					if sq.color == Color.WHITE:
 						s += '□'
