@@ -42,35 +42,109 @@ class ChessGame:
 			self.turn = Color.WHITE
 
 	def classic_setup(self) -> None:
-		for color in [Color.WHITE, Color.BLACK]:
-			if color == Color.WHITE:
-				player = self.white_p
-				pawn_rank = '2'
-				pieces_rank = '1'
-			else:
-				player = self.black_p
-				pawn_rank = '7'
-				pieces_rank = '8'
+		self.load_FEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
 
-			King(player, Coordinate(f'e{pieces_rank}'))
-			Queen(player, Coordinate(f'd{pieces_rank}'))
-			for file in ('a', 'h'):
-				Rook(player, Coordinate(f'{file}{pieces_rank}'))
-			for file in ('c', 'f'):
-				Bishop(player, Coordinate(f'{file}{pieces_rank}'))
-			for file in ('b', 'g'):
-				Knight(player, Coordinate(f'{file}{pieces_rank}'))
-			# pawns
-			for file_ord in range(ord('a'), ord('h')+1):
-				file = chr(file_ord)
-				Pawn(player, Coordinate(f'{file}{pawn_rank}'))
+	def destroy_all_pieces(self):
+		self.white_p.pieces = []
+		self.black_p.pieces = []
+		for row in self.board.board_matrix:
+			for square in row:
+				self.board.remove(square.coordinate)
+
+	def load_FEN(self, FEN: str):
+		"""
+		this method will load the game based on the given FEN notation. 
+		"""
+		def reset_game():
+			# reset game
+			self.destroy_all_pieces()
+			self.turn = Color.WHITE
+
+		def place_pieces(fen_placements: str):
+			# fen_placements is the first field of FEN
+			p_placements_ranks: list[str] = fen_placements.split('/')
+
+			for rank, rank_pieces in zip('87654321', p_placements_ranks):
+				file = 'a'
+				for piece in rank_pieces:
+					# can be 'KQRBNPkqrbnp' or a number between 1 and 8
+					# the number denotes the number of consecutive empty squares
+					if piece in '87654321':
+						new_f_ord = ord(file) + int(piece)
+						file = chr(new_f_ord)
+						continue
+
+					if piece.isupper():
+						player = self.white_p
+					else:
+						player = self.black_p
+
+					coord = Coordinate(f'{file}{rank}')
+
+					if piece in 'Kk':
+						King(player, coord)
+					elif piece in 'Qq':
+						Queen(player, coord)
+					elif piece in 'Rr':
+						Rook(player, coord)
+					elif piece in 'Bb':
+						Bishop(player, coord)
+					elif piece in 'Nn':
+						Knight(player, coord)
+					elif piece in 'Pp':
+						Pawn(player, coord)
+
+					# move to next file
+					file = chr(ord(file) + 1)
+
+		def handle_turn(fen_turn: str):
+			if fen_turn == 'b':
+				self.change_turns()
+
+		def handle_castle_moves(fen_castle_field: str) -> None:
+			# k means kingside, q means queenside
+			to_disable: list[str] = ['K', 'Q', 'k', 'q']
+			for cr in fen_castle_field:
+				if cr in to_disable:
+					to_disable.remove(cr)
+
+			for move in to_disable:
+				if move.isupper():
+					player = self.white_p
+				else:
+					player = self.black_p
+
+				if move in 'Kk':
+					rook_file = 'h'
+				if move in 'Qq':
+					rook_file = 'a'
+
+				for p in player.pieces:
+					if p.piece_type != PieceType.ROOK: continue
+					if p.coordinate.file != rook_file: continue
+					p.has_moved = True
+
+		fen_fields: list[str] = FEN.split()
+		# 0: piece placements, from rank 8 to 1
+		# 1: 'w' or 'b', current player's turn
+		# 2: castling availablity, first white's then black's or -
+		# 3: en passant target square
+		# 4, 5 are not important really
+
+		reset_game()
+
+		place_pieces(fen_fields[0])
+
+		handle_turn(fen_fields[1])
+
+		# handling castle moves
+		handle_castle_moves(fen_fields[2])
+
+		# en passant
+		#fen_fields[3]
 
 		self.white_p.update_valid_moves()
 		self.black_p.update_valid_moves()
-
-	def two_kings_setup(self) -> None:
-		King(self.white_p, Coordinate('e1'))
-		King(self.black_p, Coordinate('e8'))
 
 	def check_state(self) -> GameEndState:
 		if self.white_p.is_checkmated():
