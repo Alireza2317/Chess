@@ -1,20 +1,19 @@
 import sys
 import pygame as pg
-from copy import deepcopy
-from enum import Enum
-from chess.pieces.bishop import Bishop
+import enum
 from chess.pieces.king import King
-from chess.pieces.knight import Knight
-from chess.pieces.pawn import Pawn
 from chess.pieces.queen import Queen
 from chess.pieces.rook import Rook
+from chess.pieces.bishop import Bishop
+from chess.pieces.knight import Knight
+from chess.pieces.pawn import Pawn
 from gui.config import gui_cfg, RGBColor
 from chess.components import Color, Coordinate, Piece, PieceType, Square
 from chess.game.game import ChessGame, GameEndState
 
-class Mode(Enum):
-	PIECE_SELECT = 'p'
-	MOVE_SELECT = 'm'
+class Mode(enum.Enum):
+	PIECE_SELECT = enum.auto()
+	MOVE_SELECT = enum.auto()
 
 class ChessGUI(ChessGame):
 	def __init__(self) -> None:
@@ -311,6 +310,10 @@ class ChessGUI(ChessGame):
 
 	def draw_square(self, square: Square, color: RGBColor | None = None):
 		""" draws the given square object. """
+		p = square.piece
+		# if king is in check, do not draw the default square color
+		if ((p and p == p.player.king and p.player.is_in_check()) and color is None): return
+
 		if color is None:
 			if square.color == Color.BLACK:
 				color = gui_cfg.black_color
