@@ -339,7 +339,12 @@ class ChessGUI(ChessGame):
 		if square.piece:
 			self.draw_piece(square.piece)
 
-	def update_board(self, /, all_board: bool = False, coordinates: list[Coordinate] | None = None):
+	def update_board(
+			self,
+			/,
+			all_board: bool = False,
+			coordinates: list[Coordinate] | None = None
+	):
 		"""
 		draws the whole game board.
 		draws all the pieces of the game on appropriate coordinates
