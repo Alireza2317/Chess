@@ -22,7 +22,7 @@ class Player:
 				self.king = piece
 				k_count += 1
 
-		if k_count != 1:
+		if k_count > 1:
 			raise TypeError(
 				f'pieces parameter should be a list of Piece objects!\n'+
 				f'and it should have one and only one King object inside.'
