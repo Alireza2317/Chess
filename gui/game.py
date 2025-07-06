@@ -62,16 +62,32 @@ class ChessGUI(ChessGame):
 
 	def highlight_valid_moves(self, piece: Piece):
 		"""	highlights the valid moves of the given piece on the board. """
+		# mark the piece
+		self.draw_square(self.board.get(piece.coordinate), gui_cfg.selected_piece_color)
+
 		for move in piece.valid_moves:
 			square = self.board.get(move)
 
-			self.draw_square(square, gui_cfg.valid_color)
+			row, col = square.coordinate.regular
+			l =  col * gui_cfg.square_size
+			t = (7-row) * gui_cfg.square_size
 
-			# redraw the opponent pieces, since the line above will
-			# kind of remove them from the board
-			if square.piece:
-				self.draw_piece(square.piece)
+			rect = pg.Rect((l, t), (gui_cfg.square_size, gui_cfg.square_size))
+			rect_surface = pg.Surface(rect.size, pg.SRCALPHA)
+			center = (gui_cfg.square_size//2, gui_cfg.square_size//2)
 
+			if not square.piece:
+				radius = gui_cfg.square_size/6.5
+				pg.draw.circle(
+					rect_surface, gui_cfg.valid_color, center, radius
+				)
+			else: # capture
+				radius = gui_cfg.square_size*0.49
+				pg.draw.circle(
+					rect_surface, gui_cfg.valid_color, center, radius, width=10
+				)
+
+			self.board_screen.blit(rect_surface, rect)
 	def get_coordinate_on_click(self, pos: tuple[int, int]) -> Coordinate | None:
 		"""
 		returns a chess coordinate based on the user's click.
