@@ -126,7 +126,7 @@ class ChessGame:
 		self.board.remove(coordinate)
 
 		return True
-	
+
 	def set_promotion_piece(self):
 		while True:
 			p = input('Promote to [q, r, b, n]: ')

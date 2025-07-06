@@ -2,6 +2,12 @@ import sys
 import pygame as pg
 from copy import deepcopy
 from enum import Enum
+from chess.pieces.bishop import Bishop
+from chess.pieces.king import King
+from chess.pieces.knight import Knight
+from chess.pieces.pawn import Pawn
+from chess.pieces.queen import Queen
+from chess.pieces.rook import Rook
 from gui.config import gui_cfg, RGBColor
 from chess.components import Color, Coordinate, Piece, PieceType, Square
 from chess.game.game import ChessGame, GameEndState
@@ -34,7 +40,7 @@ class ChessGUI(ChessGame):
 		self.screen = pg.display.set_mode(
 			(
 				gui_cfg.dimensions[0]+gui_cfg.coordinates_width,
-				gui_cfg.dimensions[1]+gui_cfg.square_size//1.5
+				gui_cfg.dimensions[1]+gui_cfg.square_size
 			)
 		)
 		self.screen.fill(gui_cfg.bg_color)
@@ -341,6 +347,54 @@ class ChessGUI(ChessGame):
 
 		pg.display.update()
 		self.clock.tick(gui_cfg.fps)
+
+	def custom_setup(self):
+		King(self.white_p, Coordinate('e1'))
+		King(self.black_p, Coordinate('e8'))
+		Pawn(self.white_p, Coordinate('b7'))
+
+	def set_promotion_piece(self) -> None:
+		"""
+		draw 4 buttons representing options for promotion pieces.
+		and setting self.promotion_piece to the corresponding piece type
+		"""
+
+		buttons: list[pg.Rect] = []
+		pieces: list[PieceType] = [
+			PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT
+		]
+		y_pos = gui_cfg.dimensions[1]+gui_cfg.square_size//2
+		for x, pt in enumerate(pieces, 1):
+			x_pos = int((x/4) * gui_cfg.dimensions[0] * 0.6 - 50)
+			r = pg.Rect(x_pos, y_pos, 90, 30)
+			buttons.append(r)
+			pg.draw.rect(
+				self.screen,
+				(200, 200, 200),
+				rect=r,
+				border_radius=2,
+			)
+
+			text = self.main_font.render(
+				pt.name.title(), True, gui_cfg.bg_color
+			)
+			self.screen.blit(text, (x_pos+10, y_pos+7))
+
+		pg.display.update()
+		index = None
+		while True:
+			for event in pg.event.get():
+				if event.type == pg.QUIT:
+					pg.quit()
+					sys.exit()
+				elif event.type == pg.MOUSEBUTTONDOWN:
+					for btn in buttons:
+						if btn.collidepoint(*event.pos):
+							index = buttons.index(btn)
+			if index is not None: break
+
+		self.screen.fill(gui_cfg.bg_color)
+		self.promotion_piece = pieces[index]
 
 	def on_game_over(self, state: GameEndState):
 		color: RGBColor = (255, 255, 255)
