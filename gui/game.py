@@ -21,8 +21,6 @@ class ChessGUI(ChessGame):
 		super().__init__()
 		self.classic_setup()
 
-		self.old_board = deepcopy(self.board)
-
 		self.init_gui_elements()
 
 		self.draw_coordinates()
@@ -60,10 +58,13 @@ class ChessGUI(ChessGame):
 			pg.font.get_default_font(), gui_cfg.coordinates_font_size
 		)
 
+		self.draw_coordinates()
+
 	def highlight_valid_moves(self, piece: Piece):
 		"""	highlights the valid moves of the given piece on the board. """
-		# mark the piece
-		self.draw_square(self.board.get(piece.coordinate), gui_cfg.selected_piece_color)
+		# mark the piece if it is not a checked king
+		if piece != piece.player.king or not piece.player.is_in_check():
+			self.draw_square(self.board.get(piece.coordinate), gui_cfg.selected_piece_color)
 
 		for move in piece.valid_moves:
 			square = self.board.get(move)
@@ -88,6 +89,7 @@ class ChessGUI(ChessGame):
 				)
 
 			self.board_screen.blit(rect_surface, rect)
+
 	def get_coordinate_on_click(self, pos: tuple[int, int]) -> Coordinate | None:
 		"""
 		returns a chess coordinate based on the user's click.
@@ -124,30 +126,27 @@ class ChessGUI(ChessGame):
 		if p and self.turn == p.color:
 			# then we are trying to check the valid moves
 			# of our own piece
-			self.update_board(all_board=True)
 
 			if p.valid_moves:
 				self.highlight_valid_moves(p)
-			# no valid moves
-			else: return None
+				return p
 
-		# it was a misclick
-		else: return None
-
-		return p
+		# no valid moves
+		# or it was a misclick
+		return None
 
 	def select_move(self, coordinate: Coordinate):
-		"""
-		selects the move that was clicked.
-		"""
-		if coordinate not in self.selected_piece.valid_moves:
-			self.update_board(all_board=True)
-			return
+		"""	selects the move that was clicked. """
+		coords = self.selected_piece.valid_moves.copy() + [
+			self.selected_piece.coordinate,
+			self.selected_piece.player.king.coordinate
+		]
 
-		# trying to move our piece to one of the valid moves
-		self.move(self.selected_piece, coordinate)
+		if coordinate in self.selected_piece.valid_moves:
+			# trying to move our piece to one of the valid moves
+			self.move(self.selected_piece, coordinate)
 
-		self.update_board(all_board=True)
+		self.update_board(coordinates=coords)
 
 	def handle_click(self, pos: tuple[int, int]):
 		c: Coordinate | None = self.get_coordinate_on_click(pos)
@@ -337,25 +336,20 @@ class ChessGUI(ChessGame):
 		if square.piece:
 			self.draw_piece(square.piece)
 
-	def update_board(self, all_board: bool = False):
+	def update_board(self, /, all_board: bool = False, coordinates: list[Coordinate] | None = None):
 		"""
 		draws the whole game board.
 		draws all the pieces of the game on appropriate coordinates
 		and draws empty squares if a piece moved from it.
 		"""
-		self.draw_coordinates()
-		for i, row in enumerate(self.board.board_matrix):
-			for j, square in enumerate(row):
-				# skip if not changed OR not asked to draw all board
-				if (self.old_board.board_matrix[i][j] == square) and not(all_board):
-					continue
-
-				# draw board squares
-				self.draw_square(square)
-
-				# draw pieces
-				if square.piece:
-					self.draw_piece(square.piece)
+		if all_board:
+			for row in self.board.board_matrix:
+				for square in row:
+					self.draw_square(square)
+		elif coordinates:
+			for c in coordinates:
+				sq = self.board.get(c)
+				self.draw_square(sq)
 
 		self.screen.blit(self.board_screen, (0, 0))
 
@@ -439,6 +433,12 @@ class ChessGUI(ChessGame):
 		while True:
 			self.handle_events()
 
+	def highlight_checked_king(self):
+		player = self.white_p if self.turn == Color.WHITE else self.black_p
+		if player.is_in_check():
+			square = self.board.get(player.king.coordinate)
+			self.draw_square(square, gui_cfg.in_check_color)
+
 	def step(self) -> bool:
 		""" one step in the chess game + gui updates."""
 		self.handle_events()
@@ -448,13 +448,12 @@ class ChessGUI(ChessGame):
 		self.white_p.update_valid_moves()
 		self.black_p.update_valid_moves()
 
+		self.highlight_checked_king()
+
 		state: GameEndState = self.check_state()
 		if state != GameEndState.ONGOING:
 			self.on_game_over(state)
 			return True
-
-		# set self.old_board
-		self.old_board = deepcopy(self.board)
 
 		return False
 
