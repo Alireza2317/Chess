@@ -306,18 +306,20 @@ class ChessGUI(ChessGame):
 		l = gui_cfg.square_size * col
 		t = gui_cfg.square_size * (7-row)
 
-		# draw board squares
-		pg.draw.rect(
-			self.board_screen,
-			color,
-			((l, t), (gui_cfg.square_size, gui_cfg.square_size))
-		)
+		rect = pg.Rect(l, t, gui_cfg.square_size, gui_cfg.square_size)
+		rect_surface = pg.Surface(rect.size, pg.SRCALPHA)
+		pg.draw.rect(rect_surface, color, rect_surface.get_rect())
+		self.board_screen.blit(rect_surface, rect)
+
 		# border
 		pg.draw.rect(
 			self.board_screen,
 			gui_cfg.bg_color,
 			((l, t), (gui_cfg.square_size, gui_cfg.square_size)), width=1
 		)
+
+		if square.piece:
+			self.draw_piece(square.piece)
 
 	def update_board(self, all_board: bool = False):
 		"""
