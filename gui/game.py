@@ -19,7 +19,7 @@ class ChessGUI(ChessGame):
 	def __init__(self) -> None:
 		super().__init__()
 		self.classic_setup()
-
+		
 		self.init_gui_elements()
 
 		self.draw_coordinates()
@@ -143,6 +143,12 @@ class ChessGUI(ChessGame):
 
 		if coordinate in self.selected_piece.valid_moves:
 			# trying to move our piece to one of the valid moves
+			rcm = self.get_rook_castle_move(self.selected_piece, coordinate)
+			if rcm:
+				rook, rook_move = rcm
+				coords.append(rook.coordinate)
+				coords.append(rook_move)
+
 			self.move(self.selected_piece, coordinate)
 
 		self.update_board(coordinates=coords)
@@ -367,11 +373,6 @@ class ChessGUI(ChessGame):
 
 		pg.display.update()
 		self.clock.tick(gui_cfg.fps)
-
-	def custom_setup(self):
-		King(self.white_p, Coordinate('e1'))
-		King(self.black_p, Coordinate('e8'))
-		Pawn(self.white_p, Coordinate('b7'))
 
 	def set_promotion_piece(self) -> None:
 		"""
