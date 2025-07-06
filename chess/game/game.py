@@ -1,5 +1,5 @@
 from enum import Enum
-from chess.components import Board, Color, Coordinate, Piece
+from chess.components import Board, Color, Coordinate, Piece, PieceType
 from chess.game.player import Player
 from chess.pieces.king import King
 from chess.pieces.queen import Queen
@@ -26,6 +26,9 @@ class ChessGame:
 
 		# it's white's turn at first
 		self.turn: Color = Color.WHITE
+
+		# default promotion piece is queen
+		self.promotion_piece: PieceType = PieceType.QUEEN
 
 	def change_turns(self):
 		""" changes the player's turns, from white to black or vice versa. """
@@ -112,6 +115,33 @@ class ChessGame:
 
 		return None
 
+	def pawn_promotion(self, piece: Piece, coordinate: Coordinate) -> bool:
+		""" checks pawn promotion and returns wether it happened or not. """
+		if piece.piece_type != PieceType.PAWN: return False
+
+		if coordinate.rank not in ('1', '8'): return False
+
+		# remove pawn from board and player's pieces
+		piece.player.remove_piece(piece)
+		self.board.remove(coordinate)
+
+		return True
+	
+	def set_promotion_piece(self):
+		while True:
+			p = input('Promote to [q, r, b, n]: ')
+			if p in 'Qq':
+				self.promotion_piece = PieceType.QUEEN
+			elif p in 'Rr':
+				self.promotion_piece = PieceType.ROOK
+			elif p in 'Bb':
+				self.promotion_piece = PieceType.BISHOP
+			elif p in 'Nn':
+				self.promotion_piece = PieceType.KNIGHT
+			else: continue
+
+			break
+
 	def move(self, piece: Piece, coordinate: Coordinate):
 		"""
 		moves the given piece to the given coordinate.
@@ -141,6 +171,20 @@ class ChessGame:
 		if opponent_piece:
 			# remove piece from opponent's(player) pieces
 			opponent.remove_piece(opponent_piece)
+
+		# pawn promotion
+		if self.pawn_promotion(piece, coordinate):
+			self.set_promotion_piece()
+
+			match self.promotion_piece:
+				case PieceType.QUEEN:
+					Queen(piece.player, coordinate)
+				case PieceType.ROOK:
+					Rook(piece.player, coordinate)
+				case PieceType.BISHOP:
+					Bishop(piece.player, coordinate)
+				case PieceType.KNIGHT:
+					Knight(piece.player, coordinate)
 
 		# switch turns
 		self.change_turns()
