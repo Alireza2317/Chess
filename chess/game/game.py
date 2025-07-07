@@ -29,6 +29,13 @@ class ChessGame:
 		# default promotion piece is queen
 		self.promotion_piece: PieceType = PieceType.QUEEN
 
+	@property
+	def current_player(self) -> Player:
+		if self.turn == Color.WHITE:
+			return self.white_p
+		else:
+			return self.black_p
+
 	def change_turns(self):
 		""" changes the player's turns, from white to black or vice versa. """
 		self.turn = ~self.turn
@@ -161,16 +168,10 @@ class ChessGame:
 		else returns None.
 		"""
 
-		player: Player
-		if self.turn == Color.WHITE:
-			player = self.white_p
-		else:
-			player = self.black_p
-
-		king = player.king
+		king = self.current_player.king
 		if piece != king: return None
 
-		castle_moves = player.castle_moves()
+		castle_moves = self.current_player.castle_moves()
 		if not castle_moves: return None
 
 		for moves_pair in castle_moves:
@@ -215,15 +216,20 @@ class ChessGame:
 		handles captures of opponent pieces.
 		"""
 		if not (piece and coordinate):
-			print('cannot move the given piece ')
+			print('wrong inputs!')
 			return
 
-		# castling
+		# if castling, move the rook too
 		rook_castle_move = self.get_rook_castle_move(piece, coordinate)
 		if rook_castle_move:
 			rook, rook_move = rook_castle_move
 			self.board.move(rook, rook_move)
+			# the king
+			self.board.move(piece, coordinate)
+			self.change_turns()
+			return
 
+		# regular moves
 		opponent_piece: Piece | None = self.board.get(coordinate).piece
 
 		if opponent_piece:
@@ -255,7 +261,7 @@ class ChessGame:
 		# switch turns
 		self.change_turns()
 
-	def get_player_valid_moves(
+	def print_player_valid_moves(
 		self, player: Player
 	) -> list[tuple[Piece, Coordinate]]:
 		player_moves = []
@@ -294,11 +300,8 @@ class ChessGame:
 			state = self.check_state()
 			if state != GameEndState.ONGOING: return True
 
-			valid_moves = self.get_player_valid_moves(player)
-			self.apply_input_to_game(
-				player,
-				valid_moves
-			)
+			valid_moves = self.print_player_valid_moves(player)
+			self.apply_input_to_game(player, valid_moves)
 
 		return False
 
@@ -307,6 +310,9 @@ def main():
 	game = ChessGame()
 
 	game.classic_setup()
+	game.white_p.update_valid_moves()
+	game.black_p.update_valid_moves()
+
 	while True:
 		game_over = game.step()
 		if game_over: break
