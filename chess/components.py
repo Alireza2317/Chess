@@ -1,14 +1,14 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
-from enum import Enum
+import enum
 from chess.utils import colored_str
 
 if TYPE_CHECKING:
 	from chess.game.player import Player
 
 
-class PieceType(Enum):
+class PieceType(enum.Enum):
 	KING = 'k'
 	QUEEN = 'q'
 	ROOK = 'r'
@@ -17,10 +17,12 @@ class PieceType(Enum):
 	PAWN = 'p'
 
 
-class Color(Enum):
-	WHITE = 'w'
-	BLACK = 'b'
+class Color(enum.Enum):
+	WHITE = 0
+	BLACK = -1
 
+	def __invert__(self):
+		return self.__class__(~self.value)
 
 class Coordinate:
 	def __init__(self, coordinate: str):
