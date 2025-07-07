@@ -1,13 +1,8 @@
 import sys
 import pygame as pg
-import enum
 from gui.config import gui_cfg, RGBColor
 from chess.components import Color, Coordinate, Piece, PieceType, Square
 from chess.game.game import ChessGame, GameEndState
-
-class Mode(enum.Enum):
-	PIECE_SELECT = enum.auto()
-	MOVE_SELECT = enum.auto()
 
 class ChessGUI(ChessGame):
 	def __init__(self) -> None:
@@ -17,9 +12,8 @@ class ChessGUI(ChessGame):
 		self.init_gui_elements()
 
 		self.draw_coordinates()
-		self.update_board(all_board=True)
+		self.update_board()
 
-		self.mode: Mode = Mode.PIECE_SELECT
 		self.selected_piece: Piece | None = None
 
 	def init_gui_elements(self):
@@ -84,9 +78,6 @@ class ChessGUI(ChessGame):
 
 			self.board_screen.blit(rect_surface, rect)
 
-		#self.update_board(coordinates=piece.valid_moves)
-		self.update_screen()
-
 	def get_coordinate_on_click(self, pos: tuple[int, int]) -> Coordinate | None:
 		"""
 		returns a chess coordinate based on the user's click.
@@ -112,66 +103,53 @@ class ChessGUI(ChessGame):
 
 		return Coordinate(c_s)
 
-	def select_piece(self, coordinate: Coordinate) -> Piece | None:
-		"""
-		selects the piece that was clicked, highlights its valid moves
-		on the board
-		and returns the piece 
-		"""
-		#p: Piece | None = self.board.get(coordinate).piece
-
-		#if p and self.turn == p.color:
-		#	# then we are trying to check the valid moves
-		#	# of our own piece
-
-		#	if p.valid_moves:
-		#		self.highlight_valid_moves(p)
-		#		return p
-
-		## no valid moves
-		## or it was a misclick
-		#return None
-
-	def select_move(self, coordinate: Coordinate):
-		"""	selects the move that was clicked. """
-		#coords = self.selected_piece.valid_moves.copy() + [
-		#	self.selected_piece.coordinate,
-		#	self.selected_piece.player.king.coordinate
-		#]
-
-		#if coordinate in self.selected_piece.valid_moves:
-		#	# trying to move our piece to one of the valid moves
-		#	rcm = self.get_rook_castle_move(self.selected_piece, coordinate)
-		#	if rcm:
-		#		rook, rook_move = rcm
-		#		coords.append(rook.coordinate)
-		#		coords.append(rook_move)
-
-		#	self.move(self.selected_piece, coordinate)
-
-		#self.update_board(coordinates=coords)
-
 	def handle_click(self, pos: tuple[int, int]):
+		"""
+		handles gameplay and clicks. selects a piece first, then 
+		highlights its valid moves.
+		and then moves the piece to the selected coordinate.
+		"""
 		c: Coordinate | None = self.get_coordinate_on_click(pos)
 		if not c: return
 
 		if not self.selected_piece:
 			p: Piece | None = self.board.get(c).piece
-			if p and p.color == self.turn:
-				self.selected_piece = p
+			# ignore if not our piece or has no moves
+			if not (p and p.color == self.turn and p.valid_moves): return
 
-			if not self.selected_piece: return
+			self.selected_piece = p
 
-			print(f'selected {self.selected_piece} on {c}')
-			print(self.selected_piece.valid_moves)
 			self.highlight_valid_moves(self.selected_piece)
-		else:
-			if c in self.selected_piece.valid_moves:
-				self.move(self.selected_piece, c)
+			return
 
+		# here we already have selected a piece before
+		if c in self.selected_piece.valid_moves:
+			self.move(self.selected_piece, c)
+			self.selected_piece = None
+			self.update_board()
+			return
+
+		# here we had a selected_piece but the move selection failed
+		# it means it either was a misclick, or the player wanted to
+		# select another piece
+		p = self.board.get(c).piece
+		if p and p.color == self.turn and p.valid_moves:
+			if p == self.selected_piece:
+				# selected the same piece, ignore and deselect
+				self.update_board()
+				self.selected_piece = None
+				return
+
+			# selected a new piece
+			self.selected_piece = p
+			self.update_board()
+			self.highlight_valid_moves(self.selected_piece)
+			return
+		else: # completely wrong click
+			# deselect piece
 			self.selected_piece = None
 
-			self.update_board(all_board=True)
+		self.update_board()
 
 	def handle_events(self):
 		""" handle user events. """
@@ -350,25 +328,15 @@ class ChessGUI(ChessGame):
 		if square.piece:
 			self.draw_piece(square.piece)
 
-	def update_board(
-			self,
-			/,
-			all_board: bool = False,
-			coordinates: list[Coordinate] | None = None
-	):
+	def update_board(self):
 		"""
 		draws the whole game board.
 		draws all the pieces of the game on appropriate coordinates
 		and draws empty squares if a piece moved from it.
 		"""
-		if all_board:
-			for row in self.board.board_matrix:
-				for square in row:
-					self.draw_square(square)
-		elif coordinates:
-			for c in coordinates:
-				sq = self.board.get(c)
-				self.draw_square(sq)
+		for row in self.board.board_matrix:
+			for square in row:
+				self.draw_square(square)
 
 		self.screen.blit(self.board_screen, (0, 0))
 
