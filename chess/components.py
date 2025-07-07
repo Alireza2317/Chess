@@ -24,6 +24,7 @@ class Color(enum.Enum):
 	def __invert__(self):
 		return self.__class__(~self.value)
 
+
 class Coordinate:
 	def __init__(self, coordinate: str):
 		if not self.is_valid(coordinate):
@@ -35,7 +36,7 @@ class Coordinate:
 	@staticmethod
 	def is_valid(coordinate: str) -> bool:
 		if not isinstance(coordinate, str):
-			raise ValueError('coordinate should be a str!')
+			raise TypeError('coordinate should be a str!')
 		return (
 			len(coordinate) == 2 and
 			(coordinate[0] in 'abcdefgh') and
@@ -75,6 +76,12 @@ class Piece(ABC):
 			raise TypeError(
 				f'coordinate should be of type {Coordinate.__name__}!'
 			)
+		from chess.game.player import Player
+		if not isinstance(player, Player):
+			raise TypeError(
+				f'player should be of type {Player.__name__}!'
+			)
+
 		self.player = player
 		self.board = player.board
 		self.color = player.color
@@ -87,9 +94,12 @@ class Piece(ABC):
 		# add the piece to player's pieces
 		player.add_piece(self)
 
+	@property
 	@abstractmethod
-	def attacking_coordinates(self) -> list[Coordinate]:
-		pass
+	def piece_type(self) -> PieceType: ...
+
+	@abstractmethod
+	def attacking_coordinates(self) -> list[Coordinate]: ...
 
 	def available_moves(self) -> list[Coordinate]:
 		"""
@@ -100,21 +110,17 @@ class Piece(ABC):
 
 		for c in self.attacking_coordinates():
 			p: Piece | None = self.board.get(c).piece
-			if p:
-				# if is a piece of our own, cannot move there
-				if p.color == self.color: continue
+
+			# if is a piece of our own, cannot move there: ignore
+			if p and p.color == self.color: continue
 
 			moves.append(c)
 
 		return moves
 
-	@property
-	@abstractmethod
-	def piece_type(self) -> PieceType:
-		pass
-
 	def __eq__(self, other: object):
 		if other is None: return False
+		
 		if not isinstance(other, Piece):
 			raise NotImplementedError(
 				f'cannot compare {self.__class__.__name__} with {type(other)}!'
