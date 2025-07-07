@@ -6,4 +6,4 @@
 
 3. drawing captured pieces on the side
 
-4. make game playable without a king
+4. rooks and kings has_moved should be false if they are not in the classic coordinate by default
