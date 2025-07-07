@@ -36,7 +36,7 @@ class ChessGUI(ChessGame):
 			gui_cfg.dimensions[1]+gui_cfg.coordinates_width
 		)
 		self.board_screen = pg.surface.Surface(board_size)
-		self.board_screen.fill((0, 0, 0))
+		self.board_screen.fill(gui_cfg.bg_color)
 
 		self.clock = pg.time.Clock()
 		self.main_font = pg.font.Font(
@@ -45,8 +45,6 @@ class ChessGUI(ChessGame):
 		self.coordinates_font = pg.font.Font(
 			pg.font.get_default_font(), gui_cfg.coordinates_font_size
 		)
-
-		self.draw_coordinates()
 
 	def highlight_valid_moves(self, piece: Piece):
 		"""	highlights the valid moves of the given piece on the board. """
@@ -200,24 +198,13 @@ class ChessGUI(ChessGame):
 		# add color letter
 		color = piece.color
 		if color == Color.WHITE:
-			filepath += Color.WHITE.value
+			filepath += 'w'
 		else:
-			filepath += Color.BLACK.value
+			filepath += 'b'
 
 		# add piece type letter
-		if piece.piece_type == PieceType.KING:
-			filepath += 'k'
-		if piece.piece_type == PieceType.QUEEN:
-			filepath += 'q'
-		if piece.piece_type == PieceType.ROOK:
-			filepath += 'r'
-		if piece.piece_type == PieceType.BISHOP:
-			filepath += 'b'
-		if piece.piece_type == PieceType.KNIGHT:
-			filepath += 'n'
-		if piece.piece_type == PieceType.PAWN:
-			filepath += 'p'
-
+		filepath += piece.piece_type.value
+	
 		# add file extension
 		filepath += '.png'
 

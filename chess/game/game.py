@@ -1,4 +1,4 @@
-from enum import Enum
+import enum
 from chess.components import Board, Color, Coordinate, Piece, PieceType
 from chess.game.player import Player
 from chess.pieces.king import King
@@ -8,11 +8,11 @@ from chess.pieces.bishop import Bishop
 from chess.pieces.knight import Knight
 from chess.pieces.pawn import Pawn
 
-class GameEndState(Enum):
-	BLACK_WON = 'b'
-	WHITE_WON = 'w'
-	DRAW = 'd'
-	ONGOING = 'o'
+class GameEndState(enum.Enum):
+	BLACK_WON = enum.auto()
+	WHITE_WON = enum.auto()
+	DRAW = enum.auto()
+	ONGOING = enum.auto()
 
 
 class ChessGame:
@@ -32,14 +32,7 @@ class ChessGame:
 
 	def change_turns(self):
 		""" changes the player's turns, from white to black or vice versa. """
-		if self.white_p.is_turn:
-			self.white_p.is_turn = False
-			self.black_p.is_turn = True
-			self.turn = Color.BLACK
-		else:
-			self.black_p.is_turn = False
-			self.white_p.is_turn = True
-			self.turn = Color.WHITE
+		self.turn = ~self.turn
 
 	def classic_setup(self) -> None:
 		self.load_FEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')

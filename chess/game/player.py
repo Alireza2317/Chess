@@ -11,8 +11,6 @@ class Player:
 		self.board = board
 		self.color = color
 		self.pieces: list[Piece] = []
-		# it's white's turn at first
-		self.is_turn: bool = (color == Color.WHITE)
 
 	def set_king(self) -> None:
 		""" sets up self.king based on self.pieces. """
@@ -168,13 +166,10 @@ class Player:
 
 	def is_in_check(self) -> bool:
 		""" returns wether the player is in check or not. """
-		if not self.is_turn: return False
-
 		return self.is_under_attack(self.king.coordinate)
 
 	def is_checkmated(self) -> bool:
 		""" returns wether the player is lost or not. """
-		if not self.is_turn: return False
 		if not self.is_in_check(): return False
 
 		for piece in self.pieces:
@@ -190,7 +185,6 @@ class Player:
 			all_valid_moves.extend(p.valid_moves)
 
 		return (
-			self.is_turn and
 			not self.is_in_check() and
 			not all_valid_moves
 		)
