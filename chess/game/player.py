@@ -35,6 +35,9 @@ class Player:
 	def set_opponent(self, opponent: Player) -> None:
 		self.opponent = opponent
 
+		# enemy of my enemy is myself!
+		opponent.opponent = self
+
 	def update_valid_moves(self) -> None:
 		"""
 		updates valid_moves property for each piece of the player

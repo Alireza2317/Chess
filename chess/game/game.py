@@ -22,7 +22,6 @@ class ChessGame:
 		self.black_p: Player = Player(self.board, Color.BLACK)
 
 		self.white_p.set_opponent(self.black_p)
-		self.black_p.set_opponent(self.white_p)
 
 		# it's white's turn at first
 		self.turn: Color = Color.WHITE
