@@ -120,7 +120,7 @@ class Piece(ABC):
 
 	def __eq__(self, other: object):
 		if other is None: return False
-		
+
 		if not isinstance(other, Piece):
 			raise NotImplementedError(
 				f'cannot compare {self.__class__.__name__} with {type(other)}!'
@@ -136,18 +136,13 @@ class Piece(ABC):
 
 
 class Square:
-	def __init__(self, coordinate: Coordinate, piece: Piece | None = None):
+	def __init__(self, coordinate: Coordinate):
 		if not isinstance(coordinate, Coordinate):
 			raise TypeError(
 				f'Invalid coordinate! should be of type {Coordinate.__name__}'
 			)
-		if not isinstance(piece, (Piece, type(None))):
-			raise TypeError(
-				f'Invalid piece! should be a Piece object, or None.'
-			)
 
 		self.coordinate = coordinate
-		self.piece: Piece | None = piece
 
 		# set the color based on the coordinate
 		self.set_color()
@@ -162,15 +157,27 @@ class Square:
 		else:
 			self.color = Color.WHITE
 
+	def set_piece(self, piece: Piece):
+		if not isinstance(piece, Piece):
+			raise TypeError(
+				f'Invalid piece! should be a Piece object.'
+			)
+		self._piece = piece
+
+	@property
+	def piece(self):
+		return self._piece
+
+	def remove_piece(self):
+		self._piece = None
+
 	def __eq__(self, other: object):
 		if not isinstance(other, Square):
 			raise NotImplementedError(
 				f'cannot compare {self.__class__.__name__} with {type(other)}!'
 			)
 
-		same_coordinate: bool = (self.coordinate == other.coordinate)
-		same_piece: bool = (self.piece == other.piece)
-		return same_coordinate and same_piece
+		return (self.piece == other.piece)
 
 	def __ne__(self, other: object):
 		return not self.__eq__(other)
@@ -181,15 +188,15 @@ class Square:
 
 class Board:
 	def __init__(self) -> None:
-		# the arrangement of these lists is such that the first row is
-		# equivalent to the rank 1, from a to h
+		# the arrangement of these lists is initially such that
+		# the first row is equivalent to the rank 1, from a to h
 		# and the last row is the rank 8
 		self.board_matrix: list[list[Square]] = []
 
 		for rank in '12345678':
 			self.board_matrix.append(
 				[
-					Square(Coordinate(f'{file}{rank}'), piece=None)
+					Square(Coordinate(f'{file}{rank}'))
 					for file in 'abcdefgh'
 				]
 			)
@@ -197,16 +204,16 @@ class Board:
 	def put(self, piece: Piece, coordinate: Coordinate) -> None:
 		"""
 		takes a chess coordinate and puts the given piece
-		in the appropriate square
+		in the appropriate square.
 		"""
 		row, col = coordinate.regular
-		self.board_matrix[row][col].piece = piece
+		self.board_matrix[row][col].set_piece(piece)
 		piece.coordinate = coordinate
 
 	def remove(self, coordinate: Coordinate) -> None:
 		""" removes the piece(if any) from the given coordinate. """
 		row, col = coordinate.regular
-		self.board_matrix[row][col].piece = None
+		self.board_matrix[row][col].remove_piece()
 
 	def move(self, piece: Piece, coordinate: Coordinate) -> None:
 		"""
@@ -233,7 +240,6 @@ class Board:
 		that corresponds to (file_direction, rank_direction)
 		like (0, 1), which means going up
 		"""
-
 		file_ord = ord(current_coordinate.file)
 		rank_ord = ord(current_coordinate.rank)
 
@@ -243,7 +249,6 @@ class Board:
 			f_dir, r_dir = direction
 			new_file = chr(file_ord + i*f_dir)
 			new_rank = chr(rank_ord + i*r_dir)
-
 			m = f'{new_file}{new_rank}'
 
 			if not Coordinate.is_valid(m): return coords
@@ -251,7 +256,7 @@ class Board:
 			c = Coordinate(m)
 			coords.append(c)
 
-			# if reached a piece, the range of attack stops
+			# if reached a piece(any color), the range of attack stops
 			if self.get(c).piece: return coords
 
 		return coords
