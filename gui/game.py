@@ -1,12 +1,6 @@
 import sys
 import pygame as pg
 import enum
-from chess.pieces.king import King
-from chess.pieces.queen import Queen
-from chess.pieces.rook import Rook
-from chess.pieces.bishop import Bishop
-from chess.pieces.knight import Knight
-from chess.pieces.pawn import Pawn
 from gui.config import gui_cfg, RGBColor
 from chess.components import Color, Coordinate, Piece, PieceType, Square
 from chess.game.game import ChessGame, GameEndState
@@ -19,7 +13,7 @@ class ChessGUI(ChessGame):
 	def __init__(self) -> None:
 		super().__init__()
 		self.classic_setup()
-		
+
 		self.init_gui_elements()
 
 		self.draw_coordinates()
@@ -182,7 +176,7 @@ class ChessGUI(ChessGame):
 					pg.quit()
 					sys.exit()
 
-			elif event.type == pg.MOUSEBUTTONUP:
+			elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
 				self.handle_click(event.pos)
 
 	def _draw_image_at(
