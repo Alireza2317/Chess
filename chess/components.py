@@ -215,14 +215,22 @@ class Board:
 		row, col = coordinate.regular
 		self.board_matrix[row][col].remove_piece()
 
-	def move(self, piece: Piece, coordinate: Coordinate) -> None:
+	def move(
+		self,
+		piece: Piece,
+		coordinate: Coordinate,
+		/,
+		examine_mode: bool = False
+	) -> None:
 		"""
 		puts the piece in given coordinate and
 		removes it from its original coordinate
 		"""
 		self.remove(piece.coordinate)
 		self.put(piece, coordinate)
-		piece.has_moved = True
+
+		if not examine_mode:
+			piece.has_moved = True
 
 	def get(self, coordinate: Coordinate) -> Square:
 		""" returns the square in the given coordinate. """

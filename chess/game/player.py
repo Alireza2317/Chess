@@ -19,12 +19,10 @@ class Player:
 			if piece.piece_type == PieceType.KING:
 				self.king = piece
 				k_count += 1
-
-		if k_count > 1:
-			raise TypeError(
-				f'pieces parameter should be a list of Piece objects!\n'+
-				f'and it should have one and only one King object inside.'
-			)
+				if k_count > 1:
+					raise TypeError(
+						f'player should exactly one King object!'
+					)
 
 	def set_opponent(self, opponent: Player) -> None:
 		self.opponent = opponent
@@ -37,36 +35,29 @@ class Player:
 		and sets up only the legal and valid moves
 		"""
 		for piece in self.pieces:
-			original_coord = piece.coordinate
-			has_moved = piece.has_moved
 			valid_moves: list[Coordinate] = []
+
+			# save to restore later
+			original_coord = piece.coordinate
 
 			for coord in piece.available_moves():
 				enemy_piece: Piece | None = self.board.get(coord).piece
 
-				self.board.remove(coord)
 				if enemy_piece:
-					# remove from opponent's pieces
-					for op_piece in self.opponent.pieces:
-						if op_piece.coordinate == coord:
-							self.opponent.pieces.remove(op_piece)
-							break
+					self.board.remove(coord)
+					# and remove from opponent's pieces
+					self.opponent.remove_piece(enemy_piece)
 
-				self.board.move(piece, coord)
+				self.board.move(piece, coord, examine_mode=True)
 
 				if not self.is_in_check():
 					valid_moves.append(coord)
 
 				# reset
-				self.board.move(piece, original_coord)
-
-				# reset
+				self.board.move(piece, original_coord, examine_mode=True)
 				if enemy_piece:
 					self.board.put(enemy_piece, enemy_piece.coordinate)
 					self.opponent.add_piece(enemy_piece)
-
-			# reset
-			piece.has_moved = has_moved
 
 			# update valid moves for each piece
 			piece.valid_moves = valid_moves
@@ -86,9 +77,10 @@ class Player:
 	def remove_piece(self, piece: Piece) -> None:
 		if piece is None: return
 
-		for i, p in enumerate(self.pieces):
-			if p == piece:
-				self.pieces.pop(i)
+		self.pieces.remove(piece)
+		#for i, p in enumerate(self.pieces):
+		#	if p == piece:
+		#		self.pieces.pop(i)
 
 	def castle_moves(
 		self
