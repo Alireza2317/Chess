@@ -14,6 +14,13 @@ class Player:
 		self.color = color
 		self.pieces: list[Piece] = []
 
+	@property
+	def _start_rank(self) -> str:
+		if self.color == Color.WHITE:
+			return '1'
+		else:
+			return '8'
+
 	def set_king(self) -> None:
 		""" sets up self.king based on self.pieces. """
 		k_count = 0
@@ -21,16 +28,39 @@ class Player:
 			if piece.piece_type == PieceType.KING:
 				self.king = piece
 				k_count += 1
-				if k_count > 1:
-					raise TypeError(
-						f'player should exactly one King object!'
-					)
+
 		if k_count == 0:
 			self.set_dummy_king()
+			return
+
+		if k_count > 1:
+			raise TypeError(
+				f'player should exactly one King object!'
+			)
+
+		if self.king.coordinate != Coordinate(f'e{self._start_rank}'):
+			self.king.has_moved = True
 
 	def set_dummy_king(self):
 		""" setup a dummy king so that a game can be played without kings! """
 		self.king = DummyKing()
+
+	def rooks(self) -> list[Piece]:
+		rooks: list[Piece] = []
+
+		for piece in self.pieces:
+			if piece.piece_type == PieceType.ROOK:
+				rooks.append(piece)
+
+		classic_coords: tuple[Coordinate, Coordinate] = (
+			Coordinate(f'a{self._start_rank}'),
+			Coordinate(f'h{self._start_rank}')
+		)
+		for rook in rooks:
+			if rook.coordinate not in classic_coords:
+				rook.has_moved = True
+
+		return rooks
 
 	def set_opponent(self, opponent: Player) -> None:
 		self.opponent = opponent
@@ -110,17 +140,13 @@ class Player:
 		] = []
 
 		valid_rooks: list[Piece] = []
-		for piece in self.pieces:
-			if piece.piece_type != PieceType.ROOK: continue
-
-			# rook has moved
-			if piece.has_moved: continue
-
-			rook_attacks: list[Coordinate] = piece.attacking_coordinates()
+		for rook in self.rooks():
+			if rook.has_moved: continue
+			rook_attacks: list[Coordinate] = rook.attacking_coordinates()
 			# there are pieces in the middle
 			if self.king.coordinate not in rook_attacks: continue
 
-			valid_rooks.append(piece)
+			valid_rooks.append(rook)
 
 		for rook in valid_rooks:
 			rank: str = rook.coordinate.rank
@@ -130,6 +156,7 @@ class Player:
 				files = ['g', 'f']
 			elif rook.coordinate.file == 'a':
 				files = ['c', 'd']
+			else: continue
 
 			for file in files:
 				# check squares in the middle for enemy attacks
@@ -181,14 +208,12 @@ class Player:
 
 	def is_stalemate(self) -> bool:
 		""" returns wether the game is a stalemate(draw) or not. """
-		all_valid_moves = []
-		for p in self.pieces:
-			all_valid_moves.extend(p.valid_moves)
+		if self.is_in_check(): return False
 
-		return (
-			not self.is_in_check() and
-			not all_valid_moves
-		)
+		for p in self.pieces:
+			if p.valid_moves: return False
+
+		return True
 
 	def __repr__(self):
-		return f'<{self.color.name.title()} {Player.__name__}>'
+		return f'<{self.color.name.title()} {self.__class__.__name__}>'
