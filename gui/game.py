@@ -20,6 +20,7 @@ class ChessGUI(ChessGame):
 		self.update_board(all_board=True)
 
 		self.mode: Mode = Mode.PIECE_SELECT
+		self.selected_piece: Piece | None = None
 
 	def init_gui_elements(self):
 		"""
@@ -83,6 +84,9 @@ class ChessGUI(ChessGame):
 
 			self.board_screen.blit(rect_surface, rect)
 
+		#self.update_board(coordinates=piece.valid_moves)
+		self.update_screen()
+
 	def get_coordinate_on_click(self, pos: tuple[int, int]) -> Coordinate | None:
 		"""
 		returns a chess coordinate based on the user's click.
@@ -114,53 +118,60 @@ class ChessGUI(ChessGame):
 		on the board
 		and returns the piece 
 		"""
-		p: Piece | None = self.board.get(coordinate).piece
+		#p: Piece | None = self.board.get(coordinate).piece
 
-		if p and self.turn == p.color:
-			# then we are trying to check the valid moves
-			# of our own piece
+		#if p and self.turn == p.color:
+		#	# then we are trying to check the valid moves
+		#	# of our own piece
 
-			if p.valid_moves:
-				self.highlight_valid_moves(p)
-				return p
+		#	if p.valid_moves:
+		#		self.highlight_valid_moves(p)
+		#		return p
 
-		# no valid moves
-		# or it was a misclick
-		return None
+		## no valid moves
+		## or it was a misclick
+		#return None
 
 	def select_move(self, coordinate: Coordinate):
 		"""	selects the move that was clicked. """
-		coords = self.selected_piece.valid_moves.copy() + [
-			self.selected_piece.coordinate,
-			self.selected_piece.player.king.coordinate
-		]
+		#coords = self.selected_piece.valid_moves.copy() + [
+		#	self.selected_piece.coordinate,
+		#	self.selected_piece.player.king.coordinate
+		#]
 
-		if coordinate in self.selected_piece.valid_moves:
-			# trying to move our piece to one of the valid moves
-			rcm = self.get_rook_castle_move(self.selected_piece, coordinate)
-			if rcm:
-				rook, rook_move = rcm
-				coords.append(rook.coordinate)
-				coords.append(rook_move)
+		#if coordinate in self.selected_piece.valid_moves:
+		#	# trying to move our piece to one of the valid moves
+		#	rcm = self.get_rook_castle_move(self.selected_piece, coordinate)
+		#	if rcm:
+		#		rook, rook_move = rcm
+		#		coords.append(rook.coordinate)
+		#		coords.append(rook_move)
 
-			self.move(self.selected_piece, coordinate)
+		#	self.move(self.selected_piece, coordinate)
 
-		self.update_board(coordinates=coords)
+		#self.update_board(coordinates=coords)
 
 	def handle_click(self, pos: tuple[int, int]):
 		c: Coordinate | None = self.get_coordinate_on_click(pos)
 		if not c: return
 
-		if self.mode == Mode.PIECE_SELECT:
-			piece: Piece | None = self.select_piece(coordinate=c)
-			if piece and piece.valid_moves:
-				self.selected_piece = piece
-				self.mode = Mode.MOVE_SELECT
-			return
+		if not self.selected_piece:
+			p: Piece | None = self.board.get(c).piece
+			if p and p.color == self.turn:
+				self.selected_piece = p
 
-		if self.mode == Mode.MOVE_SELECT:
-			self.select_move(coordinate=c)
-			self.mode = Mode.PIECE_SELECT
+			if not self.selected_piece: return
+
+			print(f'selected {self.selected_piece} on {c}')
+			print(self.selected_piece.valid_moves)
+			self.highlight_valid_moves(self.selected_piece)
+		else:
+			if c in self.selected_piece.valid_moves:
+				self.move(self.selected_piece, c)
+
+			self.selected_piece = None
+
+			self.update_board(all_board=True)
 
 	def handle_events(self):
 		""" handle user events. """
