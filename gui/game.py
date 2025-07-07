@@ -342,7 +342,7 @@ class ChessGUI(ChessGame):
 
 	def update_screen(self):
 		""" update all the dynamic gui elements. """
-		self.update_board()
+		self.screen.blit(self.board_screen, (0, 0))
 
 		pg.display.update()
 		self.clock.tick(gui_cfg.fps)
