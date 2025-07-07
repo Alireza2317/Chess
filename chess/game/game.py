@@ -128,6 +128,9 @@ class ChessGame:
 
 		place_pieces(fen_fields[0])
 
+		self.white_p.set_king()
+		self.black_p.set_king()
+
 		handle_turn(fen_fields[1])
 
 		# handling castle moves
@@ -135,9 +138,6 @@ class ChessGame:
 
 		# en passant
 		#fen_fields[3]
-
-		self.white_p.update_valid_moves()
-		self.black_p.update_valid_moves()
 
 	def check_state(self) -> GameEndState:
 		if self.white_p.is_checkmated():

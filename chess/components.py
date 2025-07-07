@@ -120,7 +120,8 @@ class Piece(ABC):
 
 	def __eq__(self, other: object):
 		if other is None: return False
-
+		from chess.game.player import DummyKing
+		if isinstance(other, DummyKing): return False
 		if not isinstance(other, Piece):
 			raise NotImplementedError(
 				f'cannot compare {self.__class__.__name__} with {type(other)}!'

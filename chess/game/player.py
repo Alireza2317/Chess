@@ -1,6 +1,8 @@
 from __future__ import annotations
 from chess.components import Color, Board, Coordinate, Piece, PieceType
 
+class DummyKing: ...
+
 class Player:
 	def __init__(self, board: Board, color: Color):
 		if not isinstance(color, Color):
@@ -23,6 +25,12 @@ class Player:
 					raise TypeError(
 						f'player should exactly one King object!'
 					)
+		if k_count == 0:
+			self.set_dummy_king()
+
+	def set_dummy_king(self):
+		""" setup a dummy king so that a game can be played without kings! """
+		self.king = DummyKing()
 
 	def set_opponent(self, opponent: Player) -> None:
 		self.opponent = opponent
@@ -72,15 +80,10 @@ class Player:
 			)
 
 		self.pieces.append(piece)
-		self.set_king()
 
 	def remove_piece(self, piece: Piece) -> None:
 		if piece is None: return
-
 		self.pieces.remove(piece)
-		#for i, p in enumerate(self.pieces):
-		#	if p == piece:
-		#		self.pieces.pop(i)
 
 	def castle_moves(
 		self
@@ -94,6 +97,7 @@ class Player:
 			fourth one is the respective rook's new coordinate
 		returns None or [] if player has no legal castle moves
 		"""
+		if isinstance(self.king, DummyKing): return None
 		if self.king.has_moved: return None
 		if self.is_in_check(): return None
 
@@ -158,6 +162,8 @@ class Player:
 
 	def is_in_check(self) -> bool:
 		""" returns wether the player is in check or not. """
+		if isinstance(self.king, DummyKing): return False
+
 		return self.is_under_attack(self.king.coordinate)
 
 	def is_checkmated(self) -> bool:
@@ -183,34 +189,3 @@ class Player:
 
 	def __repr__(self):
 		return f'<{self.color.name.title()} {Player.__name__}>'
-
-
-def main():
-	from chess.pieces.king import King
-	from chess.pieces.rook import Rook
-	from chess.pieces.queen import Queen
-
-	b = Board()
-	white = Player(b, Color.WHITE)
-	black = Player(b, Color.BLACK)
-
-	white.set_opponent(black)
-	black.set_opponent(white)
-
-	wk = King(white, Coordinate('e1'))
-	bk = King(black, Coordinate('e8'))
-	#Queen(black, Coordinate('h2'))
-
-	short_rook = Rook(white, Coordinate('h1'))
-	long_rook = Rook(white, Coordinate('a1'))
-
-	#Knight(white, Coordinate('g1'))
-	#Knight(white, Coordinate('b1'))
-
-	white.update_valid_moves()
-
-	print(b)
-	print(wk.valid_moves)
-
-if __name__ == '__main__':
-	main()
