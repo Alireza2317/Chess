@@ -40,13 +40,16 @@ class Pawn(Piece):
 		file = self.coordinate.file
 		rank_ord = ord(self.coordinate.rank)
 
-		sign: int
+		direction: int
+		starting_rank: str
 		if self.color == Color.WHITE:
-			sign = +1
+			direction = +1
+			starting_rank = '2'
 		elif self.color == Color.BLACK:
-			sign = -1
+			direction = -1
+			starting_rank = '7'
 
-		new_rank = chr(rank_ord + sign*1)
+		new_rank = chr(rank_ord + direction)
 		m = f'{file}{new_rank}'
 		if Coordinate.is_valid(m):
 			c: Coordinate = Coordinate(m)
@@ -56,8 +59,8 @@ class Pawn(Piece):
 				moves.append(c)
 
 				# only if it's the first move, allow double forward move
-				if not self.has_moved:
-					new_rank = chr(rank_ord + sign*2)
+				if self.coordinate.rank == starting_rank:
+					new_rank = chr(rank_ord + direction*2)
 					m = f'{file}{new_rank}'
 					if Coordinate.is_valid(m):
 						c = Coordinate(m)
