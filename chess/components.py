@@ -26,35 +26,32 @@ class Color(enum.Enum):
 
 class Coordinate:
 	def __init__(self, coordinate: str):
-		file: str = str(coordinate[0]).lower()
-		rank: str = str(coordinate[1])
+		if not self.is_valid(coordinate):
+			raise ValueError('Invalid chess coordinate.')
 
-		if (
-			(len(coordinate) != 2) or
-			(file not in 'abcdefgh') or
-			(rank not in '12345678')
-		):
-			raise ValueError('Invalid chess coordinate!')
-
-
-		self.file: str = file
-		self.rank: str = rank
-
-		# cc: chess coordinate
-		self.cc: str = coordinate
-
-	@property
-	def regular(self) -> tuple[int, int]:
-		""" converts chess coordinates like 'a1' to regular matrix coordinates. """
-
-		row: int = int(self.rank) - 1
-		col: int = 'abcdefgh'.index(self.file)
-
-		return row, col
+		self.file: str = coordinate[0].lower()
+		self.rank: str = coordinate[1]
 
 	@staticmethod
 	def is_valid(coordinate: str) -> bool:
-		return (coordinate[0] in 'abcdefgh') and (coordinate[1] in '12345678')
+		if not isinstance(coordinate, str):
+			raise ValueError('coordinate should be a str!')
+		return (
+			len(coordinate) == 2 and
+			(coordinate[0] in 'abcdefgh') and
+			(coordinate[1] in '12345678')
+		)
+
+	@property
+	def regular(self) -> tuple[int, int]:
+		""" 
+		converts chess coordinates like 'a1' 
+		to regular matrix coordinates.
+		"""
+		row: int = '12345678'.index(self.rank)
+		col: int = 'abcdefgh'.index(self.file)
+
+		return row, col
 
 	def __eq__(self, other: object):
 		if not isinstance(other, Coordinate):
@@ -63,13 +60,13 @@ class Coordinate:
 				f'{self.__class__.__name__} and {type(other)}!'
 			)
 
-		return (self.file == other.file) and (self.rank == other.rank)
+		return repr(self) == repr(other)
 
 	def __ne__(self, other: object):
 		return not self.__eq__(other)
 
 	def __repr__(self):
-		return self.cc
+		return f'<{self.file}{self.rank}>'
 
 
 class Piece(ABC):
