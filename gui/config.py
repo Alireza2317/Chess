@@ -5,12 +5,12 @@ RGBColor: TypeAlias = tuple[int, int, int] | tuple[int, int, int, int]
 
 @dataclass
 class ChessGUIConfig:
-	coordinates_width: int = 24
-	dimensions: tuple[int, int] = (800, 800)
 	square_size: int = 100
+	coordinates_width: int = square_size//4
+	dimensions: tuple[int, int] = (8*square_size, 8*square_size)
 	padding: int = 20
-	fps: int = 45
-	anim_duration: float = 0.2 # second
+	fps: int = 60
+	anim_duration: float = .18 # second
 	animation: bool = True
 
 	bg_color: RGBColor = (20, 20, 20)

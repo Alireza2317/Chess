@@ -199,6 +199,54 @@ class ChessGUI(ChessGame):
 		end_coord: Coordinate
 	) -> None:
 		""" animate the piece while moving across the board. """
+
+		def get_initial_inc():
+			"""
+			get the initial increment(in pixels) for the animation.
+			this is dynamic and based on the total distance.
+			longer distances work better with smaller initial increment
+			values and vice versa.
+			"""
+			srow, scol = start_coord.regular
+			erow, ecol = end_coord.regular
+
+			# coordinate-wise distance
+			diff = max(abs(srow-erow), abs(scol-ecol)) # 1 <= diff <= 7
+
+			# THESE RANGES CAN BE CHANGED, BUT CAREFULLY
+			start = 0.04
+			end = 0.10
+
+			i = (end - start) / 6
+			init_inc = round((start + (7-diff)*i) * gui_cfg.square_size)
+
+			return init_inc
+
+		def find_r(initial_inc: int, total_distance: int, n_frames: int):
+			"""
+			Newton-Raphson method to estimate the ratio of a geometric 
+			series. this is used in	the animation transitions to make
+			the animation slower at the beginning and faster in the end.
+			"""
+			def f(a, Sn, n, r):
+				return a*(1 - r**n) - Sn*(1 - r)
+
+			def fprime(a, Sn, n, r):
+				return a*n*(r**(n-1)) + Sn
+
+			if total_distance == 0: return 0
+
+			a = initial_inc
+			Sn = total_distance
+			n = n_frames
+
+			# initial guess
+			rk = 1.5
+			while True:
+				rkp1 = rk + f(a, Sn, n, rk)/fprime(a, Sn, n, rk)
+				if abs(rkp1 - rk) < 1e-4: return rkp1
+				rk = rkp1
+
 		# remove the piece to make it not stick to its starting position
 		self.board.remove(piece.coordinate)
 		self.update_board()
@@ -211,8 +259,13 @@ class ChessGUI(ChessGame):
 
 		n_frames: int = max(int(gui_cfg.fps * gui_cfg.anim_duration), 1)
 
-		x_inc: int = (end_pos[0] - start_pos[0]) // n_frames
-		y_inc: int = (end_pos[1] - start_pos[1]) // n_frames
+		x_inc: int = get_initial_inc()
+		y_inc: int = x_inc
+		x_inc_sign = -1 if (end_pos[0] - start_pos[0] < 0) else 1
+		y_inc_sign = -1 if (end_pos[1] - start_pos[1] < 0) else 1
+
+		rx: float = find_r(x_inc, abs(end_pos[0] - start_pos[0]), n_frames)
+		ry: float = find_r(y_inc, abs(end_pos[1] - start_pos[1]), n_frames)
 
 		current_pos_x, current_pos_y = start_pos
 
@@ -225,8 +278,8 @@ class ChessGUI(ChessGame):
 			)
 			self.update_screen()
 
-			current_pos_x += x_inc
-			current_pos_y += y_inc
+			current_pos_x += (x_inc:=abs(int(x_inc * rx)) * x_inc_sign)
+			current_pos_y += (y_inc:=abs(int(y_inc * ry)) * y_inc_sign)
 
 	def get_piece_image_path(self, piece: Piece) -> str:
 		"""
@@ -479,6 +532,9 @@ class ChessGUI(ChessGame):
 
 def main():
 	game = ChessGUI()
+	game.load_FEN('k5r1/8/8/8/8/8/8/B5RK w - - 1 0')
+	game.update_board()
+	game.update_screen()
 	while True:
 		if game.step(): break
 
