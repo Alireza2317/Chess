@@ -191,8 +191,41 @@ class ChessGUI(ChessGame):
 
 		surface.blit(scaled_image, scaled_image_rect)
 
-	def draw_piece(self, piece: Piece):
-		"""	draws the given piece on its coordinate. """
+	def animate_piece(
+		self,
+		piece: Piece,
+		end_coord: Coordinate
+	) -> None:
+		""" animate the piece while moving across the board. """
+
+		piece_filepath: str = self.get_piece_image_path(piece)
+
+		start_coord: Coordinate = piece.coordinate
+
+		start_pos: tuple[int, int] = self.coord_to_pixels_xy(start_coord)
+		end_pos: tuple[int, int] = self.coord_to_pixels_xy(end_coord)
+
+		n_frames: int = int(self.clock.get_fps() * gui_cfg.anim_duration)
+		if n_frames < 1: n_frames = 1
+
+		current_pos_x = start_pos[0]
+		current_pos_y = start_pos[1]
+
+		for frame in range(n_frames):
+			current_pos_x += (end_pos[0] - start_pos[0]) // n_frames
+			current_pos_y += (end_pos[1] - start_pos[1]) // n_frames
+			pos: tuple[int, int] = (current_pos_x, current_pos_y)
+
+			self.update_board()
+			self._draw_image_at(
+				self.board_screen, piece_filepath, pos
+			)
+			self.update_screen()
+
+	def get_piece_image_path(self, piece: Piece) -> str:
+		"""
+		returns the filepath of the image file for the given piece.
+		"""
 		filepath = f'assets/pieces/{gui_cfg.pieces_theme}/'
 
 		# add color letter
@@ -204,11 +237,17 @@ class ChessGUI(ChessGame):
 
 		# add piece type letter
 		filepath += piece.piece_type.value
-	
+
 		# add file extension
 		filepath += '.png'
 
-		row, col = piece.coordinate.regular
+		return filepath
+
+	def coord_to_pixels_xy(self, coordinate: Coordinate) -> tuple[int, int]:
+		"""
+		returns the x and y pixel position for a given chess coordinate
+		"""
+		row, col = coordinate.regular
 		# if row==0 -> rank 1 -> y = (7-row)*square_size = 7*square_size
 		# if row==1 -> rank 2 -> y = (7-row)*square_size = 6*square_size
 		# if col==0 -> file a -> x = col*square_size = 0
@@ -216,6 +255,14 @@ class ChessGUI(ChessGame):
 		xy: tuple[int, int] = (
 			col * gui_cfg.square_size, (7-row) * gui_cfg.square_size
 		)
+
+		return xy
+
+	def draw_piece(self, piece: Piece):
+		"""	draws the given piece on its coordinate. """
+		filepath: str = self.get_piece_image_path(piece)
+
+		xy: tuple[int, int] = self.coord_to_pixels_xy(piece.coordinate)
 
 		self._draw_image_at(self.board_screen, filepath, xy)
 
@@ -324,8 +371,6 @@ class ChessGUI(ChessGame):
 		for row in self.board.board_matrix:
 			for square in row:
 				self.draw_square(square)
-
-		self.screen.blit(self.board_screen, (0, 0))
 
 	def update_screen(self):
 		""" update all the dynamic gui elements. """

@@ -9,7 +9,8 @@ class ChessGUIConfig:
 	dimensions: tuple[int, int] = (800, 800)
 	square_size: int = 100
 	padding: int = 20
-	fps: int = 20
+	fps: int = 60
+	anim_duration: float = 0.5 # second
 
 	bg_color: RGBColor = (20, 20, 20)
 
