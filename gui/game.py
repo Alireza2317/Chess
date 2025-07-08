@@ -342,8 +342,6 @@ class ChessGUI(ChessGame):
 			for square in row:
 				self.draw_square(square)
 
-		self.screen.blit(self.board_screen, (0, 0))
-
 	def update_screen(self):
 		""" update all the dynamic gui elements. """
 		self.screen.blit(self.board_screen, (0, 0))
