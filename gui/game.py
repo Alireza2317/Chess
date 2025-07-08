@@ -191,8 +191,11 @@ class ChessGUI(ChessGame):
 
 		surface.blit(scaled_image, scaled_image_rect)
 
-	def draw_piece(self, piece: Piece):
-		"""	draws the given piece on its coordinate. """
+
+	def get_piece_image_path(self, piece: Piece) -> str:
+		"""
+		returns the filepath of the image file for the given piece.
+		"""
 		filepath = f'assets/pieces/{gui_cfg.pieces_theme}/'
 
 		# add color letter
@@ -204,11 +207,17 @@ class ChessGUI(ChessGame):
 
 		# add piece type letter
 		filepath += piece.piece_type.value
-	
+
 		# add file extension
 		filepath += '.png'
 
-		row, col = piece.coordinate.regular
+		return filepath
+
+	def coord_to_pixels_xy(self, coordinate: Coordinate) -> tuple[int, int]:
+		"""
+		returns the x and y pixel position for a given chess coordinate
+		"""
+		row, col = coordinate.regular
 		# if row==0 -> rank 1 -> y = (7-row)*square_size = 7*square_size
 		# if row==1 -> rank 2 -> y = (7-row)*square_size = 6*square_size
 		# if col==0 -> file a -> x = col*square_size = 0
@@ -216,6 +225,14 @@ class ChessGUI(ChessGame):
 		xy: tuple[int, int] = (
 			col * gui_cfg.square_size, (7-row) * gui_cfg.square_size
 		)
+
+		return xy
+
+	def draw_piece(self, piece: Piece):
+		"""	draws the given piece on its coordinate. """
+		filepath: str = self.get_piece_image_path(piece)
+
+		xy: tuple[int, int] = self.coord_to_pixels_xy(piece.coordinate)
 
 		self._draw_image_at(self.board_screen, filepath, xy)
 
