@@ -122,6 +122,8 @@ class ChessGUI(ChessGame):
 
 		# here we already have selected a piece before
 		if c in self.selected_piece.valid_moves:
+			if gui_cfg.animation:
+				self.animate_piece(self.selected_piece, c)
 			self.move(self.selected_piece, c)
 			self.selected_piece = None
 			self.update_board()
@@ -197,30 +199,34 @@ class ChessGUI(ChessGame):
 		end_coord: Coordinate
 	) -> None:
 		""" animate the piece while moving across the board. """
+		# remove the piece to make it not stick to its starting position
+		self.board.remove(piece.coordinate)
+		self.update_board()
 
 		piece_filepath: str = self.get_piece_image_path(piece)
-
 		start_coord: Coordinate = piece.coordinate
 
 		start_pos: tuple[int, int] = self.coord_to_pixels_xy(start_coord)
 		end_pos: tuple[int, int] = self.coord_to_pixels_xy(end_coord)
 
-		n_frames: int = int(self.clock.get_fps() * gui_cfg.anim_duration)
-		if n_frames < 1: n_frames = 1
+		n_frames: int = max(int(gui_cfg.fps * gui_cfg.anim_duration), 1)
 
-		current_pos_x = start_pos[0]
-		current_pos_y = start_pos[1]
+		x_inc: int = (end_pos[0] - start_pos[0]) // n_frames
+		y_inc: int = (end_pos[1] - start_pos[1]) // n_frames
+
+		current_pos_x, current_pos_y = start_pos
 
 		for frame in range(n_frames):
-			current_pos_x += (end_pos[0] - start_pos[0]) // n_frames
-			current_pos_y += (end_pos[1] - start_pos[1]) // n_frames
-			pos: tuple[int, int] = (current_pos_x, current_pos_y)
-
 			self.update_board()
 			self._draw_image_at(
-				self.board_screen, piece_filepath, pos
+				self.board_screen,
+				piece_filepath,
+				(current_pos_x, current_pos_y)
 			)
 			self.update_screen()
+
+			current_pos_x += x_inc
+			current_pos_y += y_inc
 
 	def get_piece_image_path(self, piece: Piece) -> str:
 		"""
