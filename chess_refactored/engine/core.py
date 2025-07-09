@@ -1,5 +1,8 @@
 from __future__ import annotations
 import enum
+from typing import Iterator, TYPE_CHECKING
+if TYPE_CHECKING:
+	from chess_refactored.engine.piece import Piece
 
 
 class Color(enum.Enum):
@@ -9,7 +12,7 @@ class Color(enum.Enum):
 	WHITE = 1
 	BLACK = -1
 
-	def __invert__(self):
+	def __invert__(self) -> Color:
 		# Toggles the Color object when ~ is applied.
 		return Color.WHITE if self == Color.BLACK else Color.BLACK
 
@@ -32,7 +35,10 @@ class Coordinate:
 
 		return file in cls.FILES and rank in cls.RANKS
 
-	def __eq__(self, other: object):
+	def __hash__(self) -> int:
+		return hash(f'{self.file}{self.rank}')
+
+	def __eq__(self, other: object) -> bool:
 		if not isinstance(other, Coordinate):
 			return NotImplemented
 
@@ -65,5 +71,126 @@ class Coordinate:
 		return f'<{self.file}{self.rank}>'
 
 
+class Square:
+	def __init__(self, coordinate: Coordinate):
+		if not isinstance(coordinate, Coordinate):
+			raise TypeError(
+				f'Invalid coordinate! should be of type {Coordinate.__name__}'
+			)
+
+		self._piece: Piece | None = None
+		self.coordinate: Coordinate = coordinate
+		self.color: Color = self._set_color()
+
+	def _set_color(self) -> Color:
+		file_i: int = ord(self.coordinate.file) - ord('a')
+		rank_i: int = int(self.coordinate.rank) - 1
+		if (file_i + rank_i)%2 == 1:
+			return Color.WHITE
+		else:
+			return Color.BLACK
+
+	def is_occupied(self) -> bool:
+		return self._piece is not None
+
+	def remove_piece(self) -> None:
+		self._piece = None
+
+	@property
+	def piece(self) -> Piece | None:
+		return self._piece
+
+	def set_piece(self, piece: Piece | None) -> None:
+		self._piece = piece
+
+	def __repr__(self) -> str:
+		return f'{self.__class__.__name__}({self.coordinate}, {self._piece})'
+
+class Board:
+	def __init__(self) -> None:
+		self._grid: dict[Coordinate, Square] = {
+			(coord := Coordinate(file, rank)): Square(coord)
+			for file in Coordinate.FILES
+			for rank in Coordinate.RANKS
+		}
+
+	def get_square(self, coordinate: Coordinate) -> Square:
+		if not isinstance(coordinate, Coordinate):
+			raise TypeError(
+				f'Invalid coordinate! should be of type {Coordinate.__name__}'
+			)
+
+		return self._grid[coordinate]
+
+	def place_piece(self, piece: Piece, coordinate: Coordinate) -> None:
+		self.get_square(coordinate).set_piece(piece)
+
+	def remove_piece(self, coordinate: Coordinate) -> None:
+		self.get_square(coordinate).remove_piece()
+
+	def move_piece(self, from_coord: Coordinate, to_coord: Coordinate) -> None:
+		if not isinstance(from_coord, Coordinate) or not isinstance(to_coord, Coordinate):
+			raise TypeError(
+				f'Invalid coordinate! should be of type {Coordinate.__name__}'
+			)
+
+		from_square: Square = self.get_square(from_coord)
+		to_square: Square = self.get_square(to_coord)
+
+		if not from_square.is_occupied():
+			raise ValueError(
+				f'Invalid move from {from_coord}. No piece present.'
+			)
+
+		# remove the piece from the original square and
+		# put it in the new square
+		to_square.set_piece(from_square._piece)
+		from_square.remove_piece()
+
+	def all_squares(self) -> list[Square]:
+		return list(self._grid.values())
+
+	def __iter__(self) -> Iterator[tuple[Coordinate, Square]]:
+		return iter(self._grid.items())
+
+	def __repr__(self) -> str:
+		def colored_str(text: str, color: str) -> str:
+			"""
+			supported colors:
+			red, green, yellow, blue, magenta, cyan
+			"""
+			if color in ('red', 'r'):
+				start = '\033[91m'
+			elif color in ('green', 'g'):
+				start = '\033[92m'
+			elif color in ('yellow', 'y'):
+				start = '\033[93m'
+			elif color in ('blue', 'b'):
+				start = '\033[94m'
+			elif color in ('magenta', 'm'):
+				start = '\033[95m'
+			elif color in ('cyan', 'c'):
+				start = '\033[96m'
+
+			return start + text + '\033[0m'
+
+		board_str: str = ''
+		square_delimiter: str = ' '*3
+		for rank in reversed(Coordinate.RANKS):
+			for file in Coordinate.FILES:
+				sq: Square = self._grid[Coordinate(file, rank)]
+				piece = sq.piece
+				square_str: str = '□' if sq.color == Color.WHITE else '■'
+				board_str += f'{piece}' if piece else square_str
+				board_str += square_delimiter
+
+			board_str += colored_str(rank, 'g') + '\n'
+
+		board_str += colored_str(square_delimiter.join(Coordinate.FILES), 'g')
+
+
+		return board_str
+
 if __name__ == '__main__':
-	pass
+	b = Board()
+	print(b)
