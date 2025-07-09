@@ -90,9 +90,6 @@ class Square:
 		else:
 			return Color.BLACK
 
-	def is_occupied(self) -> bool:
-		return self._piece is not None
-
 	def remove_piece(self) -> None:
 		self._piece = None
 
@@ -122,6 +119,9 @@ class Board:
 
 		return self._grid[coordinate]
 
+	def __getitem__(self, coordinate: Coordinate) -> Square:
+		return self.get_square(coordinate)
+
 	def place_piece(self, piece: Piece, coordinate: Coordinate) -> None:
 		self.get_square(coordinate).set_piece(piece)
 
@@ -137,7 +137,7 @@ class Board:
 		from_square: Square = self.get_square(from_coord)
 		to_square: Square = self.get_square(to_coord)
 
-		if not from_square.is_occupied():
+		if not from_square.piece:
 			raise ValueError(
 				f'Invalid move from {from_coord}. No piece present.'
 			)
