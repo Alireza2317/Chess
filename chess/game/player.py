@@ -3,6 +3,12 @@ from chess.components import Color, Board, Coordinate, Piece, PieceType
 
 class DummyKing: ...
 
+CASTLE_PATHS: dict[str, tuple[str, str]] = {
+	'a': ('c', 'd'),
+	'h': ('g', 'f')
+}
+
+
 class Player:
 	def __init__(self, board: Board, color: Color):
 		if not isinstance(color, Color):
@@ -52,10 +58,10 @@ class Player:
 			if piece.piece_type == PieceType.ROOK:
 				rooks.append(piece)
 
-		classic_coords: tuple[Coordinate, Coordinate] = (
-			Coordinate(f'a{self._start_rank}'),
-			Coordinate(f'h{self._start_rank}')
-		)
+		classic_coords: list[Coordinate] = [
+			Coordinate(f'{file}{self._start_rank}') for file in CASTLE_PATHS
+		]
+
 		for rook in rooks:
 			if rook.coordinate not in classic_coords:
 				rook.has_moved = True
@@ -149,23 +155,19 @@ class Player:
 			valid_rooks.append(rook)
 
 		for rook in valid_rooks:
-			rank: str = rook.coordinate.rank
-
-			files: list[str]
-			if rook.coordinate.file == 'h':
-				files = ['g', 'f']
-			elif rook.coordinate.file == 'a':
-				files = ['c', 'd']
-			else: continue
+			files: tuple[str, str] | None = CASTLE_PATHS.get(
+				rook.coordinate.file, None
+			)
+			if not files: continue
 
 			for file in files:
 				# check squares in the middle for enemy attacks
-				c = Coordinate(f'{file}{rank}')
+				c = Coordinate(f'{file}{self._start_rank}')
 				if self.is_under_attack(c): break
 			else: # if successful and no break = no enemy attacks
 				king_file, rook_file = files
-				king_c = Coordinate(f'{king_file}{rank}')
-				rook_c = Coordinate(f'{rook_file}{rank}')
+				king_c = Coordinate(f'{king_file}{self._start_rank}')
+				rook_c = Coordinate(f'{rook_file}{self._start_rank}')
 
 				king_rook_moves_pair.append(
 						(self.king, king_c, rook, rook_c)
