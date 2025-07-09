@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 	from chess_refactored.engine.player import Player
 
 class Pawn(Piece):
+	from chess_refactored.engine.player import Player
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
 		super().__init__(player, coordinate)
 		self._start_rank: str = '2' if self.owner.color == Color.WHITE else '7'
@@ -39,7 +40,7 @@ class Pawn(Piece):
 
 		return moves
 
-	def attacking_squares(self) -> list[Coordinate]:
+	def attacking_coordinates(self) -> list[Coordinate]:
 		""" returns all squares that are under attack by the pawn. """
 		attacks: list[Coordinate] = []
 
@@ -48,3 +49,16 @@ class Pawn(Piece):
 				attacks.append(diag)
 
 		return attacks
+
+if __name__ == '__main__':
+	from chess_refactored.engine.core import Board, Coordinate, Color
+	from chess_refactored.engine.player import Player
+
+	board = Board()
+	player = Player(board=board, color=Color.WHITE)
+	p = Pawn(player, Coordinate.from_str('e3'))
+	Pawn(player, Coordinate.from_str('d4'))
+	board.place_piece(p, p.coordinate)
+
+	print(p.legal_moves())
+	print(p.attacking_coordinates())

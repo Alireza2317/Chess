@@ -1,3 +1,4 @@
+from __future__ import annotations
 import enum
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -17,8 +18,9 @@ class PieceType(enum.Enum):
 
 
 class Piece(ABC):
-	from chess_refactored.engine.player import Player
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
+		from chess_refactored.engine.player import Player
+
 		if not isinstance(coordinate, Coordinate):
 			raise TypeError(
 				f'coordinate should be of type {Coordinate.__name__}!'

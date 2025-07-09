@@ -4,7 +4,7 @@ if TYPE_CHECKING:
 	from chess_refactored.engine.piece import Piece
 
 class Player:
-	def __init__(self) -> None:
+	def __init__(self, board: Board, color: Color) -> None:
 		self.pieces: list[Piece] = []
-		self.color = Color.WHITE
-		self.board = Board()
+		self.color = color
+		self.board = board
