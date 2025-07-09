@@ -448,9 +448,8 @@ class ChessGUI(ChessGame):
 			self.handle_events()
 
 	def highlight_checked_king(self):
-		player = self.white_p if self.turn == Color.WHITE else self.black_p
-		if player.is_in_check():
-			square = self.board.get(player.king.coordinate)
+		if self.current_player.is_in_check():
+			square = self.board.get(self.current_player.king.coordinate)
 			self.draw_square(square, gui_cfg.in_check_color)
 
 	def step(self) -> bool:
