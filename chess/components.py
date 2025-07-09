@@ -61,7 +61,7 @@ class Coordinate:
 				f'{self.__class__.__name__} and {type(other)}!'
 			)
 
-		return repr(self) == repr(other)
+		return self.file == other.file and self.rank == other.rank
 
 	def __ne__(self, other: object):
 		return not self.__eq__(other)
@@ -143,20 +143,19 @@ class Square:
 				f'Invalid coordinate! should be of type {Coordinate.__name__}'
 			)
 
-		self.coordinate = coordinate
+		self._piece: Piece | None = None
+		self.coordinate: Coordinate = coordinate
 
 		# set the color based on the coordinate
 		self.set_color()
 
-	def set_color(self):
-		if (
-			(self.coordinate.file in 'aceg' and int(self.coordinate.rank)%2 == 1)
-			or
-			self.coordinate.file in 'bdfh' and int(self.coordinate.rank)%2 == 0
-		):
-			self.color = Color.BLACK
-		else:
+	def set_color(self) -> None:
+		file_i: int = ord(self.coordinate.file) - ord('a')
+		rank_i: int = int(self.coordinate.rank) - 1
+		if (file_i + rank_i)%2 == 1:
 			self.color = Color.WHITE
+		else:
+			self.color = Color.BLACK
 
 	def set_piece(self, piece: Piece):
 		if not isinstance(piece, Piece):
@@ -237,6 +236,10 @@ class Board:
 		""" returns the square in the given coordinate. """
 		row, col = coordinate.regular
 		return self.board_matrix[row][col]
+
+	def __getitem__(self, coordinate: Coordinate) -> Square:
+		""" returns the square in the given coordinate. """
+		return self.get(coordinate)
 
 	def get_coordinates(
 		self,
