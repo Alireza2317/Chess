@@ -182,6 +182,20 @@ class Player:
 			_, king_new_coord, *_ = moves_pair
 			self.king.valid_moves.append(king_new_coord)
 
+	def potential_en_passant_pawns(self) -> list[Piece]:
+		potential_pawns: list[Piece]= []
+
+		for piece in self.pieces:
+			if piece.piece_type != PieceType.PAWN: continue
+
+			if self.color == Color.WHITE:
+				if piece.coordinate.rank == '5':
+					potential_pawns.append(piece)
+			else:
+				if piece.coordinate.rank == '4':
+					potential_pawns.append(piece)
+		return potential_pawns
+
 	def is_under_attack(self, coordinate: Coordinate) -> bool:
 		""" returns wether the given square is under opponent's attack."""
 		for op_piece in self.opponent.pieces:

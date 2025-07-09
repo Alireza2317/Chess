@@ -29,6 +29,9 @@ class ChessGame:
 		# default promotion piece is queen
 		self.promotion_piece: PieceType = PieceType.QUEEN
 
+		self.en_passant_target_square: Coordinate | None = None
+		self.en_passant_pawns: list[Piece] = []
+
 	@property
 	def current_player(self) -> Player:
 		if self.turn == Color.WHITE:
@@ -159,6 +162,48 @@ class ChessGame:
 
 		return GameEndState.ONGOING
 
+	def handle_en_passant(self, piece: Piece, coordinate: Coordinate) -> None:
+		# if this move was a pawn trying to escape, set the en passant square
+		if piece.piece_type != PieceType.PAWN: return
+
+		opponent_pawns: list[Piece] = self.current_player.opponent.potential_en_passant_pawns()
+		if not opponent_pawns: return
+
+		if coordinate.rank != opponent_pawns[0].coordinate.rank: return
+
+		adjacent_files = []
+		if (f:=chr(ord(coordinate.file)+1)) in 'abcdefgh':
+			adjacent_files.append(f)
+		if (f:=chr(ord(coordinate.file)-1)) in 'abcdefgh':
+			adjacent_files.append(f)
+
+		adjacent_coords = []
+		for file in adjacent_files:
+			adjacent_coords.append(Coordinate(f'{file}{coordinate.rank}'))
+
+		en_passant_pawns: list[Piece] = []
+		for op_pawn in opponent_pawns:
+			if op_pawn.coordinate in adjacent_coords:
+				en_passant_pawns.append(op_pawn)
+
+		if not en_passant_pawns: return
+
+		# this was a move, that enabled en passant on the next move
+		# so
+		new_rank: str
+		if self.current_player.color == Color.WHITE:
+			new_rank = chr(ord(piece.coordinate.rank)+1)
+		else:
+			new_rank = chr(ord(piece.coordinate.rank)-1)
+
+
+		self.en_passant_target_square = Coordinate(
+			f'{piece.coordinate.file}{new_rank}'
+		)
+
+		self.en_passant_pawns = en_passant_pawns
+		self.can_en_passant = True
+
 	def get_rook_castle_move(
 		self, piece: Piece, coordinate: Coordinate
 	) -> tuple[Piece, Coordinate] | None:
@@ -218,6 +263,30 @@ class ChessGame:
 		if not (piece and coordinate):
 			print('wrong inputs!')
 			return
+
+		can_en_passant: bool = False
+		if self.en_passant_target_square:
+			before = True
+
+		# make en passant happen in the next move, if possible
+		self.handle_en_passant(piece, coordinate)
+
+		if can_en_passant:
+			# en passant is happeing if
+			if piece in self.en_passant_pawns and coordinate == self.en_passant_target_square:
+				# remove the enemy pawn
+				if self.current_player.color == Color.WHITE:
+					rank = chr(ord(coordinate.rank)-1)
+				else:
+					rank = chr(ord(coordinate.rank)+1)
+				pawn_coord: Coordinate = Coordinate(f'{coordinate.file}{rank}')
+				op_pawn: Piece = self.board.get(pawn_coord).piece
+				self.board.remove(pawn_coord)
+				self.current_player.opponent.remove_piece(op_pawn)
+
+			# disable en passant, either way
+			self.en_passant_target_square = None
+			self.en_passant_pawns = []
 
 		# if castling, move the rook too
 		rook_castle_move = self.get_rook_castle_move(piece, coordinate)
