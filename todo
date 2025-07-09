@@ -1,25 +1,23 @@
-1. en passant
-
-2. other draw situations
+1. other draw situations
 	threefold repetition
 	insufficient material
 
-3. drawing captured pieces on the side
+2. drawing captured pieces on the side
 
-4. piece transitions
+3. fix piece animation for rooks in castling
 
-5. drag & drop options
+4. drag & drop options
 
-6. arrows and square highlights on right clicks
+5. arrows and square highlights on right clicks
 
-7. export FEN
+6. export FEN
 
-8. recording moves in algebraic notation
+7. recording moves in algebraic notation
 
-9. getting algebraic notation and play game (in terminal game)
+8. getting algebraic notation and play game (in terminal game)
 
-10. resign button
+9. resign button
 
-11. timers?
+10. timers?
 
-12. adding sounds
+11. adding sounds

@@ -514,12 +514,15 @@ class ChessGUI(ChessGame):
 
 	def step(self) -> bool:
 		""" one step in the chess game + gui updates."""
+		self.white_p.update_valid_moves()
+		self.black_p.update_valid_moves()
+		if self.en_passant_target_square:
+			for pawn in self.en_passant_pawns:
+				pawn.valid_moves.append(self.en_passant_target_square)
+
 		self.handle_events()
 
 		self.update_screen()
-
-		self.white_p.update_valid_moves()
-		self.black_p.update_valid_moves()
 
 		self.highlight_checked_king()
 
