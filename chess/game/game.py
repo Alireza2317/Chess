@@ -266,7 +266,7 @@ class ChessGame:
 
 		can_en_passant: bool = False
 		if self.en_passant_target_square:
-			before = True
+			can_en_passant = True
 
 		# make en passant happen in the next move, if possible
 		self.handle_en_passant(piece, coordinate)
