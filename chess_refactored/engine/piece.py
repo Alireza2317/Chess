@@ -43,7 +43,7 @@ class Piece(ABC):
 	@abstractmethod
 	def piece_type(self) -> PieceType: ...
 
-	def legal_moves(self) -> list[Coordinate]:
+	def all_moves(self) -> list[Coordinate]:
 		moves: list[Coordinate] = []
 
 		for c in self.attacking_coordinates():

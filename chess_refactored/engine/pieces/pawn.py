@@ -1,10 +1,6 @@
 from chess_refactored.engine.core import Color, Coordinate
 from chess_refactored.engine.piece import Piece, PieceType
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-	from chess_refactored.engine.player import Player
-
 class Pawn(Piece):
 	from chess_refactored.engine.player import Player
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
@@ -16,7 +12,17 @@ class Pawn(Piece):
 	def piece_type(self) -> PieceType:
 		return PieceType.PAWN
 
-	def legal_moves(self) -> list[Coordinate]:
+	def attacking_coordinates(self) -> list[Coordinate]:
+		""" returns all squares that are under attack by the pawn. """
+		attacks: list[Coordinate] = []
+
+		for file_offset in (-1, 1):
+			if (diag := self.coordinate.shift(file_offset, self._direction)):
+				attacks.append(diag)
+
+		return attacks
+
+	def all_moves(self) -> list[Coordinate]:
 		moves: list[Coordinate] = []
 
 		one_ahead: Coordinate | None = self.coordinate.shift(0, self._direction)
@@ -35,20 +41,16 @@ class Pawn(Piece):
 				):
 					moves.append(two_ahead)
 
-		# add the attacking squares
-		moves.extend(super().legal_moves())
+		# add the attacking squares, if there are enemy pieces there
+		# this behavior is needed only for pawns
+		for move in super().all_moves():
+			# since .all_moves() returns only the squares that are
+			# empty or occupied by enemy pieces
+			if self.owner.board[move].piece:
+				moves.append(move)
 
 		return moves
 
-	def attacking_coordinates(self) -> list[Coordinate]:
-		""" returns all squares that are under attack by the pawn. """
-		attacks: list[Coordinate] = []
-
-		for file_offset in (-1, 1):
-			if (diag := self.coordinate.shift(file_offset, self._direction)):
-				attacks.append(diag)
-
-		return attacks
 
 if __name__ == '__main__':
 	from chess_refactored.engine.core import Board, Coordinate, Color
@@ -60,5 +62,5 @@ if __name__ == '__main__':
 	Pawn(player, Coordinate.from_str('d4'))
 	board.place_piece(p, p.coordinate)
 
-	print(p.legal_moves())
+	print(p.all_moves())
 	print(p.attacking_coordinates())
