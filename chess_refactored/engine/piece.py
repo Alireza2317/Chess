@@ -64,4 +64,14 @@ class Piece(ABC):
 		symbol: str = self.piece_type.value.lower()
 		return symbol.upper() if self.owner.color == Color.WHITE else symbol
 
+	def __eq__(self, other: object) -> bool:
+		if not isinstance(other, Piece):
+			raise TypeError(
+				f'Cannot compare {self.__class__.__name__} with {type(other)}.'
+			)
 
+		same_owner: bool = self.owner == other.owner
+		same_type: bool = self.piece_type == other.piece_type
+		same_coord: bool = self.coordinate == other.coordinate
+
+		return same_owner and same_type and same_coord
