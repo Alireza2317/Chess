@@ -100,6 +100,10 @@ class Square:
 	def set_piece(self, piece: Piece | None) -> None:
 		self._piece = piece
 
+	def __eq__(self, other: object) -> bool:
+		if not isinstance(other, Square):
+			raise TypeError(f'Cannot compare {self.}')
+
 	def __repr__(self) -> str:
 		return f'{self.__class__.__name__}({self.coordinate}, {self._piece})'
 
