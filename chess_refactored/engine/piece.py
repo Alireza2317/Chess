@@ -34,10 +34,13 @@ class Piece(ABC):
 		self.owner: Player = player
 		self.coordinate: Coordinate = coordinate
 
+		# put the piece on the board if square is not occupied
+		if self.owner.board[coordinate].piece:
+			raise ValueError(f'There is already a piece on {coordinate}!')
+		self.owner.board.place_piece(self, coordinate)
+
 		# add the piece to player's pieces
 		self.owner.pieces.add(self)
-		# put the piece on the board
-		self.owner.board.place_piece(self, coordinate)
 
 	@property
 	@abstractmethod
