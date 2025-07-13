@@ -35,7 +35,7 @@ class Piece(ABC):
 		self.coordinate: Coordinate = coordinate
 
 		# add the piece to player's pieces
-		self.owner.pieces.append(self)
+		self.owner.pieces.add(self)
 		# put the piece on the board
 		self.owner.board.place_piece(self, coordinate)
 
@@ -75,3 +75,6 @@ class Piece(ABC):
 		same_coord: bool = self.coordinate == other.coordinate
 
 		return same_owner and same_type and same_coord
+
+	def __hash__(self) -> int:
+		return hash(f'{self.owner.color.name} {self} {self.coordinate}')
