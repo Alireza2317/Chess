@@ -37,9 +37,14 @@ class Player:
 		if not self.king:
 			return False
 
-		# TODO
-		# FIXME
+		for square in self.board.all_squares():
+			piece: Piece | None = square.piece
+			if piece and piece.owner is not self:
+				if self.king.coordinate in piece.attacking_coordinates():
+					return True
+
 		return False
+
 
 	def __repr__(self) -> str:
 		return f'<{self.color.name.title()} {self.__class__.__name__}>'
