@@ -40,7 +40,9 @@ class Coordinate:
 
 	def __eq__(self, other: object) -> bool:
 		if not isinstance(other, Coordinate):
-			return NotImplemented
+			raise TypeError(
+				f'Cannot compare {self.__class__.__name__} with {type(other)}.'
+			)
 
 		return self.file == other.file and self.rank == other.rank
 
@@ -102,7 +104,15 @@ class Square:
 
 	def __eq__(self, other: object) -> bool:
 		if not isinstance(other, Square):
-			raise TypeError(f'Cannot compare {self.}')
+			raise TypeError(
+				f'Cannot compare {self.__class__.__name__} with {type(other)}'
+			)
+
+		same_coord: bool = self.coordinate == other.coordinate
+		same_color: bool = self.color == other.color
+		same_piece: bool = self.piece == other.piece
+
+		return same_coord and same_color and same_piece
 
 	def __repr__(self) -> str:
 		return f'{self.__class__.__name__}({self.coordinate}, {self._piece})'
@@ -196,5 +206,5 @@ class Board:
 		return board_str
 
 if __name__ == '__main__':
-	b = Board()
-	print(b)
+	c1 = Coordinate.from_str('a1')
+	c2 = Coordinate.from_str('a1')
