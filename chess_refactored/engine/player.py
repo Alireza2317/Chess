@@ -8,6 +8,7 @@ class Player:
 		self.color = color
 		self.board = board
 		self.pieces: set[Piece] = set()
+		self._set_king()
 
 	def _set_king(self) -> None:
 		self.king: Piece | None = None
@@ -33,6 +34,9 @@ class Player:
 
 		self.pieces.remove(piece) #? or discard
 
+		#? also remove it from the board
+		self.board.remove_piece(piece.coordinate)
+
 	def is_in_check(self) -> bool:
 		if not self.king:
 			return False
@@ -56,11 +60,3 @@ class Player:
 	def __repr__(self) -> str:
 		return f'<{self.color.name.title()} {self.__class__.__name__}>'
 
-def main() -> None:
-	b = Board()
-	p = Player(b, Color.WHITE)
-	print(p.king)
-
-
-if __name__ == '__main__':
-	main()
