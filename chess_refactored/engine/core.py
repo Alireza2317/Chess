@@ -206,6 +206,21 @@ class Board:
 
 			return start + text + '\033[0m'
 
+		piece_symbols: dict[str, str] = {
+			'P': '♙',
+			'N': '♘',
+			'B': '♗',
+			'R': '♖',
+			'Q': '♕',
+			'K': '♔',
+			'p': '♟',
+			'n': '♞',
+			'b': '♝',
+			'r': '♜',
+			'q': '♛',
+			'k': '♚'
+		}
+
 		board_str: str = ''
 		square_delimiter: str = ' '*3
 		for rank in reversed(Coordinate.RANKS):
@@ -213,7 +228,7 @@ class Board:
 				sq: Square = self._grid[Coordinate(file, rank)]
 				piece = sq.piece
 				square_str: str = '□' if sq.color == Color.WHITE else '■'
-				board_str += f'{piece}' if piece else square_str
+				board_str += piece_symbols[f'{piece}'] if piece else square_str
 				board_str += square_delimiter
 
 			board_str += colored_str(rank, 'g') + '\n'
