@@ -1,5 +1,5 @@
 from __future__ import annotations
-from chess_refactored.engine.core import Color, Board
+from chess_refactored.engine.core import Color, Board, Coordinate
 from chess_refactored.engine.piece import Piece, PieceType
 
 
@@ -44,6 +44,43 @@ class Player:
 
 		#? also remove it from the board
 		self.board.remove_piece(piece.coordinate)
+
+	def update_legal_moves(self) -> None:
+		"""
+		Update each piece's valid_moves list.
+		A valid move:
+		- Is within the board
+		- Does not leave the player in check
+		"""
+		for piece in self.pieces:
+			legal_moves: set[Coordinate] = set()
+
+			original_coord: Coordinate = piece.coordinate
+
+			for target in piece.all_moves():
+				captured_piece: Piece | None = self.board[target].piece
+
+				# simulate move
+				if captured_piece:
+					self.opponent.remove_piece(captured_piece)
+
+				self.board.move_piece(original_coord, target)
+
+				# check if the move leaves the player in check
+				if not self.is_in_check():
+					legal_moves.add(target)
+
+				# revert move
+				self.board.move_piece(target, original_coord)
+				if captured_piece:
+					self.board.place_piece(captured_piece, target)
+					self.opponent.add_piece(captured_piece)
+
+
+			piece.legal_moves = legal_moves # FIXME
+
+		self.add_castling_moves() # TODO
+
 
 	def is_in_check(self) -> bool:
 		if not self.king:
