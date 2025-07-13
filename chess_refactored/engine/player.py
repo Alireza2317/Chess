@@ -10,6 +10,14 @@ class Player:
 		self.pieces: set[Piece] = set()
 		self._set_king()
 
+	def set_opponent(self, player: Player) -> None:
+		if not isinstance(player, Player):
+			raise TypeError(f'Opponent should be of type {self.__class__.__name__}!')
+		self.opponent: Player = player
+
+		# enemy of my enemy is myself!
+		self.opponent.opponent = self
+
 	def _set_king(self) -> None:
 		self.king: Piece | None = None
 
