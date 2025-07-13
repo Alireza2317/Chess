@@ -1,9 +1,11 @@
-from chess_refactored.engine.core import Color, Coordinate, Direction
+from __future__ import annotations
+from chess_refactored.engine.core import Coordinate, Direction
 from chess_refactored.engine.piece import Piece, PieceType
-
-class Rook(Piece):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
 	from chess_refactored.engine.player import Player
 
+class Rook(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
 		super().__init__(player, coordinate)
 
