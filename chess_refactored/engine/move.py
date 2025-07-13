@@ -2,9 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from chess_refactored.engine.core import Coordinate
 from chess_refactored.engine.piece import Piece, PieceType
-from chess_refactored.engine.pieces.pawn import Pawn
-from chess_refactored.engine.pieces.king import King
-from chess_refactored.engine.pieces.rook import Rook
 
 
 @dataclass
