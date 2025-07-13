@@ -62,6 +62,18 @@ class Coordinate:
 
 		return Coordinate(new_file, new_rank)
 
+	def in_direction(self, direction: tuple[int, int]) -> list[Coordinate]:
+		coords: list[Coordinate] = []
+
+		current: Coordinate | None = self
+		if not current:
+			return []
+
+		while current := current.shift(*direction):
+			coords.append(current)
+
+		return coords
+
 	@classmethod
 	def from_str(cls, coord: str) -> Coordinate:
 		if (len(coord) != 2) or not cls.is_valid(coord[0], coord[1]):
@@ -202,9 +214,8 @@ class Board:
 
 		board_str += colored_str(square_delimiter.join(Coordinate.FILES), 'g')
 
-
 		return board_str
 
 if __name__ == '__main__':
-	c1 = Coordinate.from_str('a1')
-	c2 = Coordinate.from_str('a1')
+	c = Coordinate.from_str('a8')
+	print(c.in_direction((1, -1)))
