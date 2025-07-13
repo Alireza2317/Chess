@@ -1,6 +1,7 @@
 from __future__ import annotations
+from typing import Iterator, NamedTuple, TYPE_CHECKING
 import enum
-from typing import Iterator, TYPE_CHECKING
+
 if TYPE_CHECKING:
 	from chess_refactored.engine.piece import Piece
 
@@ -15,6 +16,11 @@ class Color(enum.Enum):
 	def __invert__(self) -> Color:
 		# Toggles the Color object when ~ is applied.
 		return Color.WHITE if self == Color.BLACK else Color.BLACK
+
+
+class Direction(NamedTuple):
+	file_offset: int
+	rank_offset: int
 
 
 class Coordinate:
@@ -62,7 +68,7 @@ class Coordinate:
 
 		return Coordinate(new_file, new_rank)
 
-	def in_direction(self, direction: tuple[int, int]) -> list[Coordinate]:
+	def in_direction(self, direction: Direction) -> list[Coordinate]:
 		coords: list[Coordinate] = []
 
 		current: Coordinate | None = self
@@ -218,4 +224,4 @@ class Board:
 
 if __name__ == '__main__':
 	c = Coordinate.from_str('a8')
-	print(c.in_direction((1, -1)))
+	print(c.in_direction(Direction(1, -1)))
