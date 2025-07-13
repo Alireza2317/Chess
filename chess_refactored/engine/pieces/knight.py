@@ -21,7 +21,7 @@ class Knight(Piece):
 				direction: Direction = Direction(
 					file_dir * file_offset, rank_dir * rank_offset
 				)
-				coord: Coordinate | None = self.coordinate.shift(*direction)
+				coord: Coordinate | None = self.coordinate.shift(direction)
 				if coord:
 					moves.add(coord)
 

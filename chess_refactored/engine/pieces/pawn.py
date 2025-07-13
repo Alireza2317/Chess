@@ -1,4 +1,4 @@
-from chess_refactored.engine.core import Color, Coordinate
+from chess_refactored.engine.core import Color, Coordinate, Direction
 from chess_refactored.engine.piece import Piece, PieceType
 
 class Pawn(Piece):
@@ -17,7 +17,8 @@ class Pawn(Piece):
 		attacks: set[Coordinate] = set()
 
 		for file_offset in (-1, 1):
-			if (diag := self.coordinate.shift(file_offset, self._direction)):
+			direction: Direction = Direction(file_offset, self._direction)
+			if (diag := self.coordinate.shift(direction)):
 				attacks.add(diag)
 
 		return attacks
@@ -25,7 +26,9 @@ class Pawn(Piece):
 	def all_moves(self) -> set[Coordinate]:
 		moves: set[Coordinate] = set()
 
-		one_ahead: Coordinate | None = self.coordinate.shift(0, self._direction)
+		one_ahead: Coordinate | None = self.coordinate.shift(
+			Direction(file_offset=0, rank_offset=self._direction)
+		)
 		if (
 			one_ahead and
 			not self.owner.board[one_ahead].piece
@@ -34,7 +37,9 @@ class Pawn(Piece):
 
 			# first move double-step
 			if self.coordinate.rank == self._start_rank:
-				two_ahead: Coordinate | None = self.coordinate.shift(0, 2*self._direction)
+				two_ahead: Coordinate | None = self.coordinate.shift(
+					Direction(file_offset=0, rank_offset=2 * self._direction)
+				)
 				if (
 					two_ahead and
 					not self.owner.board[two_ahead].piece

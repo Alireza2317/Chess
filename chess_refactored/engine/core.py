@@ -52,13 +52,13 @@ class Coordinate:
 
 		return self.file == other.file and self.rank == other.rank
 
-	def shift(self, file_offset: int, rank_offset: int) -> Coordinate | None:
+	def shift(self, direction: Direction) -> Coordinate | None:
 		"""
 		Returns a new coordinate shifted by file_offset and rank_offset,
 		or None if off board.
 		"""
-		file_i: int = self.FILES.index(self.file) + file_offset
-		rank_i: int = self.RANKS.index(self.rank) + rank_offset
+		file_i: int = self.FILES.index(self.file) + direction.file_offset
+		rank_i: int = self.RANKS.index(self.rank) + direction.rank_offset
 
 		if (file_i > 7 or file_i < 0) or (rank_i > 7 or rank_i < 0):
 			return None
@@ -75,7 +75,7 @@ class Coordinate:
 		if not current:
 			return set()
 
-		while current := current.shift(*direction):
+		while current := current.shift(direction):
 			coords.add(current)
 
 		return coords

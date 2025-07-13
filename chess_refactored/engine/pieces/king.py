@@ -1,4 +1,4 @@
-from chess_refactored.engine.core import Coordinate
+from chess_refactored.engine.core import Coordinate, Direction
 from chess_refactored.engine.piece import Piece, PieceType
 
 class King(Piece):
@@ -19,7 +19,8 @@ class King(Piece):
 
 		for file_offset in (-1, 0, 1):
 			for rank_offset in (-1, 0, 1):
-				c: Coordinate | None = self.coordinate.shift(file_offset, rank_offset)
+				direction: Direction = Direction(file_offset, rank_offset)
+				c: Coordinate | None = self.coordinate.shift(direction)
 				if not c:
 					continue
 				# exclude the king's current coordinate
