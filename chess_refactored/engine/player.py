@@ -1,5 +1,5 @@
 from __future__ import annotations
-from chess_refactored.engine.core import Color, Coordinate, Board
+from chess_refactored.engine.core import Color, Board
 from chess_refactored.engine.piece import Piece, PieceType
 
 
