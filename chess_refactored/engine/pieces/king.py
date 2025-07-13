@@ -10,12 +10,12 @@ class King(Piece):
 	def piece_type(self) -> PieceType:
 		return PieceType.KING
 
-	def attacking_coordinates(self) -> list[Coordinate]:
+	def attacking_coordinates(self) -> set[Coordinate]:
 		"""
 		returns the coordinates that the king can attack
 		regardless of checks
 		"""
-		moves: list[Coordinate] = []
+		moves: set[Coordinate] = set()
 
 		for file_offset in (-1, 0, 1):
 			for rank_offset in (-1, 0, 1):
@@ -26,11 +26,11 @@ class King(Piece):
 				if c == self.coordinate:
 					continue
 
-				moves.append(c)
+				moves.add(c)
 
 		return moves
 
-	def all_moves(self) -> list[Coordinate]:
+	def all_moves(self) -> set[Coordinate]:
 		"""
 		returns the moves that the king can choose
 		regardless of checks.

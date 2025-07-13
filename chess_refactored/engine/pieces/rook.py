@@ -11,8 +11,8 @@ class Rook(Piece):
 	def piece_type(self) -> PieceType:
 		return PieceType.ROOK
 
-	def attacking_coordinates(self) -> list[Coordinate]:
-		moves: list[Coordinate] = []
+	def attacking_coordinates(self) -> set[Coordinate]:
+		moves: set[Coordinate] = set()
 
 		directions: tuple[Direction, ...] = (
 			Direction(file_offset=1, rank_offset=0), # right
@@ -22,6 +22,6 @@ class Rook(Piece):
 		)
 
 		for direction in directions:
-			moves.extend(self.coordinate.in_direction(direction))
+			moves.update(self.coordinate.in_direction(direction))
 
 		return moves

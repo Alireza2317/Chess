@@ -43,8 +43,8 @@ class Piece(ABC):
 	@abstractmethod
 	def piece_type(self) -> PieceType: ...
 
-	def all_moves(self) -> list[Coordinate]:
-		moves: list[Coordinate] = []
+	def all_moves(self) -> set[Coordinate]:
+		moves: set[Coordinate] = set()
 
 		for c in self.attacking_coordinates():
 			piece: Piece | None = self.owner.board[c].piece
@@ -53,12 +53,12 @@ class Piece(ABC):
 			if piece and piece.owner == self.owner:
 				continue
 
-			moves.append(c)
+			moves.add(c)
 
 		return moves
 
 	@abstractmethod
-	def attacking_coordinates(self) -> list[Coordinate]: ...
+	def attacking_coordinates(self) -> set[Coordinate]: ...
 
 	def __repr__(self) -> str:
 		symbol: str = self.piece_type.value.lower()

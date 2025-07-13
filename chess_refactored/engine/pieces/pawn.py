@@ -12,25 +12,25 @@ class Pawn(Piece):
 	def piece_type(self) -> PieceType:
 		return PieceType.PAWN
 
-	def attacking_coordinates(self) -> list[Coordinate]:
+	def attacking_coordinates(self) -> set[Coordinate]:
 		""" returns all squares that are under attack by the pawn. """
-		attacks: list[Coordinate] = []
+		attacks: set[Coordinate] = set()
 
 		for file_offset in (-1, 1):
 			if (diag := self.coordinate.shift(file_offset, self._direction)):
-				attacks.append(diag)
+				attacks.add(diag)
 
 		return attacks
 
-	def all_moves(self) -> list[Coordinate]:
-		moves: list[Coordinate] = []
+	def all_moves(self) -> set[Coordinate]:
+		moves: set[Coordinate] = set()
 
 		one_ahead: Coordinate | None = self.coordinate.shift(0, self._direction)
 		if (
 			one_ahead and
 			not self.owner.board[one_ahead].piece
 	  	):
-			moves.append(one_ahead)
+			moves.add(one_ahead)
 
 			# first move double-step
 			if self.coordinate.rank == self._start_rank:
@@ -39,7 +39,7 @@ class Pawn(Piece):
 					two_ahead and
 					not self.owner.board[two_ahead].piece
 				):
-					moves.append(two_ahead)
+					moves.add(two_ahead)
 
 		# add the attacking squares, if there are enemy pieces there
 		# this behavior is needed only for pawns
@@ -47,7 +47,7 @@ class Pawn(Piece):
 			# since .all_moves() returns only the squares that are
 			# empty or occupied by enemy pieces
 			if self.owner.board[move].piece:
-				moves.append(move)
+				moves.add(move)
 
 		return moves
 
