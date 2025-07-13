@@ -7,7 +7,7 @@ class Player:
 	def __init__(self, board: Board, color: Color) -> None:
 		self.color = color
 		self.board = board
-		self.pieces: list[Piece] = []
+		self.pieces: set[Piece] = set()
 
 	def _set_king(self) -> None:
 		self.king: Piece | None = None
@@ -24,14 +24,14 @@ class Player:
 		if piece.owner is not self:
 			raise ValueError("Piece's owner is another player! Cannot add!")
 
-		self.pieces.append(piece)
+		self.pieces.add(piece)
 		self._set_king()
 
 	def remove_piece(self, piece: Piece) -> None:
 		if piece is self.king:
 			raise ValueError('Cannot remove king from the game!')
-		if piece in self.pieces:
-			self.pieces.remove(piece)
+
+		self.pieces.remove(piece) #? or discard
 
 	def is_in_check(self) -> bool:
 		if not self.king:
@@ -45,6 +45,13 @@ class Player:
 
 		return False
 
+	def __eq__(self, other: object) -> bool:
+		if not isinstance(other, Player):
+			raise TypeError(
+				f'Cannot compare {self.__class__.__name__} with {type(other)}'
+			)
+
+		return (self is other)
 
 	def __repr__(self) -> str:
 		return f'<{self.color.name.title()} {self.__class__.__name__}>'
