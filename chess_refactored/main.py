@@ -1,4 +1,5 @@
-from chess_refactored.engine.core import Color, Coordinate, Board
+from chess_refactored.engine.core import Color, Coordinate
+from chess_refactored.engine.board import Board
 from chess_refactored.engine.player import Player
 from chess_refactored.engine.piece import Piece
 from chess_refactored.engine.pieces.knight import Knight
