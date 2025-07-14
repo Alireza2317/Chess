@@ -28,9 +28,9 @@ class Game:
 		if not piece or piece.owner is not self.current_player:
 			return False
 
-		piece.update_legal_moves() # TODO
+		self.current_player.update_legal_moves()
 
-		if to_coord not in piece.legal_moves: # TODO
+		if to_coord not in piece.legal_moves:
 			return False
 
 		captured_piece: Piece | None = self.board[to_coord].piece

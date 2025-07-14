@@ -58,7 +58,8 @@ class Pawn(Piece):
 
 
 if __name__ == '__main__':
-	from chess.engine.core import Board, Coordinate, Color
+	from chess.engine.core import Coordinate, Color
+	from chess.engine.board import Board
 	from chess.engine.player import Player
 
 	board = Board()
