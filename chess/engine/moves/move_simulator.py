@@ -1,5 +1,5 @@
 from __future__ import annotations
-from chess.engine.move import Move
+from chess.engine.moves.move import Move
 from chess.engine.board import Board
 from typing import TYPE_CHECKING
 

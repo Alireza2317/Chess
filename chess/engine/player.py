@@ -2,8 +2,8 @@ from __future__ import annotations
 from chess.engine.core import Color, Coordinate
 from chess.engine.board import Board
 from chess.engine.piece import Piece, PieceType
-from chess.engine.move import Move
-from chess.engine.move_simulator import MoveSimulator
+from chess.engine.moves.move import Move
+from chess.engine.moves.move_simulator import MoveSimulator
 
 
 def create_move(piece: Piece, to_coord: Coordinate, board: Board) -> Move:
