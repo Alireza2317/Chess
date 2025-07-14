@@ -2,7 +2,7 @@ from __future__ import annotations
 import enum
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
-from chess.engine.core import Color, Coordinate
+from chess.engine.core import Color, Coordinate, Direction
 
 if TYPE_CHECKING:
 	from chess.engine.player import Player
@@ -45,6 +45,9 @@ class Piece(ABC):
 		# piece's legal moves, which will be updated later on
 		self.legal_moves: set[Coordinate] = set()
 
+		# piece's attack directions, solely for queen, rook and bishop
+		self.attack_directions: set[Direction] = set()
+
 	@property
 	@abstractmethod
 	def piece_type(self) -> PieceType: ...
@@ -64,7 +67,20 @@ class Piece(ABC):
 		return moves
 
 	@abstractmethod
-	def attacking_coordinates(self) -> set[Coordinate]: ...
+	def attacking_coordinates(self) -> set[Coordinate]:
+		moves: set[Coordinate] = set()
+
+		for direction in self.attack_directions:
+			for coordinate in self.coordinate.in_direction(direction):
+				piece: Piece | None = self.owner.board[coordinate].piece
+
+				moves.add(coordinate)
+
+				# the range of attack stops, when met a piece in the way
+				if piece:
+					break
+				
+		return moves
 
 	def __repr__(self) -> str:
 		symbol: str = self.piece_type.value.lower()
