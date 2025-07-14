@@ -1,0 +1,40 @@
+from chess.engine.piece import Piece, PieceType
+from chess.engine.core import Color, Coordinate, Direction
+from chess.engine.moves.move import Move
+
+def create_move(piece: Piece, to_coord: Coordinate) -> Move:
+	from_coord: Coordinate = piece.coordinate
+	captured_piece: Piece | None = piece.owner.board[to_coord].piece
+
+	# check en passant
+	en_passant: bool = (
+		piece.piece_type == PieceType.PAWN and
+		to_coord.file != from_coord.file and # pawn capture
+		captured_piece is None
+	)
+
+	# check castle
+	is_castle: bool = (
+		piece.piece_type == PieceType.KING and
+		to_coord in (
+			piece.coordinate.shift(Direction(-2, 0)),
+			piece.coordinate.shift(Direction(2, 0)),
+		)
+	)
+
+	# check promotion
+	if piece.piece_type == PieceType.PAWN:
+		promotion_rank: str = '1' if piece.owner.color == Color.WHITE else '8'
+		if to_coord.rank == promotion_rank:
+			promotion: PieceType = PieceType.QUEEN # TODO: get this from input
+
+
+	return Move(
+		piece=piece,
+		start=from_coord,
+		end=to_coord,
+		captured=captured_piece,
+		promotion=promotion,
+		en_passant=en_passant,
+		castling=is_castle
+	)
