@@ -40,7 +40,10 @@ class Piece(ABC):
 		self.owner.board.place_piece(self, coordinate)
 
 		# add the piece to player's pieces
-		self.owner.pieces.add(self)
+		self.owner.add_piece(self)
+
+		# piece's legal moves, which will be updated later on
+		self.legal_moves: set[Coordinate] = set()
 
 	@property
 	@abstractmethod
