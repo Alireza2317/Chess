@@ -55,3 +55,15 @@ class Game:
 		self.current_player.executer.undo(move)
 
 		return True
+
+	def redo(self) -> bool:
+		move: Move | None = self.history.redo()
+		if not move:
+			return False
+
+		self.switch_turn()
+
+		self.current_player.executer.execute(move)
+
+		return True
+	
