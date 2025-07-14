@@ -23,32 +23,38 @@ class Board:
 		return self.get_square(coordinate)
 
 	def place_piece(self, piece: Piece, coordinate: Coordinate) -> None:
-		self.get_square(coordinate).set_piece(piece)
+		self[coordinate].set_piece(piece)
+		# update piece's coordinate
+		piece.coordinate = coordinate
 
 	def remove_piece(self, coordinate: Coordinate) -> None:
-		self.get_square(coordinate).remove_piece()
+		self[coordinate].remove_piece()
 
 	def move_piece(self, from_coord: Coordinate, to_coord: Coordinate) -> None:
 		if not isinstance(from_coord, Coordinate) or not isinstance(to_coord, Coordinate):
 			raise TypeError(
 				f'Invalid coordinate! should be of type {Coordinate.__name__}'
 			)
+		piece: Piece | None = self[from_coord].piece
 
-		from_square: Square = self.get_square(from_coord)
-		to_square: Square = self.get_square(to_coord)
-
-		if not from_square.piece:
+		if not piece:
 			raise ValueError(
 				f'Invalid move from {from_coord}. No piece present.'
 			)
 
 		# remove the piece from the original square and
+		self.remove_piece(from_coord)
+
 		# put it in the new square
-		to_square.set_piece(from_square._piece)
-		from_square.remove_piece()
+		self.place_piece(piece, to_coord)
 
 	def all_squares(self) -> list[Square]:
 		return list(self._grid.values())
+
+	def all_pieces(self) -> set[Piece]:
+		return {
+			sq.piece for sq in self.all_squares() if sq.piece
+		}
 
 	def __iter__(self) -> Iterator[tuple[Coordinate, Square]]:
 		return iter(self._grid.items())
