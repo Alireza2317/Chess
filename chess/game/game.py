@@ -46,3 +46,14 @@ class Game:
 		self.switch_turn()
 
 		return True
+
+	def undo(self) -> bool:
+		move: Move | None = self.history.undo()
+		if not move:
+			return False
+
+		self.switch_turn()
+		executor = MoveExecuter(self.current_player)
+		executor.undo(move) # todo
+
+		return True
