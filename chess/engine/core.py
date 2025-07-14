@@ -68,15 +68,17 @@ class Coordinate:
 
 		return Coordinate(new_file, new_rank)
 
-	def in_direction(self, direction: Direction) -> set[Coordinate]:
-		coords: set[Coordinate] = set()
+	def in_direction(self, direction: Direction) -> list[Coordinate]:
+
+		# since the order matters, we use a list
+		coords: list[Coordinate] = []
 
 		current: Coordinate | None = self
 		if not current:
-			return set()
+			return []
 
 		while current := current.shift(direction):
-			coords.add(current)
+			coords.append(current)
 
 		return coords
 
