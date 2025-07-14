@@ -1,0 +1,41 @@
+from chess.engine.core import Coordinate, Direction
+from chess.engine.piece import Piece, PieceType
+
+class King(Piece):
+	from chess.engine.player import Player
+	def __init__(self, player: Player, coordinate: Coordinate) -> None:
+		super().__init__(player, coordinate)
+
+	@property
+	def piece_type(self) -> PieceType:
+		return PieceType.KING
+
+	def attacking_coordinates(self) -> set[Coordinate]:
+		"""
+		returns the coordinates that the king can attack
+		regardless of checks
+		"""
+		moves: set[Coordinate] = set()
+
+		for file_offset in (-1, 0, 1):
+			for rank_offset in (-1, 0, 1):
+				direction: Direction = Direction(file_offset, rank_offset)
+				c: Coordinate | None = self.coordinate.shift(direction)
+				if not c:
+					continue
+				# exclude the king's current coordinate
+				if c == self.coordinate:
+					continue
+
+				moves.add(c)
+
+		return moves
+
+	def all_moves(self) -> set[Coordinate]:
+		"""
+		returns the moves that the king can choose
+		regardless of checks.
+		is a subset of attacking squares
+		"""
+
+		return super().all_moves()
