@@ -4,8 +4,8 @@ from chess.engine.board import Board
 from chess.engine.piece import Piece
 from chess.engine.player import Player
 from chess.engine.moves.move import Move
-from chess.engine.moves.move_executer import MoveExecuter
-from chess.engine.moves.move_factory import create_move
+from chess.engine.moves.executer import MoveExecuter
+from chess.engine.moves.factory import create_move
 
 class Game:
 	def __init__(self) -> None:

@@ -3,8 +3,8 @@ from chess.engine.core import Color, Coordinate
 from chess.engine.board import Board
 from chess.engine.piece import Piece, PieceType
 from chess.engine.moves.move import Move
-from chess.engine.moves.move_simulator import MoveSimulator
-from chess.engine.moves.move_factory import create_move
+from chess.engine.moves.simulator import MoveSimulator
+from chess.engine.moves.factory import create_move
 
 class Player:
 	def __init__(self, board: Board, color: Color) -> None:
