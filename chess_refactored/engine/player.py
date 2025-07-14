@@ -2,7 +2,29 @@ from __future__ import annotations
 from chess_refactored.engine.core import Color, Coordinate
 from chess_refactored.engine.board import Board
 from chess_refactored.engine.piece import Piece, PieceType
+from chess_refactored.engine.move import Move
 
+
+def create_move(piece: Piece, to_coord: Coordinate, board: Board) -> Move:
+	from_coord: Coordinate = piece.coordinate
+	captured_piece: Piece | None = board[to_coord].piece
+
+	# check en passant
+	#en_passant: bool = (
+	#	piece.piece_type == PieceType.PAWN and
+	#	to_coord.file != from_coord.file and # pawn capture
+	#	captured_piece is None
+	#)
+
+	return Move(
+		piece=piece,
+		start=from_coord,
+		end=to_coord,
+		captured=captured_piece,
+		promotion=None, # TODO
+		en_passant=False, # TODO
+		castling=False # TODO
+	)
 
 class Player:
 	def __init__(self, board: Board, color: Color) -> None:
