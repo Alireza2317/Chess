@@ -91,7 +91,6 @@ class Player:
 
 		#self.add_castling_moves() # TODO
 
-
 	def is_in_check(self) -> bool:
 		if not self.king:
 			return False

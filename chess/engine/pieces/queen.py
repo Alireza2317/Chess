@@ -9,14 +9,7 @@ class Queen(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
 		super().__init__(player, coordinate)
 
-	@property
-	def piece_type(self) -> PieceType:
-		return PieceType.QUEEN
-
-	def attacking_coordinates(self) -> set[Coordinate]:
-		moves: set[Coordinate] = set()
-
-		directions: tuple[Direction, ...] = (
+		self.attack_directions: set[Direction] = {
 			Direction(file_offset=0, rank_offset=1), # up
 			Direction(file_offset=0, rank_offset=-1), # down
 			Direction(file_offset=1, rank_offset=0), # right
@@ -25,9 +18,11 @@ class Queen(Piece):
 			Direction(file_offset=-1, rank_offset=1), # up & left
 			Direction(file_offset=1, rank_offset=-1), # down & right
 			Direction(file_offset=-1, rank_offset=-1) # down & left
-		)
+		}
 
-		for direction in directions:
-			moves.update(self.coordinate.in_direction(direction))
+	@property
+	def piece_type(self) -> PieceType:
+		return PieceType.QUEEN
 
-		return moves
+	def attacking_coordinates(self) -> set[Coordinate]:
+		return super().attacking_coordinates()

@@ -9,21 +9,16 @@ class Bishop(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
 		super().__init__(player, coordinate)
 
+		self.attack_directions: set[Direction] = {
+			Direction(file_offset=1, rank_offset=1), # up & right
+			Direction(file_offset=-1, rank_offset=1), # up & left
+			Direction(file_offset=1, rank_offset=-1), # down & right
+			Direction(file_offset=-1, rank_offset=-1) # down & left
+		}
+
 	@property
 	def piece_type(self) -> PieceType:
 		return PieceType.BISHOP
 
 	def attacking_coordinates(self) -> set[Coordinate]:
-		moves: set[Coordinate] = set()
-
-		directions: tuple[Direction, ...] = (
-			Direction(file_offset=1, rank_offset=1), # up & right
-			Direction(file_offset=-1, rank_offset=1), # up & left
-			Direction(file_offset=1, rank_offset=-1), # down & right
-			Direction(file_offset=-1, rank_offset=-1) # down & left
-		)
-
-		for direction in directions:
-			moves.update(self.coordinate.in_direction(direction))
-
-		return moves
+		return super().attacking_coordinates()
