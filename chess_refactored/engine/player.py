@@ -3,6 +3,7 @@ from chess_refactored.engine.core import Color, Coordinate
 from chess_refactored.engine.board import Board
 from chess_refactored.engine.piece import Piece, PieceType
 from chess_refactored.engine.move import Move
+from chess_refactored.engine.move_simulator import MoveSimulator
 
 
 def create_move(piece: Piece, to_coord: Coordinate, board: Board) -> Move:
@@ -78,31 +79,17 @@ class Player:
 		for piece in self.pieces:
 			legal_moves: set[Coordinate] = set()
 
-			original_coord: Coordinate = piece.coordinate
-
 			for target in piece.all_moves():
-				captured_piece: Piece | None = self.board[target].piece
+				move: Move = create_move(piece, target, self.board)
 
 				# simulate move
-				if captured_piece:
-					self.opponent.remove_piece(captured_piece)
+				with MoveSimulator(self.board, move, self):
+					if not self.is_in_check():
+						legal_moves.add(target)
 
-				self.board.move_piece(original_coord, target)
+			piece.legal_moves = legal_moves
 
-				# check if the move leaves the player in check
-				if not self.is_in_check():
-					legal_moves.add(target)
-
-				# revert move
-				self.board.move_piece(target, original_coord)
-				if captured_piece:
-					self.board.place_piece(captured_piece, target)
-					self.opponent.add_piece(captured_piece)
-
-
-			piece.legal_moves = legal_moves # FIXME
-
-		self.add_castling_moves() # TODO
+		#self.add_castling_moves() # TODO
 
 
 	def is_in_check(self) -> bool:
