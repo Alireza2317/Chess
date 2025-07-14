@@ -4,7 +4,6 @@ from chess.engine.board import Board
 from chess.engine.piece import Piece
 from chess.engine.player import Player
 from chess.engine.moves.move import Move
-from chess.engine.moves.executer import MoveExecuter
 from chess.engine.moves.history import MoveHistory
 from chess.engine.moves.factory import create_move
 
@@ -38,9 +37,8 @@ class Game:
 		if to_coord not in piece.legal_moves:
 			return False
 
-		executer: MoveExecuter = MoveExecuter(self.current_player)
 		move: Move = create_move(piece, to_coord)
-		executer.execute(move)
+		self.current_player.executer.execute(move)
 		self.history.record(move)
 
 		self.switch_turn()
@@ -53,7 +51,7 @@ class Game:
 			return False
 
 		self.switch_turn()
-		executor = MoveExecuter(self.current_player)
-		executor.undo(move) # todo
+
+		self.current_player.executer.undo(move)
 
 		return True
