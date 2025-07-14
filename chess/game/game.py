@@ -3,6 +3,9 @@ from chess.engine.core import Color, Coordinate
 from chess.engine.board import Board
 from chess.engine.piece import Piece
 from chess.engine.player import Player
+from chess.engine.moves.move import Move
+from chess.engine.moves.move_executer import MoveExecuter
+from chess.engine.moves.move_factory import create_move
 
 class Game:
 	def __init__(self) -> None:
@@ -33,11 +36,9 @@ class Game:
 		if to_coord not in piece.legal_moves:
 			return False
 
-		captured_piece: Piece | None = self.board[to_coord].piece
-		if captured_piece:
-			self.current_player.opponent.remove_piece(captured_piece)
-
-		self.board.move_piece(from_coord, to_coord)
+		executer: MoveExecuter = MoveExecuter(self.current_player)
+		move: Move = create_move(piece, to_coord)
+		executer.execute(move)
 
 		self.switch_turn()
 

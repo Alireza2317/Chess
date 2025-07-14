@@ -4,28 +4,7 @@ from chess.engine.board import Board
 from chess.engine.piece import Piece, PieceType
 from chess.engine.moves.move import Move
 from chess.engine.moves.move_simulator import MoveSimulator
-
-
-def create_move(piece: Piece, to_coord: Coordinate, board: Board) -> Move:
-	from_coord: Coordinate = piece.coordinate
-	captured_piece: Piece | None = board[to_coord].piece
-
-	# check en passant
-	#en_passant: bool = (
-	#	piece.piece_type == PieceType.PAWN and
-	#	to_coord.file != from_coord.file and # pawn capture
-	#	captured_piece is None
-	#)
-
-	return Move(
-		piece=piece,
-		start=from_coord,
-		end=to_coord,
-		captured=captured_piece,
-		promotion=None, # TODO
-		en_passant=False, # TODO
-		castling=False # TODO
-	)
+from chess.engine.moves.move_factory import create_move
 
 class Player:
 	def __init__(self, board: Board, color: Color) -> None:
@@ -47,7 +26,7 @@ class Player:
 
 		king_count: int = 0
 		for piece in self.pieces:
-			if piece.piece_type == PieceType.KING:
+			if piece.type == PieceType.KING:
 				self.king = piece
 				king_count += 1
 		if king_count > 1:
@@ -80,7 +59,7 @@ class Player:
 			legal_moves: set[Coordinate] = set()
 
 			for target in piece.all_moves():
-				move: Move = create_move(piece, target, self.board)
+				move: Move = create_move(piece, target)
 
 				# simulate move
 				with MoveSimulator(self, move):
