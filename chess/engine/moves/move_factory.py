@@ -8,14 +8,14 @@ def create_move(piece: Piece, to_coord: Coordinate) -> Move:
 
 	# check en passant
 	en_passant: bool = (
-		piece.piece_type == PieceType.PAWN and
+		piece.type == PieceType.PAWN and
 		to_coord.file != from_coord.file and # pawn capture
 		captured_piece is None
 	)
 
 	# check castle
 	is_castle: bool = (
-		piece.piece_type == PieceType.KING and
+		piece.type == PieceType.KING and
 		to_coord in (
 			piece.coordinate.shift(Direction(-2, 0)),
 			piece.coordinate.shift(Direction(2, 0)),
@@ -23,7 +23,7 @@ def create_move(piece: Piece, to_coord: Coordinate) -> Move:
 	)
 
 	# check promotion
-	if piece.piece_type == PieceType.PAWN:
+	if piece.type == PieceType.PAWN:
 		promotion_rank: str = '1' if piece.owner.color == Color.WHITE else '8'
 		if to_coord.rank == promotion_rank:
 			promotion: PieceType = PieceType.QUEEN # TODO: get this from input

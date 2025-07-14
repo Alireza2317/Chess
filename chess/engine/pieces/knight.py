@@ -16,7 +16,7 @@ class Knight(Piece):
 		}
 
 	@property
-	def piece_type(self) -> PieceType:
+	def type(self) -> PieceType:
 		return PieceType.KNIGHT
 
 	def attacking_coordinates(self) -> set[Coordinate]:

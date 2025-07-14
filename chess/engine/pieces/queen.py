@@ -21,7 +21,7 @@ class Queen(Piece):
 		}
 
 	@property
-	def piece_type(self) -> PieceType:
+	def type(self) -> PieceType:
 		return PieceType.QUEEN
 
 	def attacking_coordinates(self) -> set[Coordinate]:

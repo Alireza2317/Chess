@@ -17,7 +17,7 @@ class Bishop(Piece):
 		}
 
 	@property
-	def piece_type(self) -> PieceType:
+	def type(self) -> PieceType:
 		return PieceType.BISHOP
 
 	def attacking_coordinates(self) -> set[Coordinate]:

@@ -17,7 +17,7 @@ class Rook(Piece):
 		}
 
 	@property
-	def piece_type(self) -> PieceType:
+	def type(self) -> PieceType:
 		return PieceType.ROOK
 
 	def attacking_coordinates(self) -> set[Coordinate]:

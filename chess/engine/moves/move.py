@@ -27,7 +27,7 @@ class Move:
 	def is_promotion(self) -> bool:
 		return (
 			self.promotion is not None and
-			self.piece.piece_type == PieceType.PAWN
+			self.piece.type == PieceType.PAWN
 		)
 
 	@property

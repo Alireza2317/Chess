@@ -50,7 +50,7 @@ class Piece(ABC):
 
 	@property
 	@abstractmethod
-	def piece_type(self) -> PieceType: ...
+	def type(self) -> PieceType: ...
 
 	def all_moves(self) -> set[Coordinate]:
 		moves: set[Coordinate] = set()
@@ -83,7 +83,7 @@ class Piece(ABC):
 		return moves
 
 	def __repr__(self) -> str:
-		symbol: str = self.piece_type.value.lower()
+		symbol: str = self.type.value.lower()
 		return symbol.upper() if self.owner.color == Color.WHITE else symbol
 
 	def __eq__(self, other: object) -> bool:
@@ -93,7 +93,7 @@ class Piece(ABC):
 			)
 
 		same_owner: bool = self.owner == other.owner
-		same_type: bool = self.piece_type == other.piece_type
+		same_type: bool = self.type == other.type
 		same_coord: bool = self.coordinate == other.coordinate
 
 		return same_owner and same_type and same_coord

@@ -14,7 +14,7 @@ class Pawn(Piece):
 		}
 
 	@property
-	def piece_type(self) -> PieceType:
+	def type(self) -> PieceType:
 		return PieceType.PAWN
 
 	def attacking_coordinates(self) -> set[Coordinate]:
