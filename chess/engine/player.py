@@ -4,6 +4,7 @@ from chess.engine.board import Board
 from chess.engine.piece import Piece, PieceType
 from chess.engine.moves.move import Move
 from chess.engine.moves.simulator import MoveSimulator
+from chess.engine.moves.executer import MoveExecuter
 from chess.engine.moves.factory import create_move
 
 class Player:
@@ -11,6 +12,7 @@ class Player:
 		self.color = color
 		self.board = board
 		self.pieces: set[Piece] = set()
+		self.executer: MoveExecuter = MoveExecuter(self)
 		self._set_king()
 
 	def set_opponent(self, player: Player) -> None:
