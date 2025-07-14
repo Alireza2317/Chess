@@ -23,10 +23,11 @@ def create_move(piece: Piece, to_coord: Coordinate) -> Move:
 	)
 
 	# check promotion
+	promotion: PieceType | None = None
 	if piece.type == PieceType.PAWN:
 		promotion_rank: str = '1' if piece.owner.color == Color.WHITE else '8'
 		if to_coord.rank == promotion_rank:
-			promotion: PieceType = PieceType.QUEEN # TODO: get this from input
+			promotion = PieceType.QUEEN # TODO: get this from input
 
 
 	return Move(
