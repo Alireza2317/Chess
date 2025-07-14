@@ -72,17 +72,31 @@ class Player:
 
 		#self.add_castling_moves() # TODO
 
+	def has_legal_moves(self) -> bool:
+		for piece in self.pieces:
+			if piece.legal_moves:
+				return True
+
+		return False
+
 	def is_in_check(self) -> bool:
 		if not self.king:
 			return False
 
-		for square in self.board.all_squares():
-			piece: Piece | None = square.piece
-			if piece and piece.owner is not self:
-				if self.king.coordinate in piece.attacking_coordinates():
-					return True
-
+		for opponent_piece in self.opponent.pieces:
+			if self.king.coordinate in opponent_piece.attacking_coordinates():
+				return True
 		return False
+
+
+	def is_checkmated(self) -> bool:
+		if not self.king:
+			return False
+
+		return self.is_in_check() and not self.has_legal_moves()
+
+	def is_stalemeted(self) -> bool:
+		return not self.is_in_check() and not self.has_legal_moves()
 
 	def __eq__(self, other: object) -> bool:
 		if not isinstance(other, Player):
