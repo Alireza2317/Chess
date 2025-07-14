@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from chess.engine.core import Coordinate
 from chess.engine.board import Board
 from chess.engine.moves.move import Move
@@ -6,8 +7,10 @@ from chess.engine.pieces.queen import Queen
 from chess.engine.pieces.rook import Rook
 from chess.engine.pieces.bishop import Bishop
 from chess.engine.pieces.knight import Knight
-from chess.engine.player import Player
 from chess.engine.piece import Piece, PieceType
+
+if TYPE_CHECKING:
+	from chess.engine.player import Player
 
 class MoveExecuter:
 	"""
@@ -21,7 +24,6 @@ class MoveExecuter:
 
 	def __init__(self, player: Player) -> None:
 		self.player: Player = player
-		self.opponent: Player = player.opponent
 		self.board: Board = player.board
 
 	def execute(self, move: Move) -> None:
@@ -45,11 +47,11 @@ class MoveExecuter:
 
 		if move.captured:
 			self.board.place_piece(move.captured, move.end)
-			self.opponent.add_piece(move.captured)
+			self.player.opponent.add_piece(move.captured)
 
 	def _move_piece(self, move: Move) -> None:
 		if move.captured:
-			self.opponent.remove_piece(move.captured)
+			self.player.opponent.remove_piece(move.captured)
 		self.board.move_piece(move.start, move.end)
 
 	def _execute_castle(self, move: Move) -> None:
@@ -84,7 +86,8 @@ class MoveExecuter:
 		)
 		captured: Piece | None = self.board[captured_pawn_coord].piece
 		if captured:
-			self.opponent.remove_piece(captured) # also removes from board
+			self.player.opponent.remove_piece(captured)
+			# ^ this also removes from board
 
 		self.board.move_piece(move.start, move.end)
 
