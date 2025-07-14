@@ -6,6 +6,13 @@ class King(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
 		super().__init__(player, coordinate)
 
+		self.attack_directions: set[Direction] = {
+			Direction(file_offset, rank_offset)
+			for file_offset in (-1, 0, 1)
+			for rank_offset in (-1, 0, 1)
+			if file_offset or rank_offset
+		}
+
 	@property
 	def piece_type(self) -> PieceType:
 		return PieceType.KING
@@ -17,17 +24,10 @@ class King(Piece):
 		"""
 		moves: set[Coordinate] = set()
 
-		for file_offset in (-1, 0, 1):
-			for rank_offset in (-1, 0, 1):
-				direction: Direction = Direction(file_offset, rank_offset)
-				c: Coordinate | None = self.coordinate.shift(direction)
-				if not c:
-					continue
-				# exclude the king's current coordinate
-				if c == self.coordinate:
-					continue
-
-				moves.add(c)
+		for direction in self.attack_directions:
+			coord: Coordinate | None = self.coordinate.shift(direction)
+			if coord:
+				moves.add(coord)
 
 		return moves
 
@@ -37,5 +37,4 @@ class King(Piece):
 		regardless of checks.
 		is a subset of attacking squares
 		"""
-
 		return super().all_moves()

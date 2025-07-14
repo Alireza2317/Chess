@@ -8,6 +8,11 @@ class Pawn(Piece):
 		self._start_rank: str = '2' if self.owner.color == Color.WHITE else '7'
 		self._direction: int = self.owner.color.value
 
+		self.attack_directions: set[Direction] = {
+			Direction(file_offset, self._direction)
+			for file_offset in (-1, 1)
+		}
+
 	@property
 	def piece_type(self) -> PieceType:
 		return PieceType.PAWN
@@ -16,8 +21,7 @@ class Pawn(Piece):
 		""" returns all squares that are under attack by the pawn. """
 		attacks: set[Coordinate] = set()
 
-		for file_offset in (-1, 1):
-			direction: Direction = Direction(file_offset, self._direction)
+		for direction in self.attack_directions:
 			if (diag := self.coordinate.shift(direction)):
 				attacks.add(diag)
 
