@@ -12,12 +12,11 @@ class MoveSimulator:
 	automatically when the context ends.
 	Useful for move validation, check detection, etc.
 	"""
-	def __init__(self, board: Board, move: Move, player: Player):
-		self.board: Board = board
-		self.move: Move = move
+	def __init__(self, player: Player, move: Move):
 		self.player: Player = player
 		self.opponent: Player = player.opponent
-
+		self.board: Board = player.board
+		self.move: Move = move
 
 	def __enter__(self) -> MoveSimulator:
 		# remove captured piece (if any)

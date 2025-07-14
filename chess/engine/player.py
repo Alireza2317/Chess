@@ -83,7 +83,7 @@ class Player:
 				move: Move = create_move(piece, target, self.board)
 
 				# simulate move
-				with MoveSimulator(self.board, move, self):
+				with MoveSimulator(self, move):
 					if not self.is_in_check():
 						legal_moves.add(target)
 
