@@ -39,6 +39,12 @@ class Player:
 			raise ValueError("Piece's owner is another player! Cannot add!")
 
 		self.pieces.add(piece)
+
+		# also put the piece on the board
+		if self.board[piece.coordinate].piece:
+			# square is occupied
+			raise ValueError(f'There is already a piece on {piece.coordinate}!')
+
 		self.board.place_piece(piece, piece.coordinate)
 		self._set_king()
 
@@ -46,9 +52,9 @@ class Player:
 		if piece is self.king:
 			raise ValueError('Cannot remove king from the game!')
 
-		self.pieces.remove(piece) #? or discard
+		self.pieces.remove(piece)
 
-		#? also remove it from the board
+		# also remove it from the board
 		self.board.remove_piece(piece.coordinate)
 
 	def update_legal_moves(self) -> None:
