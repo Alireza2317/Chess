@@ -39,6 +39,7 @@ class Player:
 			raise ValueError("Piece's owner is another player! Cannot add!")
 
 		self.pieces.add(piece)
+		self.board.place_piece(piece, piece.coordinate)
 		self._set_king()
 
 	def remove_piece(self, piece: Piece) -> None:
