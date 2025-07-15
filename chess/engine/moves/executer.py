@@ -32,9 +32,9 @@ class MoveExecuter:
         Assumes the move is already validated.
         """
 
-		if move.is_castle:
+		if move.is_castling:
 			self._execute_castle(move)
-		elif move.en_passant:
+		elif move.is_en_passant:
 			self._execute_en_passant(move)
 		else:
 			self._move_piece(move)
@@ -43,7 +43,14 @@ class MoveExecuter:
 			self._execute_promotion(move)
 
 	def undo(self, move: Move) -> None:
-		self.board.move_piece(move.end, move.start)
+		if move.is_castling:
+			self._undo_castle(move)
+		elif move.is_en_passant:
+			self._undo_en_passant(move)
+		elif move.is_promotion:
+			self._undo_promotion(move)
+		else:
+			self.board.move_piece(move.end, move.start)
 
 		if move.captured:
 			self.board.place_piece(move.captured, move.end)
@@ -108,3 +115,9 @@ class MoveExecuter:
 				Bishop(self.player, move.end)
 			case PieceType.KNIGHT:
 				Knight(self.player, move.end)
+
+	def _undo_castle(self, move: Move) -> None: ... # TODO
+
+	def _undo_en_passant(self, move: Move) -> None: ... # TODO
+
+	def _undo_promotion(self, move: Move) -> None: ... # TODO
