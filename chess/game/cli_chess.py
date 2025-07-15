@@ -60,10 +60,9 @@ def classic_setup() -> Game:
 def play_cli(game: Game) -> None:
 	game.white.update_legal_moves()
 	game.black.update_legal_moves()
-	#game.switch_turn()
 
 	while True:
-		#clear_console()
+		clear_console()
 		print(game.board)
 
 
@@ -86,7 +85,7 @@ def play_cli(game: Game) -> None:
 			print('Invalid input!')
 			continue
 
-		#game.current_player.update_legal_moves()
+		game.current_player.update_legal_moves()
 
 		success: bool = game.move(start, end)
 		if not success:
@@ -94,9 +93,6 @@ def play_cli(game: Game) -> None:
 			continue
 
 		game.current_player.update_legal_moves()
-		#print(game.current_player, game.current_player.has_legal_moves())
-		#for p in game.current_player.pieces:
-		#	print(p.legal_moves)
 
 		if game.white.is_checkmated():
 			print(game.board)
@@ -119,116 +115,3 @@ def main() -> None:
 
 if __name__ == '__main__':
 	main()
-
-
-
-"""
-Black to move!
-Enter move: c6 e5
-----------
-P <d5>
-----------
-----------
-P <d5>
-----------
-----------
-n <e5>
-----------
-♜   ■   ♝   ♛   ♚   ♝   □   ♜   8
-♟   ♟  ♟    □   ♟   ♟   ♟  ♟   7
-□    ■   □    ■    □   ♞    □   ■   6
-■   □   ■   ♙   ♞   □   ■   □   5
-□   ■   □   ■   □   ■   □   ■   4
-■   □   ♘   □   ■   ♘   ■   □   3
-♙   ♙   ♙   ♙   □   ♙   ♙   ♙   2
-♖   □   ♗   ♕   ♔   ♗   ■   ♖   1
-a   b   c   d   e   f   g   h
-White to move!
-Enter move: f3 e5
-----------
-n <e5>
-----------
-----------
-n <e5>
-----------
-----------
-P <d5>
-----------
-----------
-P <d5>
-----------
-♜   ■   ♝   ♛   ♚   ♝   □   ♜   8
-♟   ♟   ♟   □   ♟   ♟   ♟   ♟   7
-□   ■   □   ■   □   ♞   □   ■   6
-■   □   ■   ♙   ♘   □   ■   □   5
-□   ■   □   ■   □   ■   □   ■   4
-■   □   ♘   □   ■   □   ■   □   3
-♙   ♙   ♙   ♙   □   ♙   ♙   ♙   2
-♖   □   ♗   ♕   ♔   ♗   ■   ♖   1
-a   b   c   d   e   f   g   h
-Black to move!
-Enter move: d8 d7
-----------
-P <d5>
-----------
-----------
-P <d5>
-----------
-----------
-q <d7>
-----------
-----------
-p <f7>
-----------
-♜   ■   ♝   ■   ♚   ♝   □   ♜   8
-♟   ♟   ♟   ♛   ♟   ♟   ♟   ♟   7
-□   ■   □   ■   □   ♞   □   ■   6
-■   □   ■   ♙   ♘   □   ■   □   5
-□   ■   □   ■   □   ■   □   ■   4
-■   □   ♘   □   ■   □   ■   □   3
-♙   ♙   ♙   ♙   □   ♙   ♙   ♙   2
-♖   □   ♗   ♕   ♔   ♗   ■   ♖   1
-a   b   c   d   e   f   g   h
-White to move!
-Enter move: e5 d7
-----------
-q <d7>
-----------
-----------
-p <f7>
-----------
-----------
-q <d7>
-----------
-----------
-N <d7>
-----------
-----------
-P <d5>
-----------
-----------
-N <d7>
-----------
-----------
-P <d5>
-----------
-----------
-N <d7>
-----------
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/home/alireza23/Projects/Python/Chess/chess/game/cli_chess.py", line 121, in <module>
-    main()
-  File "/home/alireza23/Projects/Python/Chess/chess/game/cli_chess.py", line 117, in main
-    play_cli(game)
-  File "/home/alireza23/Projects/Python/Chess/chess/game/cli_chess.py", line 96, in play_cli
-    game.current_player.update_legal_moves()
-  File "/home/alireza23/Projects/Python/Chess/chess/engine/player.py", line 70, in update_legal_moves
-    with MoveSimulator(self, move):
-  File "/home/alireza23/Projects/Python/Chess/chess/engine/moves/simulator.py", line 26, in __enter__
-    self.board.move_piece(self.move.start, self.move.end)
-  File "/home/alireza23/Projects/Python/Chess/chess/engine/board.py", line 41, in move_piece
-    raise ValueError(
-ValueError: Invalid move from <e5>. No piece present.
-"""
