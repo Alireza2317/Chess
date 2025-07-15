@@ -15,13 +15,15 @@ class Move:
 	promotion: PieceType | None = None
 
 	def __post_init__(self) -> None:
-		modes: list[bool] = [
+		exclusive_flags: list[bool] = [
 			(self.promotion is not None), self.is_en_passant, self.is_castling
 		]
-		if sum(modes) > 1:
+		if sum(exclusive_flags) > 1:
 			raise ValueError(
 				'Only one of promotion, en_passant, and castling can be True!'
 			)
+
+		assert self.start != self.end, 'Start and end coordinates were the same!'
 
 	@property
 	def is_castle_kingside(self) -> bool:
