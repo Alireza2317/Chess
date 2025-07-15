@@ -66,4 +66,14 @@ class Game:
 		self.current_player.executer.execute(move)
 
 		return True
-	
+
+	def play_turn(self, from_coord: Coordinate, to_coord: Coordinate) -> bool:
+		self.current_player.update_legal_moves()
+
+		move_success: bool = self.move(from_coord, to_coord)
+
+		if move_success:
+			self.switch_turn()
+			return True
+
+		return False
