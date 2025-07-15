@@ -116,7 +116,31 @@ class MoveExecuter:
 			case PieceType.KNIGHT:
 				Knight(self.player, move.end)
 
-	def _undo_castle(self, move: Move) -> None: ... # TODO
+	def _undo_castle(self, move: Move) -> None:
+		king: Piece = move.piece
+		king_end: Coordinate = move.start
+
+		rank: str = king.coordinate.rank
+		rook_start_file: str
+		rook_end_file: str
+		if move.is_castle_kingside:
+			rook_start_file = 'f'
+			rook_end_file = 'h'
+		elif move.is_castle_queenside:
+			rook_start_file = 'd'
+			rook_end_file = 'a'
+		else:
+			raise ValueError('Invalid undo castle move!')
+
+		rook_start: Coordinate = Coordinate(rook_start_file, rank)
+		rook_end: Coordinate = Coordinate(rook_end_file, rank)
+
+		rook: Piece | None = self.board[rook_start].piece
+		if not rook:
+			raise ValueError('Rook not found!')
+
+		self.board.move_piece(king.coordinate, king_end)
+		self.board.move_piece(rook_start, rook_end)
 
 	def _undo_en_passant(self, move: Move) -> None: ... # TODO
 
