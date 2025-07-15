@@ -79,7 +79,7 @@ class Piece(ABC):
 				# the range of attack stops, when met a piece in the way
 				if piece:
 					break
-				
+
 		return moves
 
 	def __repr__(self) -> str:
@@ -99,4 +99,4 @@ class Piece(ABC):
 		return same_owner and same_type and same_coord
 
 	def __hash__(self) -> int:
-		return hash(f'{self.owner.color.name} {self} {self.coordinate}')
+		return id(self)
