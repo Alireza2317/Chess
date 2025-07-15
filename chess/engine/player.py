@@ -13,7 +13,7 @@ class Player:
 		self.board = board
 		self.pieces: set[Piece] = set()
 		self.executer: MoveExecuter = MoveExecuter(self)
-		self._set_king()
+		self.king: Piece | None = None
 
 	def set_opponent(self, player: Player) -> None:
 		if not isinstance(player, Player):
@@ -23,20 +23,14 @@ class Player:
 		# enemy of my enemy is myself!
 		self.opponent.opponent = self
 
-	def _set_king(self) -> None:
-		self.king: Piece | None = None
-
-		king_count: int = 0
-		for piece in self.pieces:
-			if piece.type == PieceType.KING:
-				self.king = piece
-				king_count += 1
-		if king_count > 1:
-			raise ValueError('Player cannot have more than 1 king piece!')
-
 	def add_piece(self, piece: Piece) -> None:
 		if piece.owner is not self:
 			raise ValueError("Piece's owner is another player! Cannot add!")
+
+		if piece.type == PieceType.KING:
+			if self.king:
+				raise ValueError('Player cannot have more than 1 king piece!')
+			self.king = piece
 
 		self.pieces.add(piece)
 
@@ -46,7 +40,6 @@ class Player:
 			raise ValueError(f'There is already a piece on {piece.coordinate}!')
 
 		self.board.place_piece(piece, piece.coordinate)
-		self._set_king()
 
 	def remove_piece(self, piece: Piece) -> None:
 		if piece is self.king:
