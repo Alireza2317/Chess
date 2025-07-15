@@ -160,4 +160,16 @@ class MoveExecuter:
 
 		self.board.move_piece(move.end, move.start)
 
-	def _undo_promotion(self, move: Move) -> None: ... # TODO
+	def _undo_promotion(self, move: Move) -> None:
+		promotion_coord: Coordinate = move.end
+		promoted_piece: Piece | None = self.board[promotion_coord].piece
+		if not promoted_piece:
+			raise ValueError('No promoted piece was found! Cannot undo!')
+
+		self.player.remove_piece(promoted_piece)
+
+		original_pawn: Piece = move.piece
+		if original_pawn.coordinate != move.start:
+			raise ValueError('Something went wrong! Pawn coordinate is lost!')
+		self.player.add_piece(original_pawn)
+
