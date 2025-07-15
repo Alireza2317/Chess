@@ -96,7 +96,7 @@ class Board:
 		}
 
 		board_str: str = ''
-		square_delimiter: str = ' '*3
+		square_delimiter: str = ' '*2
 		for rank in reversed(Coordinate.RANKS):
 			for file in Coordinate.FILES:
 				sq: Square = self._grid[Coordinate(file, rank)]
