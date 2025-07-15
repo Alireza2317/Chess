@@ -35,7 +35,7 @@ def create_move(piece: Piece, to_coord: Coordinate) -> Move:
 		start=from_coord,
 		end=to_coord,
 		captured=captured_piece,
+		is_castling=is_castle,
+		is_en_passant=en_passant,
 		promotion=promotion,
-		en_passant=en_passant,
-		castling=is_castle
 	)
