@@ -117,6 +117,11 @@ class MoveExecuter:
 				Knight(self.player, move.end)
 
 	def _undo_castle(self, move: Move) -> None:
+		if not move.is_castling:
+			raise ValueError(
+				'Move was not a castling move! Cannot undo!'
+			)
+
 		king: Piece = move.piece
 		king_end: Coordinate = move.start
 
@@ -142,6 +147,17 @@ class MoveExecuter:
 		self.board.move_piece(king.coordinate, king_end)
 		self.board.move_piece(rook_start, rook_end)
 
-	def _undo_en_passant(self, move: Move) -> None: ... # TODO
+	def _undo_en_passant(self, move: Move) -> None:
+		captured_pawn_coord: Coordinate = Coordinate(
+			move.end.file, move.start.rank
+		)
+
+		captured_pawn: Piece | None = self.board[captured_pawn_coord].piece
+		if not captured_pawn or not move.is_en_passant:
+			raise ValueError('Invalid undo en passant move!')
+
+		self.player.opponent.add_piece(captured_pawn)
+
+		self.board.move_piece(move.end, move.start)
 
 	def _undo_promotion(self, move: Move) -> None: ... # TODO

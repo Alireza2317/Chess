@@ -14,6 +14,8 @@ def create_move(
 		to_coord.file != from_coord.file and # pawn capture
 		captured_piece is None
 	)
+	# TODO: if it is en passant, calculate the captured piece, and not
+	# TODO: just use the to_coord to derive it
 
 	# check castle
 	is_castle: bool = (
