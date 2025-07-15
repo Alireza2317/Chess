@@ -34,4 +34,3 @@ class MoveSimulator:
 		# restore captured piece (if any)
 		if self.move.captured:
 			self.opponent.add_piece(self.move.captured)
-			self.board.place_piece(self.move.captured, self.move.end)
