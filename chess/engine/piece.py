@@ -61,7 +61,6 @@ class Piece(ABC):
 
 		return moves
 
-	@abstractmethod
 	def attacking_coordinates(self) -> set[Coordinate]:
 		moves: set[Coordinate] = set()
 
