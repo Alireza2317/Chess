@@ -32,16 +32,12 @@ class Game:
 		if not piece or piece.owner is not self.current_player:
 			return False
 
-		self.current_player.update_legal_moves()
-
 		if to_coord not in piece.legal_moves:
 			return False
 
 		move: Move = create_move(piece, to_coord)
 		self.current_player.executer.execute(move)
 		self.history.record(move)
-
-		self.switch_turn()
 
 		return True
 
@@ -66,4 +62,14 @@ class Game:
 		self.current_player.executer.execute(move)
 
 		return True
-	
+
+	def play_turn(self, from_coord: Coordinate, to_coord: Coordinate) -> bool:
+		self.current_player.update_legal_moves()
+
+		move_success: bool = self.move(from_coord, to_coord)
+
+		if move_success:
+			self.switch_turn()
+			return True
+
+		return False
