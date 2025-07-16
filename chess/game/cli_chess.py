@@ -57,6 +57,10 @@ def classic_setup() -> Game:
 
 	return g
 
+def handle_input(game: Game) -> None:
+	pass
+
+
 def play_cli(game: Game) -> None:
 	game.white.update_legal_moves()
 	game.black.update_legal_moves()
