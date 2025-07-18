@@ -61,7 +61,7 @@ class Player:
 			legal_moves: set[Coordinate] = set()
 
 			for target in piece.all_moves():
-				move: Move = create_move(piece, target)
+				move: Move = create_move(piece, target, simulation=True)
 
 				# simulate move
 				with MoveSimulator(self, move):

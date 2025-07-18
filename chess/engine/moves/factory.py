@@ -3,7 +3,11 @@ from chess.engine.core import Color, Coordinate, Direction
 from chess.engine.moves.move import Move
 
 def create_move(
-    piece: Piece, to_coord: Coordinate, *, promotion: PieceType | None = None
+    piece: Piece,
+	to_coord: Coordinate,
+	*,
+	promotion: PieceType | None = None,
+	simulation: bool = False
 ) -> Move:
 	from_coord: Coordinate = piece.coordinate
 	captured_piece: Piece | None = piece.owner.board[to_coord].piece
@@ -27,16 +31,17 @@ def create_move(
 	)
 
 	# check promotion
-	if piece.type == PieceType.PAWN:
-		promotion_rank: str = '8' if piece.owner.color == Color.WHITE else '1'
-		if to_coord.rank == promotion_rank:
-			if promotion is None:
-				raise ValueError('A promotion PieceType should be provided!')
-		else:
-			if promotion is not None:
-				raise ValueError(
-					'A promotion PieceType was provided, while this is not a promotion move!'
-				)
+	if not simulation: # don't care about promotion in simulation mode
+		if piece.type == PieceType.PAWN:
+			promotion_rank: str = '8' if piece.owner.color == Color.WHITE else '1'
+			if to_coord.rank == promotion_rank:
+				if promotion is None :
+					raise ValueError('A promotion PieceType should be provided!')
+			else:
+				if promotion is not None:
+					raise ValueError(
+						'A promotion PieceType was provided, while this is not a promotion move!'
+					)
 
 	return Move(
 		piece=piece,
