@@ -28,7 +28,7 @@ def create_move(
 
 	# check promotion
 	if piece.type == PieceType.PAWN:
-		promotion_rank: str = '1' if piece.owner.color == Color.WHITE else '8'
+		promotion_rank: str = '8' if piece.owner.color == Color.WHITE else '1'
 		if to_coord.rank == promotion_rank:
 			if promotion is None:
 				raise ValueError('A promotion PieceType should be provided!')
