@@ -102,6 +102,42 @@ def handle_input(
 
 	return start, end, promotion
 
+def map_promotion(promotion_type: str) -> PieceType:
+	promotion_map: dict[str, PieceType] = {
+		'q': PieceType.QUEEN,
+		'r': PieceType.ROOK,
+		'b': PieceType.BISHOP,
+		'n': PieceType.KNIGHT,
+	}
+
+	promotion: PieceType | None = promotion_map.get(promotion_type)
+	if not promotion:
+		raise ValueError('Invalid promotion type! Options: [q, r, b, n]')
+
+	return promotion
+
+def check_promotion(
+	game: Game, start: Coordinate, end: Coordinate, promotion: PieceType | None
+) -> LoopDecision:
+
+	piece: Piece | None = game.board[start].piece
+	if not piece:
+		return LoopDecision.CONTINUE
+
+	if piece.type == PieceType.PAWN:
+		promotion_rank: str = '8' if piece.owner.color == Color.WHITE else '1'
+		if end.rank == promotion_rank:
+			if promotion is None:
+				print('A promotion PieceType should be provided!')
+				return LoopDecision.CONTINUE
+		else:
+			if promotion is not None:
+				print(
+					'A promotion PieceType was provided, while this is not a promotion move!'
+				)
+				return LoopDecision.CONTINUE
+
+	return LoopDecision.PROCEED
 
 def play_cli(game: Game) -> None:
 	game.white.update_legal_moves()
