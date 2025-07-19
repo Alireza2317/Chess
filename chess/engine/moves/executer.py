@@ -26,6 +26,11 @@ class MoveExecuter:
 		self.player: Player = player
 		self.board: Board = player.board
 
+	def _move_piece(self, move: Move) -> None:
+		if move.captured:
+			self.player.opponent.remove_piece(move.captured)
+		self.board.move_piece(move.start, move.end)
+
 	def execute(self, move: Move) -> None:
 		"""
         Executes the move on the board.
@@ -54,11 +59,9 @@ class MoveExecuter:
 		if move.captured:
 			self.player.opponent.add_piece(move.captured)
 
-	def _move_piece(self, move: Move) -> None:
-		if move.captured:
-			self.player.opponent.remove_piece(move.captured)
-		self.board.move_piece(move.start, move.end)
-
+	def redo(self, move: Move) -> None:
+		pass
+	
 	def _execute_castle(self, move: Move) -> None:
 		king: Piece = move.piece
 		king_end: Coordinate = move.end
