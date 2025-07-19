@@ -31,7 +31,6 @@ class MoveExecuter:
         Executes the move on the board.
         Assumes the move is already validated.
         """
-
 		if move.is_castling:
 			self._execute_castle(move)
 		elif move.is_en_passant:
@@ -169,7 +168,9 @@ class MoveExecuter:
 		self.player.remove_piece(promoted_piece)
 
 		original_pawn: Piece = move.piece
-		if original_pawn.coordinate != move.start:
-			raise ValueError('Something went wrong! Pawn coordinate is lost!')
 		self.player.add_piece(original_pawn)
+
+		# since the pawn was moved to the promotion square, its coordinate
+		# should be restored back to the starting coordinate
+		self.player.board.move_piece(original_pawn.coordinate, move.start)
 
