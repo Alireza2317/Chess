@@ -45,6 +45,11 @@ class Player:
 		if piece is self.king:
 			raise ValueError('Cannot remove king from the game!')
 
+		if piece not in self.pieces:
+			raise KeyError(
+				f'{self} has no {piece} on {piece.coordinate}! Abort piece removal.'
+		 )
+		
 		self.pieces.remove(piece)
 
 		# also remove it from the board
