@@ -144,32 +144,25 @@ def play_cli(game: Game) -> None:
 	game.black.update_legal_moves()
 
 	while True:
-		clear_console()
+		#clear_console()
 		print(game.board)
 
-
 		print(f'{game.turn.name.title()} to move!')
-		move_input: str = input('Enter move: ')
 
-		if move_input == 'undo':
-			if not game.undo():
-				print('Cannot undo!')
+		input_result: LoopDecision | MoveDetail = handle_input(game)
+		if input_result == LoopDecision.CONTINUE:
 			continue
-
-		if move_input == 'exit':
+		elif input_result == LoopDecision.BREAK:
 			break
 
-		try:
-			start_str, end_str = move_input.split()
-			start = Coordinate.from_str(start_str)
-			end = Coordinate.from_str(end_str)
-		except Exception:
-			print('Invalid input!')
+		if not isinstance(input_result, LoopDecision):
+			start, end, promotion = input_result
+
+		decision: LoopDecision = check_promotion(game, start, end, promotion)
+		if decision == LoopDecision.CONTINUE:
 			continue
 
-		game.current_player.update_legal_moves()
-
-		success: bool = game.move(start, end)
+		success: bool = game.play_turn(start, end, promotion=promotion)
 		if not success:
 			print('Illegal move!')
 			continue
@@ -197,3 +190,7 @@ def main() -> None:
 
 if __name__ == '__main__':
 	main()
+
+
+# BUG: somehow when i enter an invalid move, like picking a square without
+# a piece, the 'illegal move' message does not appear
