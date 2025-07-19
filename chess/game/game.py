@@ -60,6 +60,7 @@ class Game:
 		return True
 
 	def redo(self) -> bool:
+		#BUG for redoing captures
 		move: Move | None = self.history.redo()
 		if not move:
 			return False
