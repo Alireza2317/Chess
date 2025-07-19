@@ -1,14 +1,24 @@
-from chess.engine.core import Coordinate
+import enum
+from chess.engine.core import Coordinate, Color
 from chess.engine.pieces.bishop import Bishop
 from chess.engine.pieces.king import King
 from chess.engine.pieces.knight import Knight
 from chess.engine.pieces.pawn import Pawn
 from chess.engine.pieces.queen import Queen
 from chess.engine.pieces.rook import Rook
+from chess.engine.piece import Piece, PieceType
 from chess.game.game import Game
 
+MoveDetail = tuple[Coordinate, Coordinate, PieceType | None]
+
+class LoopDecision(enum.Enum):
+	BREAK = enum.auto()
+	CONTINUE = enum.auto()
+	PROCEED = enum.auto()
+
+
 def clear_console() -> None:
-		print("\033[H\033[J", end="")
+	print("\033[H\033[J", end="")
 
 def classic_setup() -> Game:
 	g: Game = Game()
@@ -57,8 +67,40 @@ def classic_setup() -> Game:
 
 	return g
 
-def handle_input(game: Game) -> None:
-	pass
+def handle_input(
+	game: Game
+) -> LoopDecision | MoveDetail:
+	move_input: str = input('Enter move: ')
+
+	if move_input == 'undo':
+		if not game.undo():
+			print('Cannot undo!')
+		return LoopDecision.CONTINUE
+	elif move_input == 'redo':
+		if not game.redo():
+			print('Cannot redo!')
+		return LoopDecision.CONTINUE
+
+	elif move_input == 'exit':
+		return LoopDecision.BREAK
+
+	promotion: PieceType | None = None
+
+	try:
+		parts = move_input.split()
+		if len(parts) not in (2, 3):
+			raise ValueError('Invalid input.')
+
+		if len(parts) == 3: # promotion piece
+			promotion = map_promotion(parts[2].lower())
+
+		start: Coordinate = Coordinate.from_str(parts[0])
+		end: Coordinate = Coordinate.from_str(parts[1])
+	except Exception:
+		print('Invalid input!')
+		return LoopDecision.CONTINUE
+
+	return start, end, promotion
 
 
 def play_cli(game: Game) -> None:
