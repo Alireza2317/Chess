@@ -35,13 +35,33 @@ class Piece(ABC):
 		self.coordinate: Coordinate = coordinate
 
 		# add the piece to player's pieces (& the board)
-		self.owner.add_piece(self)
+		self.attach_to_game()
 
 		# piece's legal moves, which will be updated later on
 		self.legal_moves: set[Coordinate] = set()
 
 		# piece's attack directions, solely for queen, rook and bishop
 		self.attack_directions: set[Direction] = set()
+
+	def attach_to_game(self) -> None:
+		"""
+		This method will attach the piece to its owner(Player) and 
+		its owner's board.
+		"""
+		if self in self.owner.pieces:
+			raise ValueError(f'{self} is already attached to {self.owner}!')
+		if self is self.owner.board:
+			raise ValueError(f'{self} is already attached to board!')
+
+		self.owner.add_piece(self)
+
+	def detach_from_game(self) -> None:
+		if self not in self.owner.pieces:
+			raise ValueError(f'{self} is already detached from {self.owner}!')
+		if self is self.owner.board:
+			raise ValueError(f'{self} is already detached from board!')
+
+		self.owner.remove_piece(self)
 
 	@property
 	@abstractmethod

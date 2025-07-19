@@ -48,8 +48,8 @@ class Player:
 		if piece not in self.pieces:
 			raise KeyError(
 				f'{self} has no {piece} on {piece.coordinate}! Abort piece removal.'
-		 )
-		
+		 	)
+
 		self.pieces.remove(piece)
 
 		# also remove it from the board
