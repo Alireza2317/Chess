@@ -1,11 +1,12 @@
 from __future__ import annotations
 from chess.engine.core import Color, Coordinate
 from chess.engine.board import Board
-from chess.engine.piece import Piece
+from chess.engine.piece import Piece, PieceType
 from chess.engine.player import Player
 from chess.engine.moves.move import Move
 from chess.engine.moves.history import MoveHistory
 from chess.engine.moves.factory import create_move
+
 
 class Game:
 	def __init__(self) -> None:
@@ -25,7 +26,13 @@ class Game:
 	def switch_turn(self) -> None:
 		self.turn = ~self.turn
 
-	def move(self, from_coord: Coordinate, to_coord: Coordinate) -> bool:
+	def move(
+		self,
+		from_coord: Coordinate,
+		to_coord: Coordinate,
+		*,
+		promotion: PieceType | None = None
+	) -> bool:
 		piece: Piece | None = self.board[from_coord].piece
 
 		# unable to move
@@ -35,7 +42,7 @@ class Game:
 		if to_coord not in piece.legal_moves:
 			return False
 
-		move: Move = create_move(piece, to_coord)
+		move: Move = create_move(piece, to_coord, promotion=promotion)
 		self.current_player.executer.execute(move)
 		self.history.record(move)
 
@@ -63,10 +70,16 @@ class Game:
 
 		return True
 
-	def play_turn(self, from_coord: Coordinate, to_coord: Coordinate) -> bool:
+	def play_turn(
+		self,
+		from_coord: Coordinate,
+		to_coord: Coordinate,
+		*,
+		promotion: PieceType | None = None
+	) -> bool:
 		self.current_player.update_legal_moves()
 
-		move_success: bool = self.move(from_coord, to_coord)
+		move_success: bool = self.move(from_coord, to_coord, promotion=promotion)
 
 		if move_success:
 			self.switch_turn()
