@@ -52,7 +52,6 @@ class MoveExecuter:
 			self.board.move_piece(move.end, move.start)
 
 		if move.captured:
-			self.board.place_piece(move.captured, move.end)
 			self.player.opponent.add_piece(move.captured)
 
 	def _move_piece(self, move: Move) -> None:
