@@ -8,6 +8,7 @@ from chess.engine.pieces.rook import Rook
 from chess.engine.pieces.bishop import Bishop
 from chess.engine.pieces.knight import Knight
 from chess.engine.piece import Piece, PieceType
+from chess.engine.castle import CastleSide, CastleInfo
 
 if TYPE_CHECKING:
 	from chess.engine.player import Player
@@ -72,29 +73,20 @@ class MoveExecuter:
 			)
 
 		king: Piece = move.piece
-		king_end: Coordinate = move.end
 
-		rank: str = king.coordinate.rank
-		rook_start_file: str
-		rook_end_file: str
+		info: CastleInfo = king.owner.castle_info
+
 		if move.is_castle_kingside:
-			rook_start_file = 'h'
-			rook_end_file = 'f'
+			info.update_info(CastleSide.KINGSIDE)
 		elif move.is_castle_queenside:
-			rook_start_file = 'a'
-			rook_end_file = 'd'
-		else:
-			raise ValueError('Invalid castle move!')
+			info.update_info(CastleSide.QUEENSIDE)
 
-		rook_start: Coordinate = Coordinate(rook_start_file, rank)
-		rook_end: Coordinate = Coordinate(rook_end_file, rank)
-
-		rook: Piece | None = self.board[rook_start].piece
+		rook: Piece | None = self.board[info.rook_start].piece
 		if not rook:
 			raise ValueError('Rook not found!')
 
-		self.board.move_piece(king.coordinate, king_end)
-		self.board.move_piece(rook_start, rook_end)
+		self.board.move_piece(king.coordinate, info.king_end)
+		self.board.move_piece(info.rook_start, info.rook_end)
 
 		king.has_moved = True
 		rook.has_moved = True
@@ -143,27 +135,15 @@ class MoveExecuter:
 		king: Piece = move.piece
 		king_end: Coordinate = move.start
 
-		rank: str = king.coordinate.rank
-		rook_start_file: str
-		rook_end_file: str
+		info: CastleInfo = king.owner.castle_info
+
 		if move.is_castle_kingside:
-			rook_start_file = 'f'
-			rook_end_file = 'h'
+			info.update_info(CastleSide.KINGSIDE)
 		elif move.is_castle_queenside:
-			rook_start_file = 'd'
-			rook_end_file = 'a'
-		else:
-			raise ValueError('Invalid undo castle move!')
-
-		rook_start: Coordinate = Coordinate(rook_start_file, rank)
-		rook_end: Coordinate = Coordinate(rook_end_file, rank)
-
-		rook: Piece | None = self.board[rook_start].piece
-		if not rook:
-			raise ValueError('Rook not found!')
+			info.update_info(CastleSide.QUEENSIDE)
 
 		self.board.move_piece(king.coordinate, king_end)
-		self.board.move_piece(rook_start, rook_end)
+		self.board.move_piece(info.rook_end, info.rook_start)
 
 	def _undo_en_passant(self, move: Move) -> None:
 		captured_pawn_coord: Coordinate = Coordinate(
