@@ -28,7 +28,7 @@ class MoveExecuter:
 
 	def _move_piece(self, move: Move) -> None:
 		if move.captured:
-			self.player.opponent.remove_piece(move.captured)
+			move.captured.detach_from_game()
 		self.board.move_piece(move.start, move.end)
 
 	def execute(self, move: Move) -> None:
@@ -57,11 +57,11 @@ class MoveExecuter:
 			self.board.move_piece(move.end, move.start)
 
 		if move.captured:
-			self.player.opponent.add_piece(move.captured)
+			move.captured.attach_to_game()
 
 	def redo(self, move: Move) -> None:
-		pass
-	
+		self.execute(move)
+
 	def _execute_castle(self, move: Move) -> None:
 		king: Piece = move.piece
 		king_end: Coordinate = move.end
@@ -101,7 +101,7 @@ class MoveExecuter:
 
 	def _execute_promotion(self, move: Move) -> None:
 		if move.promotion is None:
-			raise ValueError('Promotion must be provided as a PieceType!')
+			raise ValueError('Promotion piece must be provided as a PieceType!')
 
 		pawn: Piece = move.piece
 		self.player.remove_piece(pawn)
