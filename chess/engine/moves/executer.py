@@ -63,6 +63,12 @@ class MoveExecuter:
 		self.execute(move)
 
 	def _execute_castle(self, move: Move) -> None:
+		if not move.is_castling:
+			raise ValueError(
+				'The provided move was not a castling move; ' +
+				'yet attempted executing a castle move!'
+			)
+
 		king: Piece = move.piece
 		king_end: Coordinate = move.end
 
@@ -89,6 +95,12 @@ class MoveExecuter:
 		self.board.move_piece(rook_start, rook_end)
 
 	def _execute_en_passant(self, move: Move) -> None:
+		if not move.is_en_passant:
+			raise ValueError(
+				'The provided move was not an en passant move; ' +
+				'yet attempted executing an en passant move!'
+			)
+
 		captured_pawn_coord: Coordinate = Coordinate(
 			move.end.file, move.start.rank
 		)
@@ -155,7 +167,7 @@ class MoveExecuter:
 
 		captured_pawn: Piece | None = self.board[captured_pawn_coord].piece
 		if not captured_pawn or not move.is_en_passant:
-			raise ValueError('Invalid undo en passant move!')
+			raise ValueError('Invalid en passant move! Cannot undo it!')
 
 		self.player.opponent.add_piece(captured_pawn)
 
