@@ -45,6 +45,9 @@ class Coordinate:
 		return hash(f'{self.file}{self.rank}')
 
 	def __eq__(self, other: object) -> bool:
+		if other is None:
+			return False
+		
 		if not isinstance(other, Coordinate):
 			raise TypeError(
 				f'Cannot compare {self.__class__.__name__} with {type(other)}.'
