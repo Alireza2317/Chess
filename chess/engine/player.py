@@ -17,6 +17,7 @@ class Player:
 		self.pieces: set[Piece] = set()
 		self.executer: MoveExecuter = MoveExecuter(self)
 		self.king: King | None = None
+		self._castle_info: CastleInfo = CastleInfo(self.color)
 
 	def set_opponent(self, player: Player) -> None:
 		if not isinstance(player, Player):
@@ -93,13 +94,12 @@ class Player:
 		if rook.owner != self or rook.has_moved:
 			return False
 
-		info: CastleInfo = CastleInfo(self.color, side)
+		self._castle_info.update_info(side)
 
-
-		if self.king.coordinate.rank != info.rank:
+		if self.king.coordinate.rank != self._castle_info.rank:
 			return False
 
-		if rook.coordinate != info.rook_start:
+		if rook.coordinate != self._castle_info.rook_start:
 			return False
 
 		# check if all squares between king and rook are empty
@@ -108,7 +108,7 @@ class Player:
 			return False
 
 		# check opponent attacks on the squares that the king needs to pass
-		for coord in info.king_path:
+		for coord in self._castle_info.king_path:
 			for op_piece in self.opponent.pieces:
 				if coord in op_piece.attacking_coordinates():
 					return False
@@ -119,17 +119,12 @@ class Player:
 		if not self.king or self.king.has_moved or self.is_in_check():
 			return
 
-		k_info: CastleInfo = CastleInfo(self.color, CastleSide.KINGSIDE)
-		q_info: CastleInfo = CastleInfo(self.color, CastleSide.QUEENSIDE)
+		for side in (CastleSide.KINGSIDE, CastleSide.QUEENSIDE):
+			self._castle_info.update_info(side)
+			rook: Piece | None = self.board[self._castle_info.rook_start].piece
 
-		k_rook: Piece | None = self.board[k_info.rook_start].piece
-		q_rook: Piece | None = self.board[q_info.rook_start].piece
-
-		if self._can_castle(k_rook, CastleSide.KINGSIDE):
-			self.king.legal_moves.add(k_info.king_end)
-
-		if self._can_castle(q_rook, CastleSide.QUEENSIDE):
-			self.king.legal_moves.add(q_info.king_end)
+			if self._can_castle(rook, side):
+				self.king.legal_moves.add(self._castle_info.king_end)
 
 	def has_legal_moves(self) -> bool:
 		for piece in self.pieces:
