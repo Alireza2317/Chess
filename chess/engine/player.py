@@ -108,6 +108,8 @@ class Player:
 		rank: str = self.king.coordinate.rank
 		if rank != self.king.start_rank:
 			return False
+		if self.king.coordinate.file != 'e':
+			return False
 
 		if rook.coordinate != Coordinate(file, rank):
 			return False
