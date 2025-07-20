@@ -16,6 +16,9 @@ class Rook(Piece):
 			Direction(file_offset=0, rank_offset=-1) # down
 		}
 
+		if self.coordinate.file not in ('a', 'h'):
+			self.has_moved = True
+
 	@property
 	def type(self) -> PieceType:
 		return PieceType.ROOK

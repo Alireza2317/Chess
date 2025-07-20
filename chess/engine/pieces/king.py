@@ -18,7 +18,8 @@ class King(Piece):
 			if file_offset or rank_offset
 		}
 
-		self.start_rank: str = '1' if self.owner.color == Color.WHITE else '8'
+		if self.coordinate.file != 'e':
+			self.has_moved = True
 
 	@property
 	def type(self) -> PieceType:
