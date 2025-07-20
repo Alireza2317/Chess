@@ -1,7 +1,7 @@
 from __future__ import annotations
 from chess.engine.core import Color, Coordinate
 from chess.engine.board import Board
-from chess.engine.piece import Piece, PieceType
+from chess.engine.piece import Piece
 from chess.engine.pieces.king import King
 from chess.engine.pieces.rook import Rook
 from chess.engine.moves.move import Move
@@ -29,7 +29,7 @@ class Player:
 		if piece.owner is not self:
 			raise ValueError("Piece's owner is another player! Cannot add!")
 
-		if piece.type == PieceType.KING:
+		if isinstance(piece, King):
 			if self.king:
 				raise ValueError('Player cannot have more than 1 king piece!')
 			self.king = piece
