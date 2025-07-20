@@ -102,6 +102,11 @@ def handle_input(
 		print('Invalid input!')
 		return LoopDecision.CONTINUE
 
+	piece: Piece | None = game.board[start].piece
+	if not piece:
+		print(f'No piece found on {start}!')
+		return LoopDecision.CONTINUE
+
 	return start, end, promotion
 
 def map_promotion(promotion_type: str) -> PieceType:
@@ -164,6 +169,8 @@ def play_cli(game: Game) -> None:
 		if decision == LoopDecision.CONTINUE:
 			continue
 
+		#print('move was a success')
+
 		success: bool = game.play_turn(start, end, promotion=promotion)
 		if not success:
 			print('Illegal move!')
@@ -192,7 +199,3 @@ def main() -> None:
 
 if __name__ == '__main__':
 	main()
-
-
-# BUG: somehow when i enter an invalid move, like picking a square without
-# a piece, the 'illegal move' message does not appear
