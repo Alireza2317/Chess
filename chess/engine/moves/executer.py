@@ -8,7 +8,7 @@ from chess.engine.pieces.rook import Rook
 from chess.engine.pieces.bishop import Bishop
 from chess.engine.pieces.knight import Knight
 from chess.engine.piece import Piece, PieceType
-from chess.engine.castle import CastleSide, CastleInfo
+from chess.engine.castle import CastleInfo
 
 if TYPE_CHECKING:
 	from chess.engine.player import Player

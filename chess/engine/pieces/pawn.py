@@ -6,6 +6,9 @@ class Pawn(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
 		super().__init__(player, coordinate)
 		self._start_rank: str = '2' if self.owner.color == Color.WHITE else '7'
+		self.en_passant_target_rank: str = (
+			'6' if self.owner.color == Color.WHITE else '3'
+		)
 		self._direction: int = self.owner.color.value
 
 		self.attack_directions: set[Direction] = {
