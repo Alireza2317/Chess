@@ -16,6 +16,8 @@ class Rook(Piece):
 			Direction(file_offset=0, rank_offset=-1) # down
 		}
 
+		self.has_moved: bool = False
+
 	@property
 	def type(self) -> PieceType:
 		return PieceType.ROOK

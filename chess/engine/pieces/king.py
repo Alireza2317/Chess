@@ -1,8 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from chess.engine.core import Coordinate, Direction
 from chess.engine.piece import Piece, PieceType
 
-class King(Piece):
+if TYPE_CHECKING:
 	from chess.engine.player import Player
+
+
+class King(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
 		super().__init__(player, coordinate)
 
@@ -12,6 +17,8 @@ class King(Piece):
 			for rank_offset in (-1, 0, 1)
 			if file_offset or rank_offset
 		}
+
+		self.has_moved: bool = False
 
 	@property
 	def type(self) -> PieceType:
