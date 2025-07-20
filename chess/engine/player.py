@@ -1,14 +1,12 @@
 from __future__ import annotations
-from chess.engine.core import Color, Coordinate
+from chess.engine.core import Color
 from chess.engine.board import Board
 from chess.engine.piece import Piece
 from chess.engine.pieces.king import King
 from chess.engine.pieces.rook import Rook
-from chess.engine.moves.move import Move
 from chess.engine.castle import CastleSide, CastleInfo
-from chess.engine.moves.simulator import MoveSimulator
 from chess.engine.moves.executer import MoveExecuter
-from chess.engine.moves.factory import create_move
+
 
 class Player:
 	def __init__(self, board: Board, color: Color) -> None:
@@ -58,28 +56,6 @@ class Player:
 
 		# also remove it from the board
 		self.board.remove_piece(piece.coordinate)
-
-	def update_legal_moves(self) -> None:
-		"""
-		Update each piece's valid_moves list.
-		A valid move:
-		- Is within the board
-		- Does not leave the player in check
-		"""
-		for piece in self.pieces:
-			legal_moves: set[Coordinate] = set()
-
-			for target in piece.all_moves():
-				move: Move = create_move(piece, target, simulation=True)
-
-				# simulate move
-				with MoveSimulator(self, move):
-					if not self.is_in_check():
-						legal_moves.add(target)
-
-			piece.legal_moves = legal_moves
-
-		self._add_castling_moves()
 
 	def _can_castle(self, rook: Piece | None, side: CastleSide) -> bool:
 		"""Checks wether the player has a legal castle move or not."""

@@ -5,7 +5,9 @@ from chess.engine.piece import Piece, PieceType
 from chess.engine.player import Player
 from chess.engine.moves.move import Move
 from chess.engine.moves.history import MoveHistory
+from chess.engine.moves.simulator import MoveSimulator
 from chess.engine.moves.factory import create_move
+from chess.engine.en_passant import add_en_passant_if_possible
 
 
 class Game:
@@ -22,6 +24,34 @@ class Game:
 	@property
 	def current_player(self) -> Player:
 		return self.white if self.turn == Color.WHITE else self.black
+
+	def update_legal_moves(self) -> None:
+		"""
+		Update each piece's legal_moves set for the current player.
+		A legal move:
+		- Is within the board
+		- Does not leave the player in check
+		"""
+		player: Player = self.current_player
+
+		for piece in player.pieces:
+			legal_moves: set[Coordinate] = set()
+
+			for target in piece.all_moves():
+				move: Move = create_move(piece, target, simulation=True)
+
+				# simulate move
+				with MoveSimulator(player, move):
+					if not player.is_in_check():
+						legal_moves.add(target)
+
+			piece.legal_moves = legal_moves
+
+			# check en passant move
+			if piece.type == PieceType.PAWN and self.history.last():
+				add_en_passant_if_possible(piece, self.history.last())
+
+		player._add_castling_moves()
 
 	def switch_turn(self) -> None:
 		self.turn = ~self.turn
@@ -77,7 +107,7 @@ class Game:
 		*,
 		promotion: PieceType | None = None
 	) -> bool:
-		self.current_player.update_legal_moves()
+		self.update_legal_moves()
 
 		move_success: bool = self.move(from_coord, to_coord, promotion=promotion)
 
