@@ -60,14 +60,13 @@ class Game:
 		return True
 
 	def redo(self) -> bool:
-		#BUG for redoing captures
 		move: Move | None = self.history.redo()
 		if not move:
 			return False
 
 		self.switch_turn()
 
-		self.current_player.executer.execute(move)
+		self.current_player.executer.redo(move)
 
 		return True
 
