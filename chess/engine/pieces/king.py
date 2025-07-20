@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from chess.engine.core import Coordinate, Color, Direction
+from chess.engine.core import Coordinate, Direction
 from chess.engine.piece import Piece, PieceType
 
 if TYPE_CHECKING:

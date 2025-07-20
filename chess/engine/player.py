@@ -5,6 +5,7 @@ from chess.engine.piece import Piece
 from chess.engine.pieces.king import King
 from chess.engine.pieces.rook import Rook
 from chess.engine.moves.move import Move
+from chess.engine.castle import CastleSide, CastleInfo
 from chess.engine.moves.simulator import MoveSimulator
 from chess.engine.moves.executer import MoveExecuter
 from chess.engine.moves.factory import create_move
@@ -79,12 +80,8 @@ class Player:
 
 		self._add_castling_moves()
 
-	def _can_castle(self, rook: Piece | None, *, kingside: bool) -> bool:
-		"""
-		Checks wether the player has a legal castle move or not.
-		kingside: if True means kingside castling, and False 
-		means queenside castling.
-		"""
+	def _can_castle(self, rook: Piece | None, side: CastleSide) -> bool:
+		"""Checks wether the player has a legal castle move or not."""
 		if not self.king or self.king.has_moved or self.is_in_check():
 			return False
 
@@ -96,22 +93,13 @@ class Player:
 		if rook.owner != self or rook.has_moved:
 			return False
 
-		file: str
-		check_safe_files: tuple[str, str]
-		if kingside:
-			file = 'h'
-			check_safe_files = ('f', 'g')
-		else:
-			file = 'a'
-			check_safe_files = ('d', 'c')
+		info: CastleInfo = CastleInfo(self.color, side)
 
-		rank: str = self.king.coordinate.rank
-		if rank != self.king.start_rank:
-			return False
-		if self.king.coordinate.file != 'e':
+
+		if self.king.coordinate.rank != info.rank:
 			return False
 
-		if rook.coordinate != Coordinate(file, rank):
+		if rook.coordinate != info.rook_start:
 			return False
 
 		# check if all squares between king and rook are empty
@@ -120,8 +108,7 @@ class Player:
 			return False
 
 		# check opponent attacks on the squares that the king needs to pass
-		for file in check_safe_files:
-			coord = Coordinate(file, rank)
+		for coord in info.king_path:
 			for op_piece in self.opponent.pieces:
 				if coord in op_piece.attacking_coordinates():
 					return False
@@ -132,19 +119,17 @@ class Player:
 		if not self.king or self.king.has_moved or self.is_in_check():
 			return
 
-		rank: str = self.king.coordinate.rank
+		k_info: CastleInfo = CastleInfo(self.color, CastleSide.KINGSIDE)
+		q_info: CastleInfo = CastleInfo(self.color, CastleSide.QUEENSIDE)
 
-		k_rook_coord: Coordinate = Coordinate('h', rank)
-		q_rook_coord: Coordinate = Coordinate('a', rank)
+		k_rook: Piece | None = self.board[k_info.rook_start].piece
+		q_rook: Piece | None = self.board[q_info.rook_start].piece
 
-		k_rook: Piece | None = self.board[k_rook_coord].piece
-		q_rook: Piece | None = self.board[q_rook_coord].piece
+		if self._can_castle(k_rook, CastleSide.KINGSIDE):
+			self.king.legal_moves.add(k_info.king_end)
 
-		if self._can_castle(k_rook, kingside=True):
-			self.king.legal_moves.add(Coordinate('g', rank))
-
-		if self._can_castle(q_rook, kingside=False):
-			self.king.legal_moves.add(Coordinate('c', rank))
+		if self._can_castle(q_rook, CastleSide.QUEENSIDE):
+			self.king.legal_moves.add(q_info.king_end)
 
 	def has_legal_moves(self) -> bool:
 		for piece in self.pieces:
