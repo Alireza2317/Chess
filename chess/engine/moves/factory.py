@@ -1,6 +1,8 @@
 from chess.engine.piece import Piece, PieceType
-from chess.engine.core import Color, Coordinate, Direction
+from chess.engine.core import Color, Coordinate
 from chess.engine.moves.move import Move
+from chess.engine.castle import CastleSide, CastleInfo
+
 
 def create_move(
     piece: Piece,
@@ -27,13 +29,13 @@ def create_move(
 	# TODO: just use the to_coord to derive it
 
 	# check castle
-	is_castle: bool = (
-		piece.type == PieceType.KING and
-		to_coord in (
-			piece.coordinate.shift(Direction(-2, 0)),
-			piece.coordinate.shift(Direction(2, 0)),
-		)
-	)
+	castle_side: CastleSide | None = None
+	if piece.type == PieceType.KING:
+		info: CastleInfo = CastleInfo(piece.owner.color)
+		for side in (CastleSide.KINGSIDE, CastleSide.QUEENSIDE):
+			info.update_info(side)
+			if to_coord == info.king_end:
+				castle_side = side
 
 	# check promotion
 	if not simulation: # don't care about promotion in simulation mode
@@ -53,7 +55,7 @@ def create_move(
 		start=from_coord,
 		end=to_coord,
 		captured=captured_piece,
-		is_castling=is_castle,
+		castle_side=castle_side,
 		is_en_passant=en_passant,
 		promotion=promotion,
 	)

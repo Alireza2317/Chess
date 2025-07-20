@@ -66,7 +66,7 @@ class MoveExecuter:
 		self.execute(move)
 
 	def _execute_castle(self, move: Move) -> None:
-		if not move.is_castling:
+		if not move.castle_side:
 			raise ValueError(
 				'The provided move was not a castling move; ' +
 				'yet attempted executing a castle move!'
@@ -75,11 +75,7 @@ class MoveExecuter:
 		king: Piece = move.piece
 
 		info: CastleInfo = king.owner.castle_info
-
-		if move.is_castle_kingside:
-			info.update_info(CastleSide.KINGSIDE)
-		elif move.is_castle_queenside:
-			info.update_info(CastleSide.QUEENSIDE)
+		info.update_info(move.castle_side)
 
 		rook: Piece | None = self.board[info.rook_start].piece
 		if not rook:
@@ -127,7 +123,7 @@ class MoveExecuter:
 				Knight(self.player, move.end)
 
 	def _undo_castle(self, move: Move) -> None:
-		if not move.is_castling:
+		if not move.castle_side:
 			raise ValueError(
 				'Move was not a castling move! Cannot undo!'
 			)
@@ -136,11 +132,7 @@ class MoveExecuter:
 		king_end: Coordinate = move.start
 
 		info: CastleInfo = king.owner.castle_info
-
-		if move.is_castle_kingside:
-			info.update_info(CastleSide.KINGSIDE)
-		elif move.is_castle_queenside:
-			info.update_info(CastleSide.QUEENSIDE)
+		info.update_info(move.castle_side)
 
 		self.board.move_piece(king.coordinate, king_end)
 		self.board.move_piece(info.rook_end, info.rook_start)
