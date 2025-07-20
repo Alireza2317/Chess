@@ -147,8 +147,7 @@ def check_promotion(
 	return LoopDecision.PROCEED
 
 def play_cli(game: Game) -> None:
-	game.white.update_legal_moves()
-	game.black.update_legal_moves()
+	game.update_legal_moves()
 
 	while True:
 		#clear_console()
@@ -175,14 +174,12 @@ def play_cli(game: Game) -> None:
 		if decision == LoopDecision.CONTINUE:
 			continue
 
-		#print('move was a success')
-
 		success: bool = game.play_turn(start, end, promotion=promotion)
 		if not success:
 			print('Illegal move!')
 			continue
 
-		game.current_player.update_legal_moves()
+		game.update_legal_moves()
 
 		if game.white.is_checkmated():
 			print(game.board)
