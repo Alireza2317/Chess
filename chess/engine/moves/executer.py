@@ -27,6 +27,8 @@ class MoveExecuter:
 		self.board: Board = player.board
 
 	def _move_piece(self, move: Move) -> None:
+		move.piece.has_moved = True
+
 		if move.captured:
 			move.captured.detach_from_game()
 		self.board.move_piece(move.start, move.end)
@@ -93,6 +95,9 @@ class MoveExecuter:
 
 		self.board.move_piece(king.coordinate, king_end)
 		self.board.move_piece(rook_start, rook_end)
+
+		king.has_moved = True
+		rook.has_moved = True
 
 	def _execute_en_passant(self, move: Move) -> None:
 		if not move.is_en_passant:
