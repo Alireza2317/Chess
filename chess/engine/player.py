@@ -2,6 +2,8 @@ from __future__ import annotations
 from chess.engine.core import Color, Coordinate
 from chess.engine.board import Board
 from chess.engine.piece import Piece, PieceType
+from chess.engine.pieces.king import King
+from chess.engine.pieces.rook import Rook
 from chess.engine.moves.move import Move
 from chess.engine.moves.simulator import MoveSimulator
 from chess.engine.moves.executer import MoveExecuter
@@ -13,7 +15,7 @@ class Player:
 		self.board = board
 		self.pieces: set[Piece] = set()
 		self.executer: MoveExecuter = MoveExecuter(self)
-		self.king: Piece | None = None
+		self.king: King | None = None
 
 	def set_opponent(self, player: Player) -> None:
 		if not isinstance(player, Player):
@@ -77,8 +79,52 @@ class Player:
 
 		self._add_castling_moves() # TODO
 
+	def _can_castle(self, kingside: bool) -> bool:
+		"""
+		Checks wether the player has a legal castle move or not.
+		kingside: if True means kingside castling, and False 
+		means queenside castling.
+		"""
+		if not self.king or self.is_in_check():
+			return False
+
+		file: str
+		check_safe_files: tuple[str, ...]
+		if kingside:
+			file = 'h'
+			check_safe_files = ('f', 'g')
+		else:
+			file = 'a'
+			check_safe_files = ('d', 'c')
+
+		# check the corresponding rook coordinate
+		# is it really a rook? has it moved? is the rook ours?
+		coord: Coordinate = Coordinate(file, self.king.coordinate.rank)
+		piece: Piece | Rook | None = self.board[coord].piece
+		if not isinstance(piece, Rook) or piece.has_moved:
+			return False
+		if piece.owner != self:
+			return False
+
+		rook = piece
+
+		# check if all squares between king and rook are empty
+		if self.king.coordinate not in rook.attacking_coordinates():
+			# rook cannot see the king
+			return False
+
+		# check opponent attacks on the squares that the king needs to pass
+		for file in check_safe_files:
+			coord = Coordinate(file, self.king.coordinate.rank)
+			for op_piece in self.opponent.pieces:
+				if coord in op_piece.attacking_coordinates():
+					return False
+
+		return True
+
 	def _add_castling_moves(self) -> None:
-		pass
+		if not self.king or self.king.has_moved:
+			return
 
 	def has_legal_moves(self) -> bool:
 		for piece in self.pieces:
