@@ -43,6 +43,8 @@ class Piece(ABC):
 		# piece's attack directions, solely for queen, rook and bishop
 		self.attack_directions: set[Direction] = set()
 
+		self.has_moved: bool = False
+
 	def attach_to_game(self) -> None:
 		"""
 		This method will attach the piece to its owner(Player) and 

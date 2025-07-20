@@ -18,7 +18,6 @@ class King(Piece):
 			if file_offset or rank_offset
 		}
 
-		self.has_moved: bool = False
 		self.start_rank: str = '1' if self.owner.color == Color.WHITE else '8'
 
 	@property
