@@ -59,7 +59,7 @@ class Board:
 	def __iter__(self) -> Iterator[tuple[Coordinate, Square]]:
 		return iter(self._grid.items())
 
-	def __repr__(self) -> str:
+	def print(self, checked: Coordinate | None = None) -> str:
 		def colored_str(text: str, color: str) -> str:
 			"""
 			supported colors:
@@ -99,14 +99,23 @@ class Board:
 		square_delimiter: str = ' '*2
 		for rank in reversed(Coordinate.RANKS):
 			for file in Coordinate.FILES:
-				sq: Square = self._grid[Coordinate(file, rank)]
+				coord: Coordinate = Coordinate(file, rank)
+				sq: Square = self._grid[coord]
 				piece = sq.piece
 				square_str: str = '□' if sq.color == Color.WHITE else '■'
-				board_str += piece_symbols[f'{piece}'] if piece else square_str
+				if checked and coord == checked:
+					board_str += colored_str(piece_symbols[f'{piece}'], 'r') if piece else square_str
+				else:
+					board_str += piece_symbols[f'{piece}'] if piece else square_str
 				board_str += square_delimiter
 
 			board_str += colored_str(rank, 'g') + '\n'
 
 		board_str += colored_str(square_delimiter.join(Coordinate.FILES), 'g')
 
+		print(board_str)
 		return board_str
+
+
+	def __repr__(self) -> str:
+		return self.print()

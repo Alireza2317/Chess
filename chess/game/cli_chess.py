@@ -152,7 +152,13 @@ def play_cli(game: Game) -> None:
 
 	while True:
 		#clear_console()
-		print(game.board)
+		#print(game.board)
+		if game.current_player.is_in_check() and  game.current_player.king:
+			king_coord: Coordinate = game.current_player.king.coordinate
+			game.board.print(checked=king_coord)
+		else:
+			game.board.print()
+
 
 		print(f'{game.turn.name.title()} to move!')
 
