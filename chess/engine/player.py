@@ -75,7 +75,10 @@ class Player:
 
 			piece.legal_moves = legal_moves
 
-		#self.add_castling_moves() # TODO
+		self._add_castling_moves() # TODO
+
+	def _add_castling_moves(self) -> None:
+		pass
 
 	def has_legal_moves(self) -> bool:
 		for piece in self.pieces:
@@ -92,7 +95,6 @@ class Player:
 			if self.king.coordinate in opponent_piece.attacking_coordinates():
 				return True
 		return False
-
 
 	def is_checkmated(self) -> bool:
 		if not self.king:

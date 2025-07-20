@@ -35,12 +35,12 @@ def classic_setup() -> Game:
 	Rook(g.black, Coordinate.from_str("h8"))
 
 	Knight(g.white, Coordinate.from_str("b1"))
-	Knight(g.white, Coordinate.from_str("g1"))
+	#Knight(g.white, Coordinate.from_str("g1"))
 	Knight(g.black, Coordinate.from_str("b8"))
 	Knight(g.black, Coordinate.from_str("g8"))
 
 	Bishop(g.white, Coordinate.from_str("c1"))
-	Bishop(g.white, Coordinate.from_str("f1"))
+	#Bishop(g.white, Coordinate.from_str("f1"))
 	Bishop(g.black, Coordinate.from_str("c8"))
 	Bishop(g.black, Coordinate.from_str("f8"))
 
@@ -152,7 +152,7 @@ def play_cli(game: Game) -> None:
 
 	while True:
 		#clear_console()
-		#print(game.board)
+
 		if game.current_player.is_in_check() and  game.current_player.king:
 			king_coord: Coordinate = game.current_player.king.coordinate
 			game.board.print(checked=king_coord)
