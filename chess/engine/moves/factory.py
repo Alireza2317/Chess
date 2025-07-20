@@ -9,6 +9,11 @@ def create_move(
 	promotion: PieceType | None = None,
 	simulation: bool = False
 ) -> Move:
+	if not simulation and (to_coord not in piece.legal_moves):
+		raise ValueError(
+			'Move cannot be created since it is illegal!'
+		)
+
 	from_coord: Coordinate = piece.coordinate
 	captured_piece: Piece | None = piece.owner.board[to_coord].piece
 
