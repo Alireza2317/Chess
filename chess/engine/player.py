@@ -77,9 +77,9 @@ class Player:
 
 			piece.legal_moves = legal_moves
 
-		self._add_castling_moves() # TODO
+		self._add_castling_moves()
 
-	def _can_castle(self, rook: Rook, kingside: bool) -> bool:
+	def _can_castle(self, rook: Piece | None, *, kingside: bool) -> bool:
 		"""
 		Checks wether the player has a legal castle move or not.
 		kingside: if True means kingside castling, and False 
@@ -90,7 +90,7 @@ class Player:
 
 		# is it really a rook?
 		if not isinstance(rook, Rook):
-			raise TypeError('The given rook value is not a Rook object!')
+			return False
 
 		# is the rook ours? has it moved?
 		if rook.owner != self or rook.has_moved:
@@ -127,8 +127,22 @@ class Player:
 		return True
 
 	def _add_castling_moves(self) -> None:
-		if not self.king or self.king.has_moved:
+		if not self.king or self.king.has_moved or self.is_in_check():
 			return
+
+		rank: str = self.king.coordinate.rank
+
+		k_rook_coord: Coordinate = Coordinate('h', rank)
+		q_rook_coord: Coordinate = Coordinate('a', rank)
+
+		k_rook: Piece | None = self.board[k_rook_coord].piece
+		q_rook: Piece | None = self.board[q_rook_coord].piece
+
+		if self._can_castle(k_rook, kingside=True):
+			self.king.legal_moves.add(Coordinate('g', rank))
+
+		if self._can_castle(q_rook, kingside=False):
+			self.king.legal_moves.add(Coordinate('c', rank))
 
 	def has_legal_moves(self) -> bool:
 		for piece in self.pieces:

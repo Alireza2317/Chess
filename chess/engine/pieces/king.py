@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from chess.engine.core import Coordinate, Direction
+from chess.engine.core import Coordinate, Color, Direction
 from chess.engine.piece import Piece, PieceType
 
 if TYPE_CHECKING:
@@ -19,6 +19,7 @@ class King(Piece):
 		}
 
 		self.has_moved: bool = False
+		self.start_rank: str = '1' if self.owner.color == Color.WHITE else '8'
 
 	@property
 	def type(self) -> PieceType:
