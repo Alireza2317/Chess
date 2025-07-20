@@ -79,17 +79,25 @@ class Player:
 
 		self._add_castling_moves() # TODO
 
-	def _can_castle(self, kingside: bool) -> bool:
+	def _can_castle(self, rook: Rook, kingside: bool) -> bool:
 		"""
 		Checks wether the player has a legal castle move or not.
 		kingside: if True means kingside castling, and False 
 		means queenside castling.
 		"""
-		if not self.king or self.is_in_check():
+		if not self.king or self.king.has_moved or self.is_in_check():
+			return False
+
+		# is it really a rook?
+		if not isinstance(rook, Rook):
+			raise TypeError('The given rook value is not a Rook object!')
+
+		# is the rook ours? has it moved?
+		if rook.owner != self or rook.has_moved:
 			return False
 
 		file: str
-		check_safe_files: tuple[str, ...]
+		check_safe_files: tuple[str, str]
 		if kingside:
 			file = 'h'
 			check_safe_files = ('f', 'g')
@@ -97,16 +105,12 @@ class Player:
 			file = 'a'
 			check_safe_files = ('d', 'c')
 
-		# check the corresponding rook coordinate
-		# is it really a rook? has it moved? is the rook ours?
-		coord: Coordinate = Coordinate(file, self.king.coordinate.rank)
-		piece: Piece | Rook | None = self.board[coord].piece
-		if not isinstance(piece, Rook) or piece.has_moved:
-			return False
-		if piece.owner != self:
+		rank: str = self.king.coordinate.rank
+		if rank != self.king.start_rank:
 			return False
 
-		rook = piece
+		if rook.coordinate != Coordinate(file, rank):
+			return False
 
 		# check if all squares between king and rook are empty
 		if self.king.coordinate not in rook.attacking_coordinates():
@@ -115,7 +119,7 @@ class Player:
 
 		# check opponent attacks on the squares that the king needs to pass
 		for file in check_safe_files:
-			coord = Coordinate(file, self.king.coordinate.rank)
+			coord = Coordinate(file, rank)
 			for op_piece in self.opponent.pieces:
 				if coord in op_piece.attacking_coordinates():
 					return False
