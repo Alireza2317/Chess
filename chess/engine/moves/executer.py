@@ -7,6 +7,7 @@ from chess.engine.pieces.queen import Queen
 from chess.engine.pieces.rook import Rook
 from chess.engine.pieces.bishop import Bishop
 from chess.engine.pieces.knight import Knight
+from chess.engine.pieces.pawn import Pawn
 from chess.engine.piece import Piece, PieceType
 from chess.engine.castle import CastleInfo
 
@@ -141,11 +142,10 @@ class MoveExecuter:
 			move.end.file, move.start.rank
 		)
 
-		captured_pawn: Piece | None = self.board[captured_pawn_coord].piece
-		if not captured_pawn or not move.is_en_passant:
+		if not move.is_en_passant:
 			raise ValueError('Invalid en passant move! Cannot undo it!')
 
-		self.player.opponent.add_piece(captured_pawn)
+		Pawn(move.piece.owner.opponent, captured_pawn_coord)
 
 		self.board.move_piece(move.end, move.start)
 
