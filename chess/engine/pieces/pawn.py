@@ -1,8 +1,12 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from chess.engine.core import Color, Coordinate, Direction
 from chess.engine.piece import Piece, PieceType
 
-class Pawn(Piece):
+if TYPE_CHECKING:
 	from chess.engine.player import Player
+
+class Pawn(Piece):
 	def __init__(self, player: Player, coordinate: Coordinate) -> None:
 		super().__init__(player, coordinate)
 		self._start_rank: str = '2' if self.owner.color == Color.WHITE else '7'
