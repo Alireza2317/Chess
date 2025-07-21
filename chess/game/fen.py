@@ -22,6 +22,8 @@ def fen_loader(fen: str) -> Game:
 
 	setup_pieces(game, pieces)
 
+	handle_turn(game, turn)
+
 	return game
 
 def setup_pieces(game: Game, fen_pieces_part: str) -> None:
@@ -63,3 +65,9 @@ def setup_pieces(game: Game, fen_pieces_part: str) -> None:
 
 			file_idx += 1
 
+def handle_turn(game: Game, fen_turn: str) -> None:
+	if len(fen_turn) != 1 or fen_turn not in 'wb':
+		raise ValueError('Invalid FEN string!')
+
+	if fen_turn == 'b':
+		game.switch_turn()
