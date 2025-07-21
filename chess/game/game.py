@@ -1,4 +1,5 @@
 from __future__ import annotations
+import enum
 from chess.engine.core import Color, Coordinate
 from chess.engine.board import Board
 from chess.engine.piece import Piece, PieceType
@@ -9,6 +10,12 @@ from chess.engine.moves.simulator import MoveSimulator
 from chess.engine.moves.factory import create_move
 from chess.engine.en_passant import add_en_passant_if_possible
 
+class GameStatus(enum.Enum):
+	WHITE_WON = enum.auto()
+	BLACK_WON = enum.auto()
+	DRAW = enum.auto()
+	STALEMATE = enum.auto()
+	ONGOING = enum.auto()
 
 class Game:
 	def __init__(self) -> None:
