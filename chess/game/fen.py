@@ -107,16 +107,13 @@ def handle_castle_rights(game: Game, fen_castle: str) -> None:
 			rook.has_moved = True # disables castling
 
 def handle_en_passant(game: Game, fen_en_passant: str) -> None:
-	# enemy pawn on g5
-	# i am on f5
-	# can capture ep on g6
-	# i am given g6
+	if fen_en_passant == '-':
+		return
 
 	if len(fen_en_passant) != 2:
 		raise ValueError('Invalid FEN string!')
 
 	target_coord: Coordinate = Coordinate.from_str(fen_en_passant)
-	print(target_coord)
 
 	if target_coord.rank == '6':
 		rank = '5'
@@ -136,7 +133,5 @@ def handle_en_passant(game: Game, fen_en_passant: str) -> None:
 		start=Coordinate(cap_pawn_coord.file, '7' if rank=='5' else '2'),
 		end=cap_pawn_coord
 	)
-	print(move)
-
 	game.history.record(move)
 
