@@ -2,7 +2,7 @@ import enum
 from chess.engine.core import Coordinate, Color
 from chess.engine.piece import Piece, PieceType
 from chess.game.game import Game
-from chess.game.fen import fen_loader
+from chess.game.fen import FENLoader
 
 MoveDetail = tuple[Coordinate, Coordinate, PieceType | None]
 
@@ -16,10 +16,11 @@ def clear_console() -> None:
 	print("\033[H\033[J", end="")
 
 def classic_setup() -> Game:
-	return fen_loader('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - - -')
+	return FENLoader('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - - -').game
 
 def custom_setup() -> Game:
-	return fen_loader('rnbqkbnr/pppppp1p/8/5Pp1/8/8/PPPPP1PP/RNBQKBNR w KQkq g6 - -')
+	return FENLoader('rnbqkbnr/pppppp1p/8/5Pp1/8/8/PPPPP1PP/RNBQKBNR w KQkq g6 - -').game
+	#return fen_loader('r3k2r/pppppp1p/8/5Pp1/8/8/PPPPP1PP/R3K2R w KQkq - - -')
 
 def handle_input(
 	game: Game
