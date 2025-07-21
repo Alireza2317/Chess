@@ -136,3 +136,90 @@ class FENLoader:
 	@property
 	def game(self) -> Game:
 		return self._game
+
+class FENExporter:
+	def __init__(self, game: Game):
+		self.game: Game = game
+		self.generate_fen()
+
+	def generate_fen(self) -> None:
+		fields: list[str] = [
+			self.export_pieces(),
+			self.export_turn(),
+			self.export_castle(),
+			self.export_en_passant(),
+			self.export_halfmove(),
+			self.export_fullmove(),
+		]
+
+		self.fen: str = ' '.join(fields)
+
+	def export_pieces(self) -> str:
+		ranks: list[str] = []
+
+		for rank in Coordinate.RANKS[::-1]:
+			count_empty: int = 0
+			rank_s: str = ''
+			for file in Coordinate.FILES:
+				coord: Coordinate = Coordinate(file, rank)
+				p: Piece | None = self.game.board[coord].piece
+				if p:
+					if count_empty > 0:
+						rank_s += f'{count_empty}'
+						count_empty = 0
+					rank_s += repr(p)
+				else:
+					count_empty += 1
+
+			c: int = 0
+			for char in rank_s:
+				if char.isdigit():
+					c += int(char)
+				else:
+					c += 1
+			if c != 8:
+				rank_s += str(8-c)
+
+			ranks.append(rank_s)
+
+
+		result: str = '/'.join(ranks)
+		return result
+
+	def export_turn(self) -> str:
+		return 'w' if self.game.turn == Color.WHITE else 'b'
+
+	def export_castle(self) -> str:
+		result: str = ''
+
+		for player in (self.game.white, self.game.black):
+			if not player.king:
+				continue
+			if player.king.move_count != 0:
+				continue
+
+			info: CastleInfo = CastleInfo(player.color)
+			for side in (CastleSide.KINGSIDE, CastleSide.QUEENSIDE):
+				info.update_info(side)
+				p: Piece | None = player.board[info.rook_start].piece
+				if not p:
+					continue
+				if p.move_count != 0:
+					continue
+
+				sub_res: str = 'k' if side == CastleSide.KINGSIDE else 'q'
+				if player.color == Color.WHITE:
+					sub_res = sub_res.upper()
+
+				result += sub_res
+
+		return result
+
+	def export_en_passant(self) -> str:
+		return '-'
+
+	def export_halfmove(self) -> str:
+		return '-'
+
+	def export_fullmove(self) -> str:
+		return '-'
