@@ -13,6 +13,7 @@ from chess.engine.en_passant import add_en_passant_if_possible
 class Game:
 	def __init__(self) -> None:
 		self.history: MoveHistory = MoveHistory()
+		self._last_move: Move | None = None # for en passant
 		self.board: Board = Board()
 		self.white: Player = Player(self.board, Color.WHITE)
 		self.black: Player = Player(self.board, Color.BLACK)
@@ -24,6 +25,11 @@ class Game:
 	@property
 	def current_player(self) -> Player:
 		return self.white if self.turn == Color.WHITE else self.black
+
+	@property
+	def last_move(self) -> Move | None:
+		# for the sake of en passant
+		return self.history.last() or self._last_move
 
 	def update_legal_moves(self) -> None:
 		"""
@@ -48,8 +54,8 @@ class Game:
 			piece.legal_moves = legal_moves
 
 			# check en passant move
-			if piece.type == PieceType.PAWN and self.history.last():
-				add_en_passant_if_possible(piece, self.history.last())
+			if piece.type == PieceType.PAWN and self.last_move:
+				add_en_passant_if_possible(piece, self.last_move)
 
 		player._add_castling_moves()
 

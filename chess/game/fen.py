@@ -133,5 +133,5 @@ def handle_en_passant(game: Game, fen_en_passant: str) -> None:
 		start=Coordinate(cap_pawn_coord.file, '7' if rank=='5' else '2'),
 		end=cap_pawn_coord
 	)
-	game.history.record(move)
+	game._last_move = move
 
