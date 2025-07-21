@@ -16,7 +16,10 @@ def clear_console() -> None:
 	print("\033[H\033[J", end="")
 
 def classic_setup() -> Game:
-	return fen_loader('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR - - - - -')
+	return fen_loader('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - - -')
+
+def custom_setup() -> Game:
+	return fen_loader('rnbqkbnr/pppppp1p/8/5Pp1/8/8/PPPPP1PP/RNBQKBNR w KQkq g6 - -')
 
 def handle_input(
 	game: Game
@@ -145,7 +148,8 @@ def play_cli(game: Game) -> None:
 
 
 def main() -> None:
-	game: Game = classic_setup()
+	#game: Game = classic_setup()
+	game: Game = custom_setup()
 	play_cli(game)
 
 

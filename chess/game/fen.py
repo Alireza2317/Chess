@@ -30,6 +30,7 @@ def fen_loader(fen: str) -> Game:
 
 	handle_castle_rights(game, castle)
 
+	handle_en_passant(game, ept)
 
 	return game
 
@@ -104,4 +105,38 @@ def handle_castle_rights(game: Game, fen_castle: str) -> None:
 		rook: Piece | None = game.board[info.rook_start].piece
 		if rook:
 			rook.has_moved = True # disables castling
+
+def handle_en_passant(game: Game, fen_en_passant: str) -> None:
+	# enemy pawn on g5
+	# i am on f5
+	# can capture ep on g6
+	# i am given g6
+
+	if len(fen_en_passant) != 2:
+		raise ValueError('Invalid FEN string!')
+
+	target_coord: Coordinate = Coordinate.from_str(fen_en_passant)
+	print(target_coord)
+
+	if target_coord.rank == '6':
+		rank = '5'
+	elif target_coord.rank == '3':
+		rank = '4'
+	else:
+		raise ValueError('Invalid FEN string!')
+
+	cap_pawn_coord: Coordinate = Coordinate(target_coord.file, rank)
+	cap_pawn: Piece | None = game.board[cap_pawn_coord].piece
+	if not cap_pawn:
+		raise ValueError('Not possible to handle this en passant target!')
+
+	# creating the last move that enabled en passant for the next move
+	move: Move = Move(
+		piece=cap_pawn,
+		start=Coordinate(cap_pawn_coord.file, '7' if rank=='5' else '2'),
+		end=cap_pawn_coord
+	)
+	print(move)
+
+	game.history.record(move)
 
