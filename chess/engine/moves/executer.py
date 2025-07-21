@@ -137,6 +137,8 @@ class MoveExecuter:
 		self.board.move_piece(king.coordinate, king_end)
 		self.board.move_piece(info.rook_end, info.rook_start)
 
+		# BUG: should update has_moved for king and rook
+
 	def _undo_en_passant(self, move: Move) -> None:
 		captured_pawn_coord: Coordinate = Coordinate(
 			move.end.file, move.start.rank

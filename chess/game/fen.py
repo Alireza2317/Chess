@@ -1,13 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from chess.engine.core import Coordinate
+from chess.engine.core import Coordinate, Color
+from chess.engine.piece import Piece
 from chess.engine.pieces.king import King
 from chess.engine.pieces.queen import Queen
 from chess.engine.pieces.rook import Rook
 from chess.engine.pieces.bishop import Bishop
 from chess.engine.pieces.knight import Knight
 from chess.engine.pieces.pawn import Pawn
+from chess.engine.moves.move import Move
+from chess.engine.castle import CastleSide, CastleInfo
 from chess.game.game import Game
+
 if TYPE_CHECKING:
 	from chess.engine.player import Player
 
@@ -23,6 +27,9 @@ def fen_loader(fen: str) -> Game:
 	setup_pieces(game, pieces)
 
 	handle_turn(game, turn)
+
+	handle_castle_rights(game, castle)
+
 
 	return game
 
@@ -71,3 +78,30 @@ def handle_turn(game: Game, fen_turn: str) -> None:
 
 	if fen_turn == 'b':
 		game.switch_turn()
+
+def handle_castle_rights(game: Game, fen_castle: str) -> None:
+	if len(fen_castle) > 4:
+		raise ValueError('Invalid FEN string!')
+
+	to_disable: list[str] = ['K', 'k', 'Q', 'q']
+	for castle_char in fen_castle:
+		if castle_char in to_disable:
+			to_disable.remove(castle_char)
+
+	for move in to_disable:
+		color: Color
+		if move.isupper():
+			color = Color.WHITE
+		else:
+			color = Color.BLACK
+
+		info: CastleInfo = CastleInfo(color)
+		if move in 'Kk':
+			info.update_info(CastleSide.KINGSIDE)
+		elif move in 'Qq':
+			info.update_info(CastleSide.QUEENSIDE)
+
+		rook: Piece | None = game.board[info.rook_start].piece
+		if rook:
+			rook.has_moved = True # disables castling
+
