@@ -43,7 +43,7 @@ class Piece(ABC):
 		# piece's attack directions, solely for queen, rook and bishop
 		self.attack_directions: set[Direction] = set()
 
-		self.has_moved: bool = False
+		self.move_count: int = 0
 
 	def attach_to_game(self) -> None:
 		"""

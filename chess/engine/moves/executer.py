@@ -29,7 +29,8 @@ class MoveExecuter:
 		self.board: Board = player.board
 
 	def _move_piece(self, move: Move) -> None:
-		move.piece.has_moved = True
+		if move.piece.type in (PieceType.KING, PieceType.ROOK):
+			move.piece.move_count += 1
 
 		if move.captured:
 			move.captured.detach_from_game()
@@ -59,6 +60,8 @@ class MoveExecuter:
 			self._undo_promotion(move)
 		else:
 			self.board.move_piece(move.end, move.start)
+			if move.piece.type in (PieceType.KING, PieceType.ROOK):
+				move.piece.move_count -= 1
 
 		if move.captured:
 			move.captured.attach_to_game()
@@ -85,8 +88,8 @@ class MoveExecuter:
 		self.board.move_piece(king.coordinate, info.king_end)
 		self.board.move_piece(info.rook_start, info.rook_end)
 
-		king.has_moved = True
-		rook.has_moved = True
+		king.move_count += 1
+		rook.move_count += 1
 
 	def _execute_en_passant(self, move: Move) -> None:
 		if not move.is_en_passant:
@@ -137,7 +140,10 @@ class MoveExecuter:
 		self.board.move_piece(king.coordinate, king_end)
 		self.board.move_piece(info.rook_end, info.rook_start)
 
-		# BUG: should update has_moved for king and rook
+		king.move_count = 0
+		rook: Piece | None = self.board[info.rook_start].piece
+		if rook:
+			rook.move_count = 0
 
 	def _undo_en_passant(self, move: Move) -> None:
 		captured_pawn_coord: Coordinate = Coordinate(
@@ -165,4 +171,3 @@ class MoveExecuter:
 		# since the pawn was moved to the promotion square, its coordinate
 		# should be restored back to the starting coordinate
 		self.player.board.move_piece(original_pawn.coordinate, move.start)
-

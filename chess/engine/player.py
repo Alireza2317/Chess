@@ -59,7 +59,7 @@ class Player:
 
 	def _can_castle(self, rook: Piece | None, side: CastleSide) -> bool:
 		"""Checks wether the player has a legal castle move or not."""
-		if not self.king or self.king.has_moved or self.is_in_check():
+		if not self.king or self.king.move_count > 0 or self.is_in_check():
 			return False
 
 		# is it really a rook?
@@ -67,7 +67,7 @@ class Player:
 			return False
 
 		# is the rook ours? has it moved?
-		if rook.owner != self or rook.has_moved:
+		if rook.owner != self or rook.move_count > 0:
 			return False
 
 		self.castle_info.update_info(side)
@@ -92,7 +92,7 @@ class Player:
 		return True
 
 	def _add_castling_moves(self) -> None:
-		if not self.king or self.king.has_moved or self.is_in_check():
+		if not self.king or self.king.move_count > 0 or self.is_in_check():
 			return
 
 		for side in (CastleSide.KINGSIDE, CastleSide.QUEENSIDE):

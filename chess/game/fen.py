@@ -104,7 +104,7 @@ def handle_castle_rights(game: Game, fen_castle: str) -> None:
 
 		rook: Piece | None = game.board[info.rook_start].piece
 		if rook:
-			rook.has_moved = True # disables castling
+			rook.move_count += 1 # disables castling
 
 def handle_en_passant(game: Game, fen_en_passant: str) -> None:
 	if fen_en_passant == '-':

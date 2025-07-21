@@ -17,7 +17,7 @@ class Rook(Piece):
 		}
 
 		if self.coordinate.file not in ('a', 'h'):
-			self.has_moved = True
+			self.move_count = 1
 
 	@property
 	def type(self) -> PieceType:

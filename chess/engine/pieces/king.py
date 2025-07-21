@@ -19,7 +19,7 @@ class King(Piece):
 		}
 
 		if self.coordinate.file != 'e':
-			self.has_moved = True
+			self.move_count = 1
 
 	@property
 	def type(self) -> PieceType:
