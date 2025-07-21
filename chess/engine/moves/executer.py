@@ -99,8 +99,7 @@ class MoveExecuter:
 		)
 		captured: Piece | None = self.board[captured_pawn_coord].piece
 		if captured:
-			self.player.opponent.remove_piece(captured)
-			# ^ this also removes from board
+			captured.detach_from_game()
 
 		self.board.move_piece(move.start, move.end)
 
