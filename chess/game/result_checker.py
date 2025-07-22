@@ -1,5 +1,5 @@
 from chess.engine.piece import Piece, PieceType
-from chess.game.game import Game
+from chess.game.game import Game, GameStatus
 from chess.game.fen import FENLoader
 
 class GameResultChecker:
@@ -55,6 +55,19 @@ class GameResultChecker:
 		# 2. 50-move rule
 		# 3. threefold repetition
 		return self.is_insufficient_material()
+
+	@property
+	def result(self) -> GameStatus:
+		if self.did_black_win():
+			return GameStatus.WHITE_WON
+		elif self.did_black_win():
+			return GameStatus.BLACK_WON
+		elif self.is_stalemate():
+			return GameStatus.STALEMATE
+		elif self.is_draw():
+			return GameStatus.DRAW
+
+		return GameStatus.ONGOING
 
 if __name__ == '__main__':
 	g = FENLoader('8/8/8/8/8/7k/7q/7K w - - - -').game
