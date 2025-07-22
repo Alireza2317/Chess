@@ -17,10 +17,15 @@ if TYPE_CHECKING:
 
 def is_rank_valid(rank: str) -> tuple[bool, int]:
 	c: int = 0
+	was_prev_digit: bool = False
 	for char in rank:
 		if char.isdigit():
+			if was_prev_digit:
+				return (False, 0)
+			was_prev_digit = True
 			c += int(char)
 		else:
+			was_prev_digit = False
 			c += 1
 	return (c == 8, 8-c)
 
