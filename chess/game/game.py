@@ -52,6 +52,8 @@ class Game:
 
 			for target in piece.all_moves():
 				move: Move = create_move(piece, target, simulation=True)
+				if move.captured and move.captured.type == PieceType.KING:
+					continue # do not simulate capturing a king!
 
 				# simulate move
 				with MoveSimulator(player, move):
