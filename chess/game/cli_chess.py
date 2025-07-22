@@ -1,8 +1,9 @@
 import enum
 from chess.engine.core import Coordinate, Color
 from chess.engine.piece import Piece, PieceType
-from chess.game.game import Game
+from chess.game.game import Game, GameStatus
 from chess.game.fen import FENLoader
+from chess.game.result_checker import GameResultChecker
 
 MoveDetail = tuple[Coordinate, Coordinate, PieceType | None]
 
@@ -10,7 +11,6 @@ class LoopDecision(enum.Enum):
 	BREAK = enum.auto()
 	CONTINUE = enum.auto()
 	PROCEED = enum.auto()
-
 
 def clear_console() -> None:
 	print("\033[H\033[J", end="")
@@ -100,6 +100,7 @@ def check_promotion(
 	return LoopDecision.PROCEED
 
 def play_cli(game: Game) -> None:
+	result_checker: GameResultChecker = GameResultChecker(game)
 	game.update_legal_moves()
 
 	while True:
@@ -134,25 +135,27 @@ def play_cli(game: Game) -> None:
 
 		game.update_legal_moves()
 
-		if game.white.is_checkmated():
-			print(game.board)
-			print('Black Won!')
+		if result_checker.result != GameStatus.ONGOING:
+			match result_checker.result:
+				case GameStatus.WHITE_WON:
+					print('White Won!')
+					if game.black.king:
+						game.board.print(game.black.king.coordinate)
+				case GameStatus.BLACK_WON:
+					print('Black Won!')
+					if game.white.king:
+						game.board.print(game.white.king.coordinate)
+				case GameStatus.STALEMATE:
+					print('Stalemate!')
+					game.board.print()
+				case GameStatus.DRAW:
+					print('Draw!')
+					game.board.print()
 			break
-		elif game.black.is_checkmated():
-			print(game.board)
-			print('White Won!')
-			break
-		elif game.current_player.is_stalemeted():
-			print(game.current_player.has_legal_moves())
-			print('Stalemate!')
-			break
-
 
 def main() -> None:
-	#game: Game = classic_setup()
 	game: Game = custom_setup()
 	play_cli(game)
-
 
 if __name__ == '__main__':
 	main()

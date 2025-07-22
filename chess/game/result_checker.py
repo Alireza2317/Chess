@@ -58,7 +58,7 @@ class GameResultChecker:
 
 	@property
 	def result(self) -> GameStatus:
-		if self.did_black_win():
+		if self.did_white_win():
 			return GameStatus.WHITE_WON
 		elif self.did_black_win():
 			return GameStatus.BLACK_WON
