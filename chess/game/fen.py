@@ -15,6 +15,16 @@ from chess.game.game import Game
 if TYPE_CHECKING:
 	from chess.engine.player import Player
 
+def is_rank_valid(rank: str) -> tuple[bool, int]:
+	c: int = 0
+	for char in rank:
+		if char.isdigit():
+			c += int(char)
+		else:
+			c += 1
+	return (c == 8, 8-c)
+
+
 class FENLoader:
 	def __init__(self, fen: str) -> None:
 		fields: list[str] = fen.split()
@@ -36,6 +46,9 @@ class FENLoader:
 			raise ValueError('Invalid FEN string!')
 
 		for rank, rank_pieces in zip(Coordinate.RANKS[::-1], p_placements_ranks):
+			if not is_rank_valid(rank_pieces)[0]:
+				raise ValueError('Invalid FEN string!')
+
 			file_idx: int = 0
 			file: str = Coordinate.FILES[file_idx]
 			for piece in rank_pieces:
@@ -171,17 +184,11 @@ class FENExporter:
 				else:
 					count_empty += 1
 
-			c: int = 0
-			for char in rank_s:
-				if char.isdigit():
-					c += int(char)
-				else:
-					c += 1
-			if c != 8:
+			valid, c = is_rank_valid(rank_s)
+			if not valid:
 				rank_s += str(8-c)
 
 			ranks.append(rank_s)
-
 
 		result: str = '/'.join(ranks)
 		return result
