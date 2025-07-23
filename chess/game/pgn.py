@@ -61,13 +61,11 @@ class PGNConverter:
 		return pgn
 
 	def candidates_for_move(
-		self, piece: Piece, end_coord: Coordinate
+		self, piece_type: PieceType, end_coord: Coordinate
 	) -> list[Piece]:
 		possible_pieces: list[Piece] = []
-		for other_piece in piece.owner.pieces:
-			if other_piece is piece:
-				continue
-			if other_piece.type != piece.type:
+		for other_piece in self.game.current_player.pieces:
+			if other_piece.type != piece_type:
 				continue
 			if end_coord in other_piece.legal_moves:
 				possible_pieces.append(other_piece)
@@ -80,8 +78,9 @@ class PGNConverter:
 		start_coord: Coordinate = main_piece.coordinate
 
 		possible_pieces: list[Piece] = self.candidates_for_move(
-			main_piece, move.end
+			main_piece.type, move.end
 		)
+		possible_pieces.remove(main_piece)
 
 		file_ambiguous: bool = any(
 			piece.coordinate.file == start_coord.file
