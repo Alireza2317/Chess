@@ -101,40 +101,99 @@ class PGNConverter:
 
 	def _find_piece(
 		self,
-		target_coord: Coordinate,
 		piece_type: PieceType,
-		additional_info: str | None = None
+		target_coord: Coordinate,
+		clarification: str | None = None
 	) -> Piece:
-		if additional_info and len(additional_info) > 2:
+		"""
+		Find the exact piece of the current player that should
+		move to target_coord, with optional disambiguation.
+		"""
+		candidates: list[Piece] = self.candidates_for_move(
+			piece_type, target_coord
+		)
+
+		if not candidates:
 			raise ValueError(
-				'Invalid additional info provided! ' +
-				'should be either a rank, a file or both.'
+				f'No {piece_type.name.lower()} can move' +
+				f'to {target_coord} for {self.game.current_player}!'
 			)
-		player: Player = self.game.current_player
-		for piece in player.pieces:
-			if piece.type != piece_type:
-				continue
-			if target_coord not in piece.legal_moves:
-				continue
 
-			if additional_info:
-				if len(additional_info) == 1:
-					if additional_info in Coordinate.FILES:
-						if piece.coordinate.file == additional_info:
-							return piece
-					elif additional_info in Coordinate.RANKS:
-						if piece.coordinate.rank == additional_info:
-							return piece
-					elif Coordinate.is_valid(*additional_info):
-						if piece.coordinate == Coordinate.from_str(additional_info):
-							return piece
-					else:
-						raise ValueError('Invalid additional info provided!')
+		if len(candidates) == 1:
+			if clarification is not None:
+				raise ValueError(
+					f'There is only one {piece_type.name.lower()} ' +
+					f'that can move to {target_coord}! ' +
+					'No clarification should be provided!'
+				)
+			return candidates[0]
 
-			return piece
 
+		if clarification is not None:
+			if not isinstance(clarification, str):
+				raise ValueError(
+					'Invalid clarification provided! Must be a string.'
+				)
+			if len(clarification) > 2:
+				raise ValueError(
+					'Invalid clarification provided!' +
+					'Should be either a rank, a file, or both.'
+				)
+
+			filtered_pieces: list[Piece] = []
+
+			if len(clarification) == 1:
+				if clarification in Coordinate.FILES:
+					filtered_pieces = [
+						p
+						for p in candidates
+						if p.coordinate.file == clarification
+					]
+				elif clarification in Coordinate.RANKS:
+					filtered_pieces = [
+						p
+						for p in candidates
+						if p.coordinate.rank == clarification
+					]
+				else:
+					raise ValueError('Invalid clarification string!')
+			elif len(clarification) == 2:
+				if Coordinate.is_valid(*clarification):
+					filtered_pieces = [
+						p
+						for p in candidates
+						if p.coordinate == Coordinate.from_str(clarification)
+					]
+				else:
+					raise ValueError('Invalid clarification string!')
+
+			if not filtered_pieces:
+				raise ValueError(
+					f'No {piece_type.name.lower()} found with `{clarification}`' +
+					f'for {self.game.current_player} to go {target_coord}!'
+				)
+			elif len(filtered_pieces) > 1:
+				self._raise_ambiguity_error(piece_type, target_coord, filtered_pieces)
+
+			return filtered_pieces[0]
+
+		else: # no clarification
+			if len(candidates) > 1:
+				self._raise_ambiguity_error(
+					piece_type, target_coord, candidates
+				)
+
+			return candidates[0]
+
+	def _raise_ambiguity_error(
+		self,
+		piece_type: PieceType,
+		target_coord: Coordinate,
+		candidates: list[Piece]
+	) -> NoReturn:
 		raise ValueError(
-			f'No piece was found for {player} to go {target_coord}!'
+			f'Ambiguous move: multiple {piece_type.name.lower()}s can move to ' +
+			f'{target_coord}: {[p.coordinate for p in candidates]}'
 		)
 
 	def pgn2move(self, pgn: str) -> Move:
