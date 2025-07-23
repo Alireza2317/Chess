@@ -60,39 +60,36 @@ class PGNConverter:
 
 		return pgn
 
-	def _check_ambiguity(self, move: Move) -> str | None:
-		# returns the intended rank or file or both
+	def _check_ambiguity(self, move: Move) -> str:
+		"""Return clarification string for ambiguous moves (file/rank/both)."""
 		main_piece: Piece = move.piece
+		start_coord: Coordinate = main_piece.coordinate
 
 		possible_pieces: list[Piece] = []
-		for other_piece in move.piece.owner.pieces:
+		for other_piece in main_piece.owner.pieces:
 			if other_piece is main_piece:
 				continue
-			if other_piece.type == main_piece.type:
-				if move.end in other_piece.legal_moves:
-					possible_pieces.append(other_piece)
+			if other_piece.type != main_piece.type:
+				continue
+			if move.end in other_piece.legal_moves:
+				possible_pieces.append(other_piece)
 
-		# check common files:
-		common_files: int = 0
-		for piece in possible_pieces:
-			if piece.coordinate.file == main_piece.coordinate.file:
-				common_files += 1
+		file_ambiguous: bool = any(
+			piece.coordinate.file == start_coord.file
+			for piece in possible_pieces
+		)
+		rank_ambiguous: bool = any(
+			piece.coordinate.rank == start_coord.rank
+			for piece in possible_pieces
+		)
+		if file_ambiguous and rank_ambiguous:
+			return start_coord.file + start_coord.rank
+		if file_ambiguous:
+			return start_coord.rank
+		if rank_ambiguous:
+			return start_coord.file
 
-		# check common ranks:
-		common_ranks: int = 0
-		for piece in possible_pieces:
-			if piece.coordinate.rank == main_piece.coordinate.rank:
-				common_ranks += 1
-
-		if common_files == 0 and common_ranks == 0:
-			return None
-
-		if common_files == 0:
-			return main_piece.coordinate.file
-		if common_ranks == 0:
-			return main_piece.coordinate.rank
-
-		return main_piece.coordinate.file + main_piece.coordinate.rank
+		return ''
 
 	def _find_piece(
 		self,
