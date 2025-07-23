@@ -1,8 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from chess.engine.core import Coordinate
-from chess.engine.castle import CastleSide
+from chess.engine.castle import CastleSide, CastleInfo
 from chess.engine.moves.move import Move
+from chess.engine.moves.factory import create_move
 from chess.engine.piece import Piece, PieceType
 if TYPE_CHECKING:
 	from chess.game.game import Game
@@ -92,7 +93,10 @@ class PGNConverter:
 		additional_info: str | None = None
 	) -> Piece:
 		if additional_info and len(additional_info) > 2:
-			raise ValueError('Invalid additional info provided! should be either a rank, a file or both.')
+			raise ValueError(
+				'Invalid additional info provided! ' +
+				'should be either a rank, a file or both.'
+			)
 		player: Player = self.game.current_player
 		for piece in player.pieces:
 			if piece.type != piece_type:
@@ -133,22 +137,26 @@ class PGNConverter:
 				# find the pawn which can go there
 				piece: Piece = self._find_piece(target_coord, PieceType.PAWN)
 
-				return Move(
-					piece=piece,
-					start=piece.coordinate,
-					end=target_coord
-				)
+				return create_move(piece, target_coord)
 
 			elif '=' in pgn: # a promotion
 				pgn_move_part: str = pgn[:pgn.index('=')]
 				if len(pgn_move_part) == 2:
 					target_coord = Coordinate.from_str(pgn_move_part)
 					piece = self._find_piece(target_coord, PieceType.PAWN)
-					return Move(
-						piece=piece,
-						start=piece.coordinate,
-						end=target_coord
+
+					promotion_map: dict[str, PieceType] = {
+						'Q': PieceType.QUEEN,
+						'R': PieceType.ROOK,
+						'B': PieceType.BISHOP,
+						'N': PieceType.KNIGHT
+					}
+					return create_move(
+						piece,
+						target_coord,
+						promotion=promotion_map[pgn[-1]]
 					)
+
 				elif len(pgn_move_part) == 4: # also a capture
 					target_coord = Coordinate.from_str(pgn_move_part[2:])
 					piece = self._find_piece(
@@ -159,37 +167,67 @@ class PGNConverter:
 						raise ValueError(
 							f'No piece on {target_coord} to be captured!'
 						)
-					return Move(
-						piece=piece,
-						start=piece.coordinate,
-						end=target_coord,
-						captured=captured
+					return create_move(
+						piece,
+						target_coord,
+						promotion=promotion_map[pgn[-1]]
 					)
 				else:
 					raise ValueError('Invalid PGN string!')
 
-			elif len(pgn) == 4: # a pawn capture like 'exd5'
-				...
+			elif len(pgn) == 4: # a regular pawn capture like 'exd5'
+				if 'x' not in pgn:
+					raise ValueError('Invalid PGN string!')
+				target_coord = Coordinate.from_str(pgn[2:])
+				piece = self._find_piece(target_coord, PieceType.PAWN, pgn[0])
+				return create_move(piece, target_coord)
 			else:
 				raise ValueError('Invalid PGN string!')
 
 		elif pgn[0] == 'O': # castle move
-			if pgn == 'O-O-O':
-				...
+			info: CastleInfo = CastleInfo(self.game.current_player.color)
+			if pgn == 'O-O':
+				info.update_info(CastleSide.KINGSIDE)
+				target_coord = info.king_end
 			elif pgn == 'O-O-O':
-				...
+				info.update_info(CastleSide.QUEENSIDE)
+				target_coord = info.king_end
 			else:
 				raise ValueError('Invalid PGN string!')
 
+			return create_move(
+				self._find_piece(target_coord, PieceType.KING),
+				target_coord
+			)
+
 		elif pgn[0] in 'KQRBN':
 			# check capture
+			additional_info: str | None = None
 			if 'x' in pgn:
-				...
+				target_coord = Coordinate.from_str(pgn[pgn.index('x')+1:])
+				additional_info = pgn[1:pgn.index('x')]
+			else:
+				target_coord = Coordinate.from_str(pgn[-2:])
+				additional_info = pgn[1:-2]
 
-			...
+			if len(additional_info) > 2:
+				raise ValueError('Invalid PGN string!')
+
+			piece_map: dict[str, PieceType] = {
+				'K': PieceType.KING,
+				'Q': PieceType.QUEEN,
+				'R': PieceType.ROOK,
+				'B': PieceType.BISHOP,
+				'N': PieceType.KNIGHT,
+			}
+
+			piece = self._find_piece(
+				target_coord,
+				piece_map[pgn[0]],
+				additional_info=additional_info
+			)
+
+			return create_move(piece, target_coord)
 
 		else:
 			raise ValueError('Invalid PGN string!')
-
-
-		return None
