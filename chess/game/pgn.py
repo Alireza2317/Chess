@@ -14,41 +14,49 @@ class PGNConverter:
 		self.game: Game = game
 
 	def move2pgn(self, move: Move) -> str:
+		"""Convert a Move object to its PGN string representation."""
+		if not isinstance(move, Move):
+			raise TypeError("move2pgn expects a Move object!")
+
 		pgn: str = ''
 
-		p: Piece = move.piece
-		if p.type == PieceType.PAWN:
-			if not move.captured and not move.is_en_passant:
-				pgn = f'{move.end.file}{move.end.rank}'
-			elif move.captured or move.is_en_passant:
-				pgn = f'{move.start.file}x{move.end.file}{move.end.rank}'
+		# Pawn moves
+		if move.piece.type == PieceType.PAWN:
+			if move.captured or move.is_en_passant:
+				pgn = f'{move.start.file}x'
+
+			pgn += f'{move.end.file}{move.end.rank}'
 
 			if move.promotion:
-				pgn += f'={move.promotion.name.upper()}'
-			return pgn
+				pgn += f'={move.promotion.name[0].upper()}'
 
-		if move.castle_side:
+		# Castling
+		elif move.castle_side:
 			if move.castle_side == CastleSide.KINGSIDE:
 				pgn = 'O-O'
 			elif move.castle_side == CastleSide.QUEENSIDE:
 				pgn = 'O-O-O'
-			return pgn
+			else:
+				raise ValueError("Invalid castle side!")
 
-		pgn = repr(move.piece).upper()
+		else:
+			# Other pieces
+			pgn = repr(move.piece).upper()
+			clarification: str | None = self._check_ambiguity(move)
 
-		clearification: str | None = self._check_ambiguity(move)
-		if clearification:
-			pgn += clearification
+			if clarification:
+				pgn += clarification
 
-		if move.captured:
-			pgn += 'x'
-		pgn += f'{move.end.file}{move.end.rank}'
+			if move.captured:
+				pgn += 'x'
 
+			pgn += f'{move.end.file}{move.end.rank}'
 
-		if move.piece.owner.opponent.is_in_check():
-			pgn += '+'
-		elif move.piece.owner.opponent.is_checkmated():
+		# Check or checkmate
+		if move.piece.owner.opponent.is_checkmated():
 			pgn += '#'
+		elif move.piece.owner.opponent.is_in_check():
+			pgn += '+'
 
 		return pgn
 
