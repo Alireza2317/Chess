@@ -60,19 +60,28 @@ class PGNConverter:
 
 		return pgn
 
+	def candidates_for_move(
+		self, piece: Piece, end_coord: Coordinate
+	) -> list[Piece]:
+		possible_pieces: list[Piece] = []
+		for other_piece in piece.owner.pieces:
+			if other_piece is piece:
+				continue
+			if other_piece.type != piece.type:
+				continue
+			if end_coord in other_piece.legal_moves:
+				possible_pieces.append(other_piece)
+
+		return possible_pieces
+
 	def _check_ambiguity(self, move: Move) -> str:
 		"""Return clarification string for ambiguous moves (file/rank/both)."""
 		main_piece: Piece = move.piece
 		start_coord: Coordinate = main_piece.coordinate
 
-		possible_pieces: list[Piece] = []
-		for other_piece in main_piece.owner.pieces:
-			if other_piece is main_piece:
-				continue
-			if other_piece.type != main_piece.type:
-				continue
-			if move.end in other_piece.legal_moves:
-				possible_pieces.append(other_piece)
+		possible_pieces: list[Piece] = self.candidates_for_move(
+			main_piece, move.end
+		)
 
 		file_ambiguous: bool = any(
 			piece.coordinate.file == start_coord.file
