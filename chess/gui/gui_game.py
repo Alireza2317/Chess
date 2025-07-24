@@ -12,7 +12,7 @@ pg.display.set_caption("Chess")
 
 
 def gui_loop(game: Game) -> None:
-	renderer: Renderer = Renderer(screen)
+	renderer: Renderer = Renderer(game.board, screen)
 	selected: Coordinate | None = None
 
 	running: bool = True

@@ -18,7 +18,7 @@ class Renderer:
 		for color in ('w', 'b'):
 			for piece in 'kqrbnp':
 				name: str = f'{color}{piece}'
-				path: str = f'assets/{name}.png'
+				path: str = f'assets/pieces/{cfg.pieces_theme}/{name}.png'
 				key: tuple[Color, PieceType] = (
 					Color.WHITE if color == 'w' else Color.BLACK,
 					{
