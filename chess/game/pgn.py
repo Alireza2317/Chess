@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 from chess.engine.core import Coordinate
 from chess.engine.castle import CastleSide, CastleInfo
 from chess.engine.moves.move import Move
@@ -7,7 +7,6 @@ from chess.engine.moves.factory import create_move
 from chess.engine.piece import Piece, PieceType
 if TYPE_CHECKING:
 	from chess.game.game import Game
-	from chess.engine.player import Player
 
 class PGNConverter:
 	def __init__(self, game: Game):
@@ -197,67 +196,85 @@ class PGNConverter:
 		)
 
 	def pgn2move(self, pgn: str) -> Move:
-		if not isinstance(pgn, str) or not pgn:
-			raise TypeError('PGN should be a non-empty string!')
+		"""Convert a PGN string to a Move object. Raises ValueError on error."""
+		if not isinstance(pgn, str):
+			raise TypeError('PGN should be a string!')
 
-		if pgn[0] in Coordinate.FILES: # is a pawn move
-			if len(pgn) == 2: # a simple pawn move
+		pgn = pgn.strip()
+		if not pgn:
+			raise ValueError('PGN string is empty!')
+
+		if pgn[-1] in '+#':
+			# ignore it for now!
+			pgn.removesuffix('+')
+			pgn.removesuffix('#')
+
+		# Pawn moves
+		if pgn[0] in Coordinate.FILES:
+			if len(pgn) == 2: # regular pawn move
 				if not Coordinate.is_valid(*pgn):
 					raise ValueError('Invalid PGN string!')
-
 				target_coord: Coordinate = Coordinate.from_str(pgn)
-				# find the pawn which can go there
-				piece: Piece = self._find_piece(target_coord, PieceType.PAWN)
-
+				piece: Piece = self._find_piece(PieceType.PAWN, target_coord)
 				return create_move(piece, target_coord)
-
 			elif '=' in pgn: # a promotion
 				pgn_move_part: str = pgn[:pgn.index('=')]
+				promotion_map: dict[str, PieceType] = {
+					'Q': PieceType.QUEEN,
+					'R': PieceType.ROOK,
+					'B': PieceType.BISHOP,
+					'N': PieceType.KNIGHT
+				}
+				promo_letter: str = pgn[-1].upper()
+				if promo_letter not in promotion_map:
+					raise ValueError('Invalid promotion piece!')
 				if len(pgn_move_part) == 2:
 					target_coord = Coordinate.from_str(pgn_move_part)
-					piece = self._find_piece(target_coord, PieceType.PAWN)
-
-					promotion_map: dict[str, PieceType] = {
-						'Q': PieceType.QUEEN,
-						'R': PieceType.ROOK,
-						'B': PieceType.BISHOP,
-						'N': PieceType.KNIGHT
-					}
+					piece = self._find_piece(PieceType.PAWN, target_coord)
 					return create_move(
 						piece,
 						target_coord,
-						promotion=promotion_map[pgn[-1]]
+						promotion=promotion_map[promo_letter]
 					)
-
 				elif len(pgn_move_part) == 4: # also a capture
+					if (
+						'x' not in pgn_move_part or
+		 				pgn_move_part[0] not in Coordinate.FILES
+					):
+						raise ValueError('Invalid PGN string!')
+					clarification: str = pgn_move_part[0]
 					target_coord = Coordinate.from_str(pgn_move_part[2:])
 					piece = self._find_piece(
-						target_coord, PieceType.PAWN, pgn_move_part[0]
+						PieceType.PAWN, target_coord, clarification
 					)
-					captured: Piece | None = self.game.board[target_coord].piece
+					captured = self.game.board[target_coord].piece
 					if not captured:
 						raise ValueError(
 							f'No piece on {target_coord} to be captured!'
 						)
+
 					return create_move(
 						piece,
 						target_coord,
-						promotion=promotion_map[pgn[-1]]
+						promotion=promotion_map[promo_letter]
 					)
 				else:
 					raise ValueError('Invalid PGN string!')
-
-			elif len(pgn) == 4: # a regular pawn capture like 'exd5'
+			elif len(pgn) == 4:
 				if 'x' not in pgn:
 					raise ValueError('Invalid PGN string!')
-				target_coord = Coordinate.from_str(pgn[2:])
-				piece = self._find_piece(target_coord, PieceType.PAWN, pgn[0])
+				clarification = pgn[0]
+
+				target_coord = Coordinate.from_str(pgn[pgn.index('x')+1:])
+				piece = self._find_piece(
+					PieceType.PAWN,target_coord, clarification
+				)
 				return create_move(piece, target_coord)
 			else:
 				raise ValueError('Invalid PGN string!')
-
-		elif pgn[0] == 'O': # castle move
-			info: CastleInfo = CastleInfo(self.game.current_player.color)
+		# Castling
+		elif pgn[0] == 'O':
+			info = CastleInfo(self.game.current_player.color)
 			if pgn == 'O-O':
 				info.update_info(CastleSide.KINGSIDE)
 				target_coord = info.king_end
@@ -267,39 +284,33 @@ class PGNConverter:
 			else:
 				raise ValueError('Invalid PGN string!')
 
-			return create_move(
-				self._find_piece(target_coord, PieceType.KING),
-				target_coord
-			)
-
+			piece = self._find_piece(PieceType.KING, target_coord)
+			return create_move(piece, target_coord)
+		# Piece moves
 		elif pgn[0] in 'KQRBN':
-			# check capture
-			additional_info: str | None = None
-			if 'x' in pgn:
-				target_coord = Coordinate.from_str(pgn[pgn.index('x')+1:])
-				additional_info = pgn[1:pgn.index('x')]
-			else:
-				target_coord = Coordinate.from_str(pgn[-2:])
-				additional_info = pgn[1:-2]
-
-			if len(additional_info) > 2:
-				raise ValueError('Invalid PGN string!')
-
 			piece_map: dict[str, PieceType] = {
 				'K': PieceType.KING,
 				'Q': PieceType.QUEEN,
 				'R': PieceType.ROOK,
 				'B': PieceType.BISHOP,
-				'N': PieceType.KNIGHT,
+				'N': PieceType.KNIGHT
 			}
-
+			if 'x' in pgn:
+				target_coord = Coordinate.from_str(
+					pgn[pgn.index('x')+1:pgn.index('x')+3]
+				)
+				clarification = pgn[1:pgn.index('x')]
+			else:
+				# FIXME: consider + and # at the end of pgn
+				target_coord = Coordinate.from_str(pgn[1:3])
+				clarification = pgn[1:-2]
+			if len(clarification) > 2:
+				raise ValueError('Invalid PGN string!')
 			piece = self._find_piece(
-				target_coord,
 				piece_map[pgn[0]],
-				additional_info=additional_info
+				target_coord,
+				clarification=clarification or None
 			)
-
 			return create_move(piece, target_coord)
-
 		else:
 			raise ValueError('Invalid PGN string!')
