@@ -3,6 +3,8 @@ from chess.engine.core import Coordinate, Color
 from chess.engine.piece import Piece, PieceType
 from chess.game.game import Game, GameStatus
 from chess.game.fen import FENLoader
+from chess.game.pgn import PGNConverter
+from chess.engine.moves.move import Move
 from chess.game.result_checker import GameResultChecker
 
 MoveDetail = tuple[Coordinate, Coordinate, PieceType | None]
@@ -62,6 +64,29 @@ def handle_input(
 
 	return start, end, promotion
 
+def handle_pgn_input(
+	game: Game
+) -> LoopDecision | MoveDetail:
+	move_input: str = input('Enter move: ')
+
+	if move_input == 'undo':
+		if not game.undo():
+			print('Cannot undo!')
+		return LoopDecision.CONTINUE
+	elif move_input == 'redo':
+		if not game.redo():
+			print('Cannot redo!')
+		return LoopDecision.CONTINUE
+
+	elif move_input == 'exit':
+		return LoopDecision.BREAK
+	try:
+		move: Move = PGNConverter(game).pgn2move(move_input)
+		return move.start, move.end, move.promotion
+	except ValueError:
+		print('Invalid input!')
+		return LoopDecision.CONTINUE
+
 def map_promotion(promotion_type: str) -> PieceType:
 	promotion_map: dict[str, PieceType] = {
 		'q': PieceType.QUEEN,
@@ -115,7 +140,7 @@ def play_cli(game: Game) -> None:
 
 		print(f'{game.turn.name.title()} to move!')
 
-		input_result: LoopDecision | MoveDetail = handle_input(game)
+		input_result: LoopDecision | MoveDetail = handle_pgn_input(game)
 		if input_result == LoopDecision.CONTINUE:
 			continue
 		elif input_result == LoopDecision.BREAK:

@@ -111,7 +111,6 @@ class PGNConverter:
 		candidates: list[Piece] = self.candidates_for_move(
 			piece_type, target_coord
 		)
-
 		if not candidates:
 			raise ValueError(
 				f'No {piece_type.name.lower()} can move' +
@@ -119,7 +118,7 @@ class PGNConverter:
 			)
 
 		if len(candidates) == 1:
-			if clarification is not None:
+			if clarification is not None and piece_type != PieceType.PAWN:
 				raise ValueError(
 					f'There is only one {piece_type.name.lower()} ' +
 					f'that can move to {target_coord}! ' +
@@ -267,7 +266,7 @@ class PGNConverter:
 
 				target_coord = Coordinate.from_str(pgn[pgn.index('x')+1:])
 				piece = self._find_piece(
-					PieceType.PAWN,target_coord, clarification
+					PieceType.PAWN, target_coord, clarification
 				)
 				return create_move(piece, target_coord)
 			else:
