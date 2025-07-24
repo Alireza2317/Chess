@@ -37,8 +37,7 @@ class Renderer:
 
 	def draw_board(self) -> None:
 		for square in self.board.all_squares():
-			file_i: int = Coordinate.FILES.index(square.coordinate.file)
-			rank_i: int = Coordinate.RANKS.index(square.coordinate.rank)
+			file_i, rank_i = square.coordinate.regular
 			rect: tuple[int, int, int, int] = (
 				file_i * cfg.square_size, rank_i * cfg.square_size,
 				cfg.square_size, cfg.square_size
@@ -69,10 +68,9 @@ class Renderer:
 
 	def highlight_squares(self, coords: set[Coordinate]) -> None:
 		for coord in coords:
-			file: int = Coordinate.FILES.index(coord.file)
-			rank: int = 7 - Coordinate.RANKS.index(coord.rank)
+			file_i, rank_i = coord.regular
 			rect = pg.Rect(
-				file * cfg.square_size, rank * cfg.square_size,
+				file_i * cfg.square_size, rank_i * cfg.square_size,
 				cfg.square_size, cfg.square_size
 			)
 			pg.draw.rect(self.screen, cfg.valid_color, rect, width=4)
