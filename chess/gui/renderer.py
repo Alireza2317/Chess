@@ -2,7 +2,7 @@ import pygame as pg
 from chess.engine.core import Coordinate, Color
 from chess.engine.piece import PieceType
 from chess.engine.board import Board
-from gui.config import cfg, RGBColor # type: ignore
+from chess.gui.config import cfg, RGBColor
 
 class Renderer:
 	def __init__(self, board: Board, screen: pg.Surface):

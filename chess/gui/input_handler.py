@@ -1,5 +1,5 @@
 from chess.engine.core import Coordinate
-from gui.config import cfg # type: ignore
+from chess.gui.config import cfg
 
 def get_coord_from_mouse(pos: tuple[int, int]) -> Coordinate | None:
     x, y = pos
