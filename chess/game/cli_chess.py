@@ -2,9 +2,9 @@ import enum
 from chess.engine.core import Coordinate, Color
 from chess.engine.piece import Piece, PieceType
 from chess.game.game import Game, GameStatus
-from chess.game.fen import FENLoader
 from chess.game.pgn import PGNConverter
 from chess.engine.moves.move import Move
+from chess.engine.setup import classic_setup
 from chess.game.result_checker import GameResultChecker
 
 MoveDetail = tuple[Coordinate, Coordinate, PieceType | None]
@@ -16,13 +16,6 @@ class LoopDecision(enum.Enum):
 
 def clear_console() -> None:
 	print("\033[H\033[J", end="")
-
-def classic_setup() -> Game:
-	return FENLoader('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - - -').game
-
-def custom_setup() -> Game:
-	return FENLoader('rnbqkbnr/pppppp1p/8/5Pp1/8/8/PPPPP1PP/RNBQKBNR w KQkq g6 - -').game
-	#return fen_loader('r3k2r/pppppp1p/8/5Pp1/8/8/PPPPP1PP/R3K2R w KQkq - - -')
 
 def handle_input(
 	game: Game
@@ -179,7 +172,7 @@ def play_cli(game: Game) -> None:
 			break
 
 def main() -> None:
-	game: Game = custom_setup()
+	game: Game = classic_setup()
 	play_cli(game)
 
 if __name__ == '__main__':
