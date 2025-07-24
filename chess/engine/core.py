@@ -44,10 +44,18 @@ class Coordinate:
 	def __hash__(self) -> int:
 		return hash(f'{self.file}{self.rank}')
 
+	@property
+	def regular(self) -> tuple[int, int]:
+		"""Convert to a regular coordinate system."""
+		file_idx: int = self.FILES.index(self.file)
+		rank_idx: int = 7 - self.RANKS.index(self.rank)
+
+		return (file_idx, rank_idx)
+
 	def __eq__(self, other: object) -> bool:
 		if other is None:
 			return False
-		
+
 		if not isinstance(other, Coordinate):
 			raise TypeError(
 				f'Cannot compare {self.__class__.__name__} with {type(other)}.'
