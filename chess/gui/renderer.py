@@ -94,7 +94,7 @@ class Renderer:
 				)
 			)
 
-		for rank_i, rank in enumerate(Coordinate.RANKS):
+		for rank_i, rank in enumerate(reversed(Coordinate.RANKS)):
 			rank_text: pg.Surface = self.small_font.render(
 				rank, True, cfg.coordinates_text_color
 			)
