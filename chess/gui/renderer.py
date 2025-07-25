@@ -8,15 +8,15 @@ from chess.gui.utils.asset_handler import load_piece_images
 class Renderer:
 	def __init__(self, board: Board):
 		self.board: Board = board
-		self.screen = pg.display.set_mode((900, 900))
-		self.screen.fill((0,0,0))
-		self.board_screen: pg.Surface = pg.Surface(cfg.dimensions)
+		self.screen = pg.display.set_mode(cfg.screen_dims)
+		self.screen.fill(cfg.bg_color)
+		self.board_screen: pg.Surface = pg.Surface(cfg.board_dims)
 		self.images: dict[
 			tuple[Color, PieceType], pg.Surface
 		] = load_piece_images()
 
 		self.small_font = pg.font.Font(
-			pg.font.get_default_font(), cfg.coordinates_font_size
+			pg.font.get_default_font(), cfg.small_font_size
 		)
 
 		self.medium_font = pg.font.Font(
@@ -35,8 +35,8 @@ class Renderer:
 			self.screen,
 			cfg.coordinates_bg_color,
 			(
-				cfg.dimensions[0]-1,
-				cfg.dimensions[1]-1,
+				cfg.board_dims[0]-1,
+				cfg.board_dims[1]-1,
 				cfg.coordinates_width+1,
 				cfg.coordinates_width+1
 			)
@@ -44,10 +44,10 @@ class Renderer:
 		pg.draw.line(
 			self.screen,
 			cfg.coordinates_text_color,
-			start_pos=(cfg.dimensions[0]-2, cfg.dimensions[1]-1),
+			start_pos=(cfg.board_dims[0]-2, cfg.board_dims[1]-1),
 			end_pos=(
-				cfg.dimensions[0]+cfg.coordinates_width-1,
-				cfg.dimensions[1]+cfg.coordinates_width,
+				cfg.board_dims[0]+cfg.coordinates_width-1,
+				cfg.board_dims[1]+cfg.coordinates_width,
 			),
 			width=2
 		)
@@ -63,7 +63,7 @@ class Renderer:
 				cfg.coordinates_bg_color,
 				(
 					file_i * cfg.square_size,
-					cfg.dimensions[1],
+					cfg.board_dims[1],
 					cfg.square_size-1,
 					cfg.coordinates_width
 				)
@@ -74,7 +74,7 @@ class Renderer:
 				file_text,
 				(
 					file_i * cfg.square_size + cfg.square_size//2 - 5,
-					cfg.dimensions[1] + cfg.coordinates_width//2 - 6
+					cfg.board_dims[1] + cfg.coordinates_width//2 - 6
 				)
 			)
 
@@ -87,7 +87,7 @@ class Renderer:
 				self.screen,
 				cfg.coordinates_bg_color,
 				(
-					cfg.dimensions[0],
+					cfg.board_dims[0],
 					rank_i * cfg.square_size,
 					cfg.coordinates_width,
 					cfg.square_size-1,
@@ -98,7 +98,7 @@ class Renderer:
 			self.screen.blit(
 				rank_text,
 				(
-					cfg.dimensions[0] + cfg.coordinates_width//2 - 6,
+					cfg.board_dims[0] + cfg.coordinates_width//2 - 6,
 					rank_i * cfg.square_size + cfg.square_size//2 - 5,
 				)
 			)
@@ -143,14 +143,14 @@ class Renderer:
 
 	def _highlight_coord(self, rect: pg.Surface) -> None:
 		center: tuple[int, int] = (cfg.square_size//2, cfg.square_size//2)
-		radius = cfg.square_size/6.5
+		radius = cfg.highlight_move_radius
 		pg.draw.circle(
 			rect, cfg.valid_color, center, radius
 		)
 
 	def _highlight_capture(self, rect: pg.Surface) -> None:
 		center: tuple[int, int] = (cfg.square_size//2, cfg.square_size//2)
-		radius = cfg.square_size*0.49
+		radius = cfg.highlight_capture_radius
 		pg.draw.circle(
 			rect, cfg.valid_color, center, radius, width=10
 		)
