@@ -75,7 +75,6 @@ def gui_loop(game: Game) -> None:
 				pg.quit()
 				exit()
 			elif event.type == pg.MOUSEBUTTONDOWN:
-				print(event.button)
 				if event.button == 1: # left click
 					selected = handle_left_click(game, selected)
 				elif event.button == 3: # right click

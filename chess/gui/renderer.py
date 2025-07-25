@@ -66,11 +66,47 @@ class Renderer:
 				image, (file * cfg.square_size, rank * cfg.square_size)
 			)
 
+	def _create_square_rect(self) -> pg.Surface:
+		rect_surface = pg.Surface(
+			(cfg.square_size, cfg.square_size),
+			pg.SRCALPHA
+		)
+
+		return rect_surface
+
+	def _highlight_coord(self, rect: pg.Surface) -> None:
+		center: tuple[int, int] = (cfg.square_size//2, cfg.square_size//2)
+		radius = cfg.square_size/6.5
+		pg.draw.circle(
+			rect, cfg.valid_color, center, radius
+		)
+
+	def _highlight_capture(self, rect: pg.Surface) -> None:
+		center: tuple[int, int] = (cfg.square_size//2, cfg.square_size//2)
+		radius = cfg.square_size*0.49
+		pg.draw.circle(
+			rect, cfg.valid_color, center, radius, width=10
+		)
+
+	def _blit_rect_on_coord(self, rect: pg.Surface, coord: Coordinate) -> None:
+		file_i, rank_i = coord.regular
+		left = file_i * cfg.square_size
+		top = rank_i * cfg.square_size
+
+		self.screen.blit(
+			rect,
+			pg.Rect((left, top), rect.get_size())
+		)
+
 	def highlight_squares(self, coords: set[Coordinate]) -> None:
 		for coord in coords:
-			file_i, rank_i = coord.regular
-			rect = pg.Rect(
-				file_i * cfg.square_size, rank_i * cfg.square_size,
-				cfg.square_size, cfg.square_size
-			)
-			pg.draw.rect(self.screen, cfg.valid_color, rect, width=4)
+			rect_surface: pg.Surface = self._create_square_rect()
+
+			# capture
+			if self.board[coord].piece:
+				self._highlight_capture(rect_surface)
+			# regular move
+			else:
+				self._highlight_coord(rect_surface)
+
+			self._blit_rect_on_coord(rect_surface, coord)
