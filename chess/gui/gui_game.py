@@ -26,6 +26,7 @@ def handle_left_click(
 			if coord in piece.legal_moves:
 				try:
 					game.play_turn(current_selected, coord)
+					game.update_legal_moves()
 				except Exception as e:
 					print(f'Error while moving piece: {e}')
 				new_selected = None
@@ -44,7 +45,6 @@ def handle_left_click(
 		# Only select if square has a piece belonging to current player
 		piece = game.board[coord].piece
 		if piece and piece.owner == game.current_player:
-			game.update_legal_moves()
 			new_selected = coord
 		else:
 			new_selected = None
@@ -52,6 +52,7 @@ def handle_left_click(
 	return new_selected
 
 def gui_loop(game: Game) -> None:
+	game.update_legal_moves()
 	renderer: Renderer = Renderer(game.board, screen)
 	selected: Coordinate | None = None
 	screen.fill(cfg.bg_color)
