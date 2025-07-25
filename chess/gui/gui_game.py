@@ -5,7 +5,6 @@ from chess.game.game import Game
 from chess.engine.setup import classic_setup
 from chess.gui.renderer import Renderer
 from chess.gui.input_handler import get_coord_from_mouse
-from chess.gui.config import cfg
 
 pg.init()
 pg.display.set_caption("Chess")
@@ -50,6 +49,10 @@ def handle_left_click(
 
 	return new_selected
 
+def update_display(renderer: Renderer) -> None:
+	renderer.screen.blit(renderer.board_screen, (0, 0))
+	pg.display.update()
+
 def gui_loop(game: Game) -> None:
 	game.update_legal_moves()
 	renderer: Renderer = Renderer(game.board)
@@ -58,7 +61,6 @@ def gui_loop(game: Game) -> None:
 	while True:
 		renderer.draw_board()
 		renderer.draw_pieces()
-		renderer.screen.blit(renderer.board_screen, (0,0))
 
 		# Highlight legal moves for selected piece
 		if selected:
@@ -68,7 +70,7 @@ def gui_loop(game: Game) -> None:
 			else:
 				selected = None
 
-		pg.display.update()
+		update_display(renderer)
 
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
