@@ -1,9 +1,15 @@
+import enum
 import pygame as pg
 from chess.engine.core import Coordinate, Color
 from chess.engine.piece import PieceType
 from chess.engine.board import Board
 from chess.gui.config import cfg, RGBColor
 from chess.gui.utils.asset_handler import load_piece_images
+
+class HighlightMode(enum.Enum):
+	VALID_MOVE = enum.auto()
+	CHECK = enum.auto()
+	CAPTURE = enum.auto()
 
 class Renderer:
 	def __init__(self, board: Board):
