@@ -8,7 +8,6 @@ from chess.gui.input_handler import get_coord_from_mouse
 from chess.gui.config import cfg
 
 pg.init()
-screen = pg.display.set_mode(cfg.dimensions)
 pg.display.set_caption("Chess")
 
 
@@ -53,12 +52,13 @@ def handle_left_click(
 
 def gui_loop(game: Game) -> None:
 	game.update_legal_moves()
-	renderer: Renderer = Renderer(game.board, screen)
+	renderer: Renderer = Renderer(game.board)
 	selected: Coordinate | None = None
-	screen.fill(cfg.bg_color)
+	renderer.draw_coordinates()
 	while True:
 		renderer.draw_board()
 		renderer.draw_pieces()
+		renderer.screen.blit(renderer.board_screen, (0,0))
 
 		# Highlight legal moves for selected piece
 		if selected:

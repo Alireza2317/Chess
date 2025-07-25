@@ -28,6 +28,6 @@ class ChessGUIConfig:
 	pieces_theme: str = 'neo_wood'
 
 	font_size: int = 20
-	coordinates_font_size: int = 14
+	coordinates_font_size: int = 16
 
 cfg: ChessGUIConfig = ChessGUIConfig()
