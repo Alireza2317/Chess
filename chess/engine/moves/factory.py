@@ -1,5 +1,5 @@
 from chess.engine.piece import Piece, PieceType
-from chess.engine.core import Color, Coordinate
+from chess.engine.core import Color, Coordinate, Direction
 from chess.engine.moves.move import Move
 from chess.engine.castle import CastleSide, CastleInfo
 
@@ -35,7 +35,12 @@ def create_move(
 		for side in (CastleSide.KINGSIDE, CastleSide.QUEENSIDE):
 			info.update_info(side)
 			if to_coord == info.king_end:
-				castle_side = side
+				coords: tuple[Coordinate | None, Coordinate | None] = (
+					info.king_end.shift(Direction(2, 0)),
+					info.king_end.shift(Direction(-2, 0))
+				)
+				if piece.coordinate in coords:
+					castle_side = side
 
 	# check promotion
 	if not simulation: # don't care about promotion in simulation mode
