@@ -45,8 +45,14 @@ class Renderer:
 				)
 		return images
 
-	def draw_coordinates(self) -> None:
+	def draw_coordinates(self, black_view: bool = False) -> None:
 		""" draws the chess coordinates on the side of the board. """
+		FILES: str = Coordinate.FILES
+		RANKS: str = Coordinate.RANKS[::-1]
+		if black_view:
+			FILES = Coordinate.FILES[::-1]
+			RANKS = Coordinate.RANKS
+
 		pg.draw.rect(
 			self.screen,
 			cfg.coordinates_bg_color,
@@ -68,7 +74,7 @@ class Renderer:
 			width=2
 		)
 
-		for file_i, file in enumerate(Coordinate.FILES):
+		for file_i, file in enumerate(FILES):
 			file_text: pg.Surface = self.small_font.render(
 				file, True, cfg.coordinates_text_color
 			)
@@ -94,7 +100,7 @@ class Renderer:
 				)
 			)
 
-		for rank_i, rank in enumerate(reversed(Coordinate.RANKS)):
+		for rank_i, rank in enumerate(RANKS):
 			rank_text: pg.Surface = self.small_font.render(
 				rank, True, cfg.coordinates_text_color
 			)
