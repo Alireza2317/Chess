@@ -4,7 +4,7 @@ from chess.engine.piece import Piece, PieceType
 from chess.game.game import Game
 from chess.engine.setup import classic_setup
 from chess.gui.renderer import Renderer
-from chess.gui.input_handler import get_coord_from_mouse
+from chess.gui.utils.mouse import get_coord
 
 pg.init()
 pg.display.set_caption("Chess")
@@ -25,7 +25,7 @@ def handle_left_click(
 		game: Game, current_selected: Coordinate | None
 ) -> Coordinate | None :
 	new_selected: Coordinate | None = None
-	coord: Coordinate | None = get_coord_from_mouse(pg.mouse.get_pos())
+	coord: Coordinate | None = get_coord(pg.mouse.get_pos())
 	if not coord:
 		return None
 	if current_selected:

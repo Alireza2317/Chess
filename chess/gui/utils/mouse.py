@@ -1,7 +1,7 @@
 from chess.engine.core import Coordinate
 from chess.gui.config import cfg
 
-def get_coord_from_mouse(pos: tuple[int, int]) -> Coordinate | None:
+def get_coord(pos: tuple[int, int]) -> Coordinate | None:
     x, y = pos
     file_idx: int = x // cfg.square_size
     rank_idx: int = 7 - (y // cfg.square_size)
