@@ -1,6 +1,6 @@
 import pygame as pg
-from chess.engine.core import Coordinate
-from chess.engine.piece import Piece
+from chess.engine.core import Coordinate, Color
+from chess.engine.piece import Piece, PieceType
 from chess.game.game import Game
 from chess.engine.setup import classic_setup
 from chess.gui.renderer import Renderer
@@ -9,6 +9,17 @@ from chess.gui.input_handler import get_coord_from_mouse
 pg.init()
 pg.display.set_caption("Chess")
 
+def check_promotion(game: Game, start: Coordinate, end: Coordinate) -> bool:
+	piece: Piece | None = game.board[start].piece
+	if not piece:
+		return False
+
+	if piece.type == PieceType.PAWN:
+		promotion_rank: str = '8' if piece.owner.color == Color.WHITE else '1'
+		if end.rank == promotion_rank:
+			return True
+
+	return False
 
 def handle_left_click(
 		game: Game, current_selected: Coordinate | None
@@ -23,7 +34,14 @@ def handle_left_click(
 		if piece is not None and piece.owner == game.current_player:
 			if coord in piece.legal_moves:
 				try:
-					game.play_turn(current_selected, coord)
+					if check_promotion(game, piece.coordinate, coord):
+						game.play_turn(
+							current_selected,
+							coord,
+							promotion=PieceType.QUEEN
+						)
+					else:
+						game.play_turn(current_selected, coord)
 					game.update_legal_moves()
 				except Exception as e:
 					print(f'Error while moving piece: {e}')
