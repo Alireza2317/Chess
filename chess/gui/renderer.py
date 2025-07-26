@@ -1,7 +1,7 @@
 import enum
 import pygame as pg
 from chess.engine.core import Coordinate, Color
-from chess.engine.piece import PieceType
+from chess.engine.piece import Piece, PieceType
 from chess.engine.board import Board
 from chess.gui.config import cfg, RGBColor
 from chess.gui.utils.asset_handler import load_piece_images
@@ -126,17 +126,16 @@ class Renderer:
 				rect
 			)
 
-	def draw_pieces(self) -> None:
-		for coord, square in self.board:
-			piece = square.piece
-			if not piece:
-				continue
+	def _draw_piece(self, piece: Piece) -> None:
+		file_i, rank_i = piece.coordinate.regular
+		image: pg.Surface = self.images[piece.owner.color, piece.type]
+		self.board_screen.blit(
+			image, (file_i * cfg.square_size, rank_i * cfg.square_size)
+		)
 
-			file_i, rank_i = coord.regular
-			image: pg.Surface = self.images[piece.owner.color, piece.type]
-			self.board_screen.blit(
-				image, (file_i * cfg.square_size, rank_i * cfg.square_size)
-			)
+	def draw_pieces(self) -> None:
+		for piece in self.board.all_pieces():
+			self._draw_piece(piece)
 
 	def _create_square_rect(self) -> pg.Surface:
 		rect_surface = pg.Surface(
@@ -161,12 +160,13 @@ class Renderer:
 		)
 
 	def _highlight_check(self, surface: pg.Surface) -> None:
-		pg.draw.rect(surface, cfg.in_check_color, surface.get_rect(), width=13)
+		pg.draw.rect(surface, cfg.in_check_color, surface.get_rect())
 
-	def highlight_check(self, coord: Coordinate) -> None:
+	def highlight_check(self, king: Piece) -> None:
 		surface: pg.Surface = self._create_square_rect()
 		self._highlight_check(surface)
-		self._blit_rect_on_coord(surface, coord)
+		self._blit_rect_on_coord(surface, king.coordinate)
+		self._draw_piece(king)
 
 	def _blit_rect_on_coord(self, surface: pg.Surface, coord: Coordinate) -> None:
 		file_i, rank_i = coord.regular

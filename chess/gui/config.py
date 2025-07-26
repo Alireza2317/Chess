@@ -21,7 +21,7 @@ class ChessGUIConfig:
 
 	valid_color: RGBColor = (90, 90, 90, 130)
 	selected_piece_color: RGBColor = (80, 80, 100, 130)
-	in_check_color: RGBColor = (240, 51, 73, 50)
+	in_check_color: RGBColor = (240, 51, 73, 150)
 
 	coordinates_text_color: RGBColor = (0, 0, 0)
 	coordinates_bg_color: RGBColor = (150, 150, 150)

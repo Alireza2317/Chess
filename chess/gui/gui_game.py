@@ -83,7 +83,7 @@ def gui_loop(game: Game) -> None:
 
 		if game.current_player.king:
 			if game.current_player.is_in_check():
-				renderer.highlight_check(game.current_player.king.coordinate)
+				renderer.highlight_check(game.current_player.king)
 
 		# Highlight legal moves for selected piece
 		if selected:
