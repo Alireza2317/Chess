@@ -112,9 +112,14 @@ def gui_loop(game: Game) -> None:
 					pass
 			elif event.type == pg.KEYDOWN:
 				if event.key == pg.K_u:
-					game.undo()
+					if not game.undo():
+						print('Cannot undo!')
+						# TODO: show message in game?
 				elif event.key == pg.K_r:
-					game.redo()
+					if not game.redo():
+						print('Cannot redo!')
+						# TODO: show message in game?
+
 
 if __name__ == '__main__':
 	pg.init()
