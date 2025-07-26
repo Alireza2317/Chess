@@ -65,5 +65,4 @@ class PromotionSelector:
 							if rect.collidepoint(pg.mouse.get_pos()):
 								selected = self.options[i]
 
-		print(f'returning {selected}')
 		return selected
