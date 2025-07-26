@@ -52,7 +52,7 @@ class Piece(ABC):
 		"""
 		if self in self.owner.pieces:
 			raise ValueError(f'{self} is already attached to {self.owner}!')
-		if self is self.owner.board:
+		if self in self.owner.board.all_pieces():
 			raise ValueError(f'{self} is already attached to board!')
 
 		self.owner.add_piece(self)
@@ -60,7 +60,7 @@ class Piece(ABC):
 	def detach_from_game(self) -> None:
 		if self not in self.owner.pieces:
 			raise ValueError(f'{self} is already detached from {self.owner}!')
-		if self is self.owner.board:
+		if self in self.owner.board.all_pieces():
 			raise ValueError(f'{self} is already detached from board!')
 
 		self.owner.remove_piece(self)
