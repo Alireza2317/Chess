@@ -189,8 +189,5 @@ class Renderer:
 					self._highlight_coord(rect_surface)
 				case HighlightMode.CAPTURE:
 					self._highlight_capture(rect_surface)
-				case HighlightMode.CHECK:
-					self._highlight_check(rect_surface)
-					print(f'highlighted check on {coord}')
 
 			self._blit_rect_on_coord(rect_surface, coord)
