@@ -113,6 +113,7 @@ class Game:
 
 		self.current_player.executer.redo(move)
 
+		# BUG: redoing a capture of a promoted piece leads to error
 		return True
 
 	def play_turn(
