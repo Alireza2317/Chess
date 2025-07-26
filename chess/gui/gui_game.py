@@ -2,10 +2,11 @@ import pygame as pg
 from chess.engine.core import Coordinate, Color
 from chess.engine.piece import Piece, PieceType
 from chess.game.game import Game
-from chess.engine.setup import classic_setup
+from chess.engine.setup import classic_setup, custom_setup
 from chess.gui.renderer import Renderer
 from chess.gui.utils.mouse import get_coord
 from chess.gui.utils.highlight import build_highlight_map
+from chess.gui.promotion_selection import PromotionSelector
 
 def check_promotion(game: Game, start: Coordinate, end: Coordinate) -> bool:
 	piece: Piece | None = game.board[start].piece
@@ -20,7 +21,7 @@ def check_promotion(game: Game, start: Coordinate, end: Coordinate) -> bool:
 	return False
 
 def handle_left_click(
-	game: Game, current_selected: Coordinate | None
+	game: Game, current_selected: Coordinate | None, renderer: Renderer | None = None
 ) -> Coordinate | None :
 	new_selected: Coordinate | None = None
 	coord: Coordinate | None = get_coord(pg.mouse.get_pos())
@@ -32,14 +33,20 @@ def handle_left_click(
 		if piece is not None and piece.owner == game.current_player:
 			if coord in piece.legal_moves:
 				try:
-					if check_promotion(game, piece.coordinate, coord):
-						game.play_turn(
-							current_selected,
-							coord,
-							promotion=PieceType.QUEEN
+					promotion = None
+					if renderer and check_promotion(game, piece.coordinate, coord):
+						selector: PromotionSelector = PromotionSelector(
+							renderer.screen,
+							piece.owner.color,
+							renderer.images
 						)
-					else:
-						game.play_turn(current_selected, coord)
+						promotion = selector.show()
+
+					game.play_turn(
+						current_selected,
+						coord,
+						promotion=promotion
+					)
 					game.update_legal_moves()
 				except Exception as e:
 					print(f'Error while moving piece: {e}')
@@ -100,7 +107,7 @@ def gui_loop(game: Game) -> None:
 				exit()
 			elif event.type == pg.MOUSEBUTTONDOWN:
 				if event.button == 1: # left click
-					selected = handle_left_click(game, selected)
+					selected = handle_left_click(game, selected, renderer)
 				elif event.button == 3: # right click
 					pass
 			elif event.type == pg.KEYDOWN:
@@ -112,5 +119,6 @@ def gui_loop(game: Game) -> None:
 if __name__ == '__main__':
 	pg.init()
 	pg.display.set_caption("Chess")
-	game = classic_setup()
+	#game = classic_setup()
+	game = custom_setup()
 	gui_loop(game)

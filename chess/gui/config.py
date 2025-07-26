@@ -26,6 +26,8 @@ class ChessGUIConfig:
 	coordinates_text_color: RGBColor = (0, 0, 0)
 	coordinates_bg_color: RGBColor = (150, 150, 150)
 
+	popup_color: RGBColor = (115, 115, 115)
+
 	highlight_capture_radius: float = square_size*0.49
 	highlight_move_radius: float = square_size*0.135
 
