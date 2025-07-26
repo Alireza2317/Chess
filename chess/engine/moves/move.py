@@ -41,11 +41,12 @@ class Move:
 
 		if self.captured:
 			desc += f', captured {self.captured}'
-		elif self.promotion:
-			desc += f', promoted to {self.promotion.name.title()}'
 		elif self.is_en_passant:
 			desc += ', en passant'
 		elif self.castle_side:
 			desc += f', castling {self.castle_side.name.title()}'
+
+		if self.promotion:
+			desc += f', promoted to {self.promotion.name.title()}'
 
 		return f'<Move {desc}>'
