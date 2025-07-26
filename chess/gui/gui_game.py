@@ -5,6 +5,7 @@ from chess.game.game import Game
 from chess.engine.setup import classic_setup
 from chess.gui.renderer import Renderer
 from chess.gui.utils.mouse import get_coord
+from chess.gui.utils.highlight import build_highlight_map
 
 pg.init()
 pg.display.set_caption("Chess")
@@ -80,11 +81,17 @@ def gui_loop(game: Game) -> None:
 		renderer.draw_board()
 		renderer.draw_pieces()
 
+		if game.current_player.king:
+			if game.current_player.is_in_check():
+				renderer.highlight_check(game.current_player.king.coordinate)
+
 		# Highlight legal moves for selected piece
 		if selected:
 			piece: Piece | None = game.board[selected].piece
 			if piece and piece.owner == game.current_player:
-				renderer.highlight_squares(piece.legal_moves)
+				renderer.highlight_squares(
+					build_highlight_map(game, piece.legal_moves)
+				)
 			else:
 				selected = None
 

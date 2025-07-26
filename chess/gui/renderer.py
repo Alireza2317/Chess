@@ -8,7 +8,6 @@ from chess.gui.utils.asset_handler import load_piece_images
 
 class HighlightMode(enum.Enum):
 	VALID_MOVE = enum.auto()
-	CHECK = enum.auto()
 	CAPTURE = enum.auto()
 
 class Renderer:
@@ -147,39 +146,51 @@ class Renderer:
 
 		return rect_surface
 
-	def _highlight_coord(self, rect: pg.Surface) -> None:
+	def _highlight_coord(self, surface: pg.Surface) -> None:
 		center: tuple[int, int] = (cfg.square_size//2, cfg.square_size//2)
 		radius = cfg.highlight_move_radius
 		pg.draw.circle(
-			rect, cfg.valid_color, center, radius
+			surface, cfg.valid_color, center, radius
 		)
 
-	def _highlight_capture(self, rect: pg.Surface) -> None:
+	def _highlight_capture(self, surface: pg.Surface) -> None:
 		center: tuple[int, int] = (cfg.square_size//2, cfg.square_size//2)
 		radius = cfg.highlight_capture_radius
 		pg.draw.circle(
-			rect, cfg.valid_color, center, radius, width=10
+			surface, cfg.valid_color, center, radius, width=10
 		)
 
-	def _blit_rect_on_coord(self, rect: pg.Surface, coord: Coordinate) -> None:
+	def _highlight_check(self, surface: pg.Surface) -> None:
+		pg.draw.rect(surface, cfg.in_check_color, surface.get_rect(), width=13)
+
+	def highlight_check(self, coord: Coordinate) -> None:
+		surface: pg.Surface = self._create_square_rect()
+		self._highlight_check(surface)
+		self._blit_rect_on_coord(surface, coord)
+
+	def _blit_rect_on_coord(self, surface: pg.Surface, coord: Coordinate) -> None:
 		file_i, rank_i = coord.regular
 		left = file_i * cfg.square_size
 		top = rank_i * cfg.square_size
 
 		self.board_screen.blit(
-			rect,
-			pg.Rect((left, top), rect.get_size())
+			surface,
+			pg.Rect((left, top), surface.get_size())
 		)
 
-	def highlight_squares(self, coords: set[Coordinate]) -> None:
-		for coord in coords:
+	def highlight_squares(
+		self, highlights: dict[Coordinate, HighlightMode]
+	) -> None:
+		for coord, mode in highlights.items():
 			rect_surface: pg.Surface = self._create_square_rect()
 
-			# capture
-			if self.board[coord].piece:
-				self._highlight_capture(rect_surface)
-			# regular move
-			else:
-				self._highlight_coord(rect_surface)
+			match mode:
+				case HighlightMode.VALID_MOVE:
+					self._highlight_coord(rect_surface)
+				case HighlightMode.CAPTURE:
+					self._highlight_capture(rect_surface)
+				case HighlightMode.CHECK:
+					self._highlight_check(rect_surface)
+					print(f'highlighted check on {coord}')
 
 			self._blit_rect_on_coord(rect_surface, coord)
