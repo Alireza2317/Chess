@@ -7,9 +7,6 @@ from chess.gui.renderer import Renderer
 from chess.gui.utils.mouse import get_coord
 from chess.gui.utils.highlight import build_highlight_map
 
-pg.init()
-pg.display.set_caption("Chess")
-
 def check_promotion(game: Game, start: Coordinate, end: Coordinate) -> bool:
 	piece: Piece | None = game.board[start].piece
 	if not piece:
@@ -23,7 +20,7 @@ def check_promotion(game: Game, start: Coordinate, end: Coordinate) -> bool:
 	return False
 
 def handle_left_click(
-		game: Game, current_selected: Coordinate | None
+	game: Game, current_selected: Coordinate | None
 ) -> Coordinate | None :
 	new_selected: Coordinate | None = None
 	coord: Coordinate | None = get_coord(pg.mouse.get_pos())
@@ -106,7 +103,14 @@ def gui_loop(game: Game) -> None:
 					selected = handle_left_click(game, selected)
 				elif event.button == 3: # right click
 					pass
+			elif event.type == pg.KEYDOWN:
+				if event.key == pg.K_u:
+					game.undo()
+				elif event.key == pg.K_r:
+					game.redo()
 
 if __name__ == '__main__':
+	pg.init()
+	pg.display.set_caption("Chess")
 	game = classic_setup()
 	gui_loop(game)
